@@ -1,0 +1,15 @@
+---
+- name: Ping Windows Machines
+  hosts: w3070
+  become: false
+  gather_facts: false
+  tasks:
+    - name: tests connection
+      ansible.windows.win_ping:
+- name: Ping Linux Machines
+  hosts: rpi
+  become: false
+  gather_facts: false
+  tasks:
+    - name: test connection
+      ping:
