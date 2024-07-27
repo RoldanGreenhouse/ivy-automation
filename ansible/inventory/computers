@@ -1,0 +1,12 @@
+all:
+    children:
+        windows:
+            hosts:
+                w3070:
+        linux:
+            hosts:
+                rpi:       
+        greenhouse:
+            hosts:
+                w3070:
+                rpi:
