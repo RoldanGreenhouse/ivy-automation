@@ -7,9 +7,15 @@
   gather_facts: false
   tasks:
     - name: test connection
+      debug:
+        msg:
+          - "Host {{ ansible_host }}"
+          - "Port {{ ansible_port }}"
       ping:
 - name: Ping Windows Machines
   hosts: w3070
+  vars_files:
+    - /greenhouse/ansible/config/secrets/vault.yml
   become: false
   gather_facts: false
   tasks:
