@@ -1,6 +1,8 @@
 ---
 - name: Ping Linux Machines
   hosts: rpi
+  vars_files:
+    - /greenhouse/ansible/config/secrets/vault.yml
   become: false
   gather_facts: false
   tasks:
