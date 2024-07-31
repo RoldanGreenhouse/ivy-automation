@@ -6,11 +6,12 @@
   become: false
   gather_facts: false
   tasks:
-    - name: test connection
+    - name: Printing some Debug Information
       debug:
         msg:
           - "Host {{ ansible_host }}"
           - "Port {{ ansible_port }}"
+    - name: test connection
       ping:
 - name: Ping Windows Machines
   hosts: w3070
