@@ -1,7 +1,7 @@
-ansible_port: {{ ansible_3070_port }}
-ansible_host: {{ ansible_3070_host }}
+ansible_port: "{{ ansible_3070_port }}"
+ansible_host: "{{ ansible_3070_host }}"
 ansible_connection: winrm
 ansible_winrm_transport: ntlm
 ansible_winrm_server_cert_validation: ignore
-ansible_user: {{ ansible_3070_user }}
-ansible_password: {{ ansible_3070_pass }}
+ansible_user: "{{ ansible_3070_user }}"
+ansible_password: "{{ ansible_3070_pass }}"
