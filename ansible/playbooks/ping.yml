@@ -1,6 +1,8 @@
 ---
 - name: Ping Windows Machines
   hosts: w3070
+  host_vars:
+    - /greenhouse/ansible/config/secrets/vault.yml
   become: false
   gather_facts: false
   tasks:
@@ -8,6 +10,8 @@
       ansible.windows.win_ping:
 - name: Ping Linux Machines
   hosts: rpi
+  host_vars:
+    - /greenhouse/ansible/config/secrets/vault.yml
   become: false
   gather_facts: false
   tasks:
