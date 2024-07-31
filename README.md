@@ -56,6 +56,20 @@ $ ssh-keygen -t ed25519 -C Ansible
 $ ssh-copy-id -i {oath of public ssh key. ie: /home/gh/.ssh/id.pub} {IP of the Server}
 ```
 
+### Vaults
+
+```bash
+$ ansible-vault create \
+    --vault-password-file /greenhouse/ansible/config/secrets/ansible_vault_password \
+    /greenhouse/ansible/config/secrets/vault.yml
+  
+$ ansible-vault edit \
+    --vault-password-file /greenhouse/ansible/config/secrets/ansible_vault_password \
+    /greenhouse/ansible/config/secrets/vault.yml
+```
+
+[ansible.cfg](./ansible/ansible.cfg)
+
 ### References
 
 [Official Docs - Debian installation]: https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html#installing-ansible-on-debian 	"Debian Installation"
