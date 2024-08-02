@@ -1,0 +1,32 @@
+# Ignore Ansible retry files
+*.retry
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Ignore roles directory except requirements.yml
+ansible/roles/**
+!roles/requirements.yml
+
+# Ignore inventory files
+# ansible/inventory/ # Not for now, but maybe in the future....
+
+# Ignore ssh folder
+ansible/ssh/**
+
+# Ignore secrets and passwords
+*secrets*
+*password*
+*vault*
+*.vault
+
+# Ignore log files
+*.log
+ansible/logs/**
+
+# Ignore compiled files
+*.pyc
+__pycache__/
