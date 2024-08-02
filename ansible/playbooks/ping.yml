@@ -1,24 +1,15 @@
 ---
 - name: Ping Linux Machines
-  hosts: rpi
+  hosts: linux
   vars_files:
-    - /greenhouse/ansible/config/secrets/vault.yml
-  become: false
-  gather_facts: false
+    - ../inventory/host_vars/vault.yml
   tasks:
-    - name: Printing some Debug Information
-      debug:
-        msg:
-          - "Host {{ ansible_host }}"
-          - "Port {{ ansible_port }}"
     - name: test connection
       ping:
 - name: Ping Windows Machines
-  hosts: w3070
+  hosts: windows
   vars_files:
-    - /greenhouse/ansible/config/secrets/vault.yml
-  become: false
-  gather_facts: false
+    - ../inventory/host_vars/vault.yml
   tasks:
     - name: tests connection
       ansible.windows.win_ping:
