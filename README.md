@@ -3,22 +3,53 @@
 
 ### Configuration
 
-To configure the project, we have created the folder `/etc/greenhouse/ansible` that will contain all necessary configs.
+To configure the project, we have created the folder `/greenhouse` that will contain this repository with all devops configs.
 
 See below the three of folders:
 
 ```
-+--- /
-     |--- /ansible
-          |--- /ivy-automation
-          |--- /config
-              |--- /ssh
-              |--- inventory
+/greenhouse/
+└── ivy-automation
+    ├── ansible
+    │   ├── ansible.cfg
+    │   ├── ansible_vault_password
+    │   ├── inventory
+    │   │   ├── computers
+    │   │   └── host_vars
+    │   │       ├── rpi.yml
+    │   │       ├── vault.yml
+    │   │       └── w3070.yml
+    │   ├── playbooks
+    │   │   ├── ping.yml
+    │   │   └── variable_checker.yml
+    │   └── ssh
+    │       ├── id_ansible
+    │       └── id_ansible.pub
+    ├── LICENSE
+    ├── profiles
+    │   └── ...
+    └── README.md
+
 ```
 
 #### Inventory
 
-File that will contain the list of IP, hostnames or DNS names that Ansible will manage.
+File that will contain the list of IP, hostnames or DNS names that Ansible will manage. On [ansible.cfg](./ansible/ansible.cfg) file, we have added the variable `inventory` that contains the path for the main inventory that we will use.
+
+```yml
+all:
+    children:
+        windows:
+            hosts:
+                w3070:
+        linux:
+            hosts:
+                rpi:       
+        greenhouse:
+            hosts:
+                w3070:
+                rpi:
+```
 
 #### Connectivity Check
 
@@ -58,17 +89,17 @@ $ ssh-copy-id -i {oath of public ssh key. ie: /home/gh/.ssh/id.pub} {IP of the S
 
 ### Vaults
 
+To make the setup, we created the file `inventory/host_vars/vault.yml` and added all credentials to make reference to them later on playbooks.
+
+Once created, just do `ansible-vault encrypt`.
+
 ```bash
-$ ansible-vault create \
-    --vault-password-file /greenhouse/ansible/config/secrets/ansible_vault_password \
-    /greenhouse/ansible/config/secrets/vault.yml
-  
-$ ansible-vault edit \
-    --vault-password-file /greenhouse/ansible/config/secrets/ansible_vault_password \
-    /greenhouse/ansible/config/secrets/vault.yml
+$ ansible-vault encrypt --vault-password-file ansible_vault_password inventory/host_vars/vault.yml
+$ ansible-vault view --vault-password-file ansible_vault_password inventory/host_vars/vault.yml  
+$ ansible-vault edit --vault-password-file ansible_vault_password inventory/host_vars/vault.yml
 ```
 
-[ansible.cfg](./ansible/ansible.cfg)
+On [ansible.cfg](./ansible/ansible.cfg) file, we have added the variable `vault_password_file` that contains the password used to encrypt in vault. So it won't require to use the flag `--vault-password-file ansible_vault_password` anymore.
 
 ### References
 
