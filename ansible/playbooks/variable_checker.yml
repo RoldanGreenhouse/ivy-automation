@@ -1,0 +1,23 @@
+---
+- name: Check not critical variables for Linux | rpi
+  hosts: rpi
+  vars_files:
+    - ../inventory/host_vars/vault.yml
+  tasks:
+    - name: Printing some Information
+      debug:
+        msg:
+          - "Host for RPI {{ ansible_host }}"
+          - "Port for RPI {{ ansible_port }}"
+          - "User for RPI {{ ansible_user }}"
+- name: Check not critical variables for Windows | w3070
+  hosts: w3070
+  vars_files:
+    - ../inventory/host_vars/vault.yml
+  tasks:
+    - name: Printing some Information
+      debug:
+        msg:
+          - "Host for RPI {{ ansible_host }}"
+          - "Port for RPI {{ ansible_port }}"
+          - "User for RPI {{ ansible_user }}"

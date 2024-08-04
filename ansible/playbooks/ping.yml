@@ -1,0 +1,15 @@
+---
+- name: Ping Linux Machines
+  hosts: linux
+  vars_files:
+    - ../inventory/host_vars/vault.yml
+  tasks:
+    - name: test connection
+      ping:
+- name: Ping Windows Machines
+  hosts: windows
+  vars_files:
+    - ../inventory/host_vars/vault.yml
+  tasks:
+    - name: tests connection
+      ansible.windows.win_ping:
