@@ -1,0 +1,96 @@
+---
+# Add flag [--ask-becomer-pass] as it requires Sudo privileges
+# Playbook to check and install Git, Docker, and Kubernetes on Debian/Ubuntu systems
+- name: Ensure Git, Docker, and Kubernetes are installed
+  hosts: linux  # Change this to target specific hosts or groups
+  vars_files:
+  - ../inventory/host_vars/vault.yml
+  become: yes  # Use sudo for privilege escalation
+
+  tasks:
+    # 1. Install Git
+    - name: Check if git is installed
+      command: git --version
+      register: git_installed
+      ignore_errors: yes
+
+    - name: Install Git if not present
+      apt:
+        name: git
+        state: present
+      when: git_installed.rc != 0  # Install Git if the check command fails
+
+    # 2. Install Docker
+    - name: Check if docker is installed
+      command: docker --version
+      register: docker_installed
+      ignore_errors: yes
+
+    - name: Install Docker if not present
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+      when: docker_installed.rc != 0
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      when: docker_installed.rc != 0
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+      when: docker_installed.rc != 0
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        state: present
+      when: docker_installed.rc != 0
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+      when: docker_installed.rc != 0
+
+    # 3. Install Kubernetes (kubectl and kubeadm)
+    - name: Check if kubectl is installed
+      command: kubectl version --client
+      register: kubectl_installed
+      ignore_errors: yes
+
+    - name: Install kubectl if not present
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+      when: kubectl_installed.rc != 0
+
+    - name: Add Kubernetes apt repository
+      apt_repository:
+        repo: "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+        state: present
+      when: kubectl_installed.rc != 0
+
+    - name: Install kubectl and kubeadm
+      apt:
+        name:
+          - kubectl
+          - kubeadm
+        state: present
+      when: kubectl_installed.rc != 0
+
+    - name: Ensure kubelet is running
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+      when: kubectl_installed.rc != 0
