@@ -5,9 +5,14 @@ all:
                 w3070:
         linux:
             hosts:
-                rpi:       
+                rpi:
+                debian:
+        vbox:
+            hosts:
+                debian:
         greenhouse:
             hosts:
                 w3070:
                 rpi:
+                debian:
                 

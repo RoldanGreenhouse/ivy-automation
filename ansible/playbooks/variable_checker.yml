@@ -7,9 +7,9 @@
     - name: Printing some Information
       debug:
         msg:
-          - "Host for RPI {{ ansible_host }}"
-          - "Port for RPI {{ ansible_port }}"
-          - "User for RPI {{ ansible_user }}"
+          - "Host for {{ ansible_host }}"
+          - "Port for {{ ansible_port }}"
+          - "User for {{ ansible_user }}"
 - name: Check not critical variables for Windows | w3070
   hosts: w3070
   vars_files:
@@ -18,6 +18,6 @@
     - name: Printing some Information
       debug:
         msg:
-          - "Host for RPI {{ ansible_host }}"
-          - "Port for RPI {{ ansible_port }}"
-          - "User for RPI {{ ansible_user }}"
+          - "Host for {{ ansible_host }}"
+          - "Port for {{ ansible_port }}"
+          - "User for {{ ansible_user }}"
