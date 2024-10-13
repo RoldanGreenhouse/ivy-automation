@@ -9,7 +9,15 @@
 ###############################################################################################
 
 export GREENHOUSE_INFRA="${BASE_GREENHOUSE_WORKSPACE}/ivy-automation"
+export GREENHOUSE_ANSIBLE="${GREENHOUSE_INFRA}/ansible"
+
 export GREENHOUSE_FRONTEND="${BASE_GREENHOUSE_WORKSPACE}/orquid-frontend"
+
+###############################################################################################
+## IMPORTS ####################################################################################
+###############################################################################################
+
+. /lib/ansible.sh
 
 ###############################################################################################
 ## ALIAS ######################################################################################
@@ -19,6 +27,9 @@ alias status="git status"
 alias commit="git commit -m"
 alias pull="git pull"
 alias push="git push"
+alias add="git add"
+alias restore="git restore"
+alias ls="ls -la"
 
 ###############################################################################################
 ## FUNCTIONS ##################################################################################
@@ -47,6 +58,7 @@ function init() {
 	echo -e "|  goto {whereToGo}           | Write goto and where do you aim to go to jump to the folder:           |"
 	echo -e "|                             |    + Workspace       -> gh                                             |"
 	echo -e "|                             |    + Ivy Automation  -> infra                                          |"
+	echo -e "|                             |        + Ansible     -> ansible                                        |"
 	echo -e "|                             |    + Orchid FrontEnd -> fe                                             |"
 	echo -e "|                             |                                                                        |"
 	echo -e "|                             | Example:                                                               |"
@@ -60,6 +72,9 @@ function init() {
 	echo -e "|  commit                     | git commit -m                                                          |"
 	echo -e "|  pull                       | git pull                                                               |"
 	echo -e "|  push                       | git push                                                               |"
+	echo -e "|  add                        | git add                                                               |"
+	echo -e "|  restore                    | git restore                                                               |"
+	echo -e "|  ls                         | ls -la                                                                 |"
 	echo -e "+------------------------------------------------------------------------------------------------------+"
 }
 
@@ -119,7 +134,8 @@ function gotoHelp() {
 	echo -e "+---------------------------------------------------------------------------------------------+"
 	echo -e "  Greenhouse                 |          |  "
 	echo -e "      |----> Workspace       | gh       | $BASE_GREENHOUSE_WORKSPACE "
-	echo -e "      |----> Ivy Automation  | infra    | $GREENHOUSE_INFRA "
+	echo -e "      |-+--> Ivy Automation  | infra    | $GREENHOUSE_INFRA "
+	echo -e "        |--> Ansible         | ansible  | $GREENHOUSE_ANSIBLE "
 	echo -e "      |----> Orchid FrontEnd | fe       | $GREENHOUSE_FRONTEND "
 	echo -e "+----------------------------------------------------------------------------------------------+"
 }
@@ -138,9 +154,17 @@ function goto() {
             echo -e "cd $GREENHOUSE_INFRA "
             cd $GREENHOUSE_INFRA
         ;;
+        'ansible')
+            echo -e "cd $GREENHOUSE_ANSIBLE "
+            cd $GREENHOUSE_ANSIBLE
+        ;;
         'fe')
             echo -e "cd $GREENHOUSE_FRONTEND "
             cd $GREENHOUSE_FRONTEND
+        ;;
+		*)
+            echo -e "There is not any defined route for [$1]..."
+            gotoHelp
         ;;
         esac
     else

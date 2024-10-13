@@ -1,0 +1,18 @@
+all:
+    children:
+        windows:
+            hosts:
+                w3070:
+        linux:
+            hosts:
+                rpi:
+                debian:
+        vbox:
+            hosts:
+                debian:
+        greenhouse:
+            hosts:
+                w3070:
+                rpi:
+                debian:
+                
