@@ -16,8 +16,9 @@ See below the three of folders:
     │   ├── inventory
     │   │   ├── computers
     │   │   └── host_vars
+    │   │       ├── debian.yml
     │   │       ├── rpi.yml
-    │   │       ├── vault.yml
+    │   │       ├── vault.yml (only on the machine. Ignored on repo.)
     │   │       └── w3070.yml
     │   ├── playbooks
     │   │   ├── ping.yml
@@ -44,11 +45,16 @@ all:
                 w3070:
         linux:
             hosts:
-                rpi:       
+                rpi:
+                debian:
+        vbox:
+            hosts:
+                debian:
         greenhouse:
             hosts:
                 w3070:
                 rpi:
+                debian:
 ```
 
 #### Connectivity Check
