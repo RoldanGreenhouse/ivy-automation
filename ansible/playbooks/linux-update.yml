@@ -2,6 +2,8 @@
 # Playbook to update and upgrade packages on Debian/Ubuntu systems
 - name: Update and upgrade all Debian/Ubuntu systems
   hosts: linux  # Change this to target specific hosts or groups
+  vars_files:
+    - ../inventory/host_vars/vault.yml
   become: yes  # Ensures that the playbook is run as a sudo user
   tasks:
 
