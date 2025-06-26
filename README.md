@@ -135,6 +135,18 @@ Explanation of Commands:
 - `systemctl stop <service>`: Stops the service immediately.
 - `systemctl disable <service>`: Disables the service from starting at boot.
 
+## Docker
+
+Starting with the design of the infrastructure for the application.
+
+*  [docker-compose.yml](docker/docker-compose.yml): [Nginx][nginx] + [Wireguard][wireguard] images.
+
+### Docker Hub Links
+
++ [nginx]: https://hub.docker.com/_/nginx
+
++ [wireguard]: https://hub.docker.com/r/linuxserver/wireguard
+
 ## Nice Readings
 
 * [Software Architecture Patterns](https://dev.to/somadevtoo/9-software-architecture-patterns-for-distributed-systems-2o86)
