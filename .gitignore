@@ -30,3 +30,8 @@ ansible/logs/**
 # Ignore compiled files
 *.pyc
 __pycache__/
+
+# Secrets from docker in local development
+docker/env
+# volume - bind 
+docker/wireguard 

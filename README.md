@@ -152,10 +152,36 @@ To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the 
 
 The ports at the moment to be opened & forwarded are:
 
-| Application |       Port       |
-| :---------: | :--------------: |
-|  Wireguard  | 51820<br />51821 |
-| Main Nginx  |        80        |
+| Application |    Port     |
+| :---------: | :---------: |
+|  Wireguard  | 51820-51821 |
+| Main Nginx  |     80      |
+
+#### Firewall on Windows
+
+Search and open **Windows Defender Firewall**. Go to **Advanced settings**
+
+![windows-defender-firewall](./README.assets/windows-defender-firewall.png)
+
+Go to **Inbound Rules** and **New Rule...** as we are allowing external connections.
+
+![windows-inbound](./README.assets/windows-defender-firewall-inbound.png)
+
+Click on **Port** and add the list of ports provided above + click on **TCP**.
+
+![windows-inbound-port](./README.assets/windows-defender-firewall-inbound-port.png)
+
+![windows-inbound-port-01](./README.assets/windows-defender-firewall-inbound-port-01.png)
+
+Let's go at the moment with Allow the connection option.
+
+![windows-inbound-port-02](./README.assets/windows-defender-firewall-inbound-port-02.png)
+
+![windows-inbound-port-03](./README.assets/windows-defender-firewall-inbound-port-03.png)
+
+Once completed, you will see the new rule on the Inbound Rules window. In this sample, **Greenhouse Ports**.
+
+![windows-inbound-port-04](./README.assets/windows-defender-firewall-inbound-port-04.png)
 
 #### Firewall on Mac
 
