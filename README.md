@@ -139,13 +139,82 @@ Explanation of Commands:
 
 Starting with the design of the infrastructure for the application.
 
-*  [docker-compose.yml](docker/docker-compose.yml): [Nginx][nginx] + [Wireguard][wireguard] images.
+*  [docker-compose.yml](docker/docker-compose.yml): [Nginx][nginx] + [Wireguard][wireguard]([wg-easy][ez_wg])  images.
+
+### Development
+
+To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the VPN you will have to do some additional changes on the machine.
+
+> First of all, log in on your router, and apply the port forwarding for the machine that you will use as a host.
+> The list of ports would be listed on the table of below.
+>
+> Each router has their own way of configuring this, so time to use Google.
+
+The ports at the moment to be opened & forwarded are:
+
+| Application |       Port       |
+| :---------: | :--------------: |
+|  Wireguard  | 51820<br />51821 |
+| Main Nginx  |        80        |
+
+#### Firewall on Mac
+
+Open the terminal and modify the next file
+
+``````bash
+> sudo nano /etc/pf.conf
+``````
+
+**For each** port that you want to open, add the next line:
+
+``````bash
+pass in proto tcp from any to any port [PORT]
+``````
+
+The next lines would be use to activate/deactivate the rule:
+
+``````bash
+> sudo pfctl -f /etc/pf.conf
+# Activate
+> sudo pfctl -e
+# Deactivate
+> sudo pfctl -d
+``````
+
+To test if it is working or not:
+
+``````bash
+> sudo lsof -i :[PORT]
+
+# The expected response should something similar to this:
+
+> sudo lsof -i :51820
+COMMAND    PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+com.docke 3836   usename  200u  IPv6 0x0000000000000001      0t0  UDP *:51820
+> sudo lsof -i :51821
+COMMAND    PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+com.docke 3836   usename  199u  IPv6 0x0000000000000001      0t0  TCP *:51821 (LISTEN)
+``````
+
+#### How to Forward traffic from [NoIp](https://www.noip.com/) to the computer
+
+The way how the Internet provider maintain our IP can be different. They can update our IP when we restart the router or in any moment. 
+
+There are lot of webages that can provide this info ([ipinfo.io](https://ipinfo.io/what-is-my-ip), [ipaddress.my](https://www.ipaddress.my/), [showmyip.com](https://www.showmyip.com/), [whatismyip.com](https://www.whatismyip.com/)...).
+
+> Why NoIp? They offer by free one hostname which we will use to forward our traffic for, here it comes, **FREE**.
+
+The screenshot of below shows how the NoIp hostname page looks like. Here you will see your hostname plus the IP where is aiming at the moment. When you are developing, you can, a, ping directly your public IP or b, use this domain.
+
+![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
 
 ### Docker Hub Links
 
 + [nginx]: https://hub.docker.com/_/nginx
 
 + [wireguard]: https://hub.docker.com/r/linuxserver/wireguard
+
++ [ez_wg]: https://hub.docker.com/r/weejewel/wg-easy
 
 ## Nice Readings
 

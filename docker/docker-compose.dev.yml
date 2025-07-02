@@ -1,0 +1,44 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: dummy_nginx
+    ports:
+     - 80:80
+    networks:
+      - greenhouse-infra
+    restart: unless-stopped
+    depends_on:
+      - wireguard
+
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:15.1.0
+    container_name: vpn
+    networks:
+      - greenhouse-infra
+    volumes:
+      - type: bind
+        target: /etc/wireguard
+        source: ./wireguard
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+    restart: unless-stopped
+
+networks:
+  greenhouse-infra:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.42.42.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64
