@@ -13,8 +13,8 @@ services:
       greenhouse-infra:
         ipv4_address: 42.42.42.30
     volumes:
-      - ./adguard/work:/opt/adguardhome/work
-      - ./adguard/conf:/opt/adguardhome/conf
+      - ./adguard/dev/work:/opt/adguardhome/work
+      - ./adguard/dev/conf:/opt/adguardhome/conf
     ports:
       - 53:53/tcp 
       - 53:53/udp
@@ -29,7 +29,7 @@ services:
       greenhouse-infra:
         ipv4_address: 42.42.42.20
     volumes:
-      - ./wireguard:/etc/wireguard
+      - ./wireguard/dev:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     ports:
       - "51820:51820/udp"
@@ -52,6 +52,6 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./nginx/conf:/etc/nginx/conf.d:ro
+      - ./nginx/dev:/etc/nginx/conf.d:ro
       - ./nginx/html:/usr/share/nginx/html
     restart: always
