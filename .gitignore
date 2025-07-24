@@ -32,6 +32,6 @@ ansible/logs/**
 __pycache__/
 
 # Secrets from docker in local development
-docker/env
+docker/
 # volume - bind 
-docker/wireguard 
+docker/wireguard/prod
