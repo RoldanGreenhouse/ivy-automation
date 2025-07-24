@@ -1,0 +1,57 @@
+networks:
+  greenhouse-infra:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 42.42.42.0/24
+          gateway: 42.42.42.42
+
+services:
+  adguard:
+    image: adguard/adguardhome:v0.107.63
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.30
+    volumes:
+      - ./adguard/dev/work:/opt/adguardhome/work
+      - ./adguard/dev/conf:/opt/adguardhome/conf
+    ports:
+      - 53:53/tcp 
+      - 53:53/udp
+
+      - 8080:80/tcp
+      - 3000:3000/tcp
+    restart: unless-stopped
+
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:15.1.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.20
+    volumes:
+      - ./wireguard/dev:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    environment:
+      WG_DEFAULT_DNS: "42.42.42.30" # Point clients to our DNS
+      WG_ALLOWED_IPS: "42.42.42.0/24,192.168.0.0/24"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25.3
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.10
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/dev:/etc/nginx/conf.d:ro
+      - ./nginx/html:/usr/share/nginx/html
+    restart: always
