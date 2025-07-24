@@ -152,12 +152,19 @@ To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the 
 
 The ports at the moment to be opened & forwarded are:
 
-| Application |    Port     |
-| :---------: | :---------: |
-|  Wireguard  | 51820-51821 |
-| Main Nginx  |     80      |
+| Application | Port  | Description      |
+| :---------: | :---: | ---------------- |
+|  Wireguard  | 51820 | VPN connectivity |
+|  Wireguard  | 51821 | UI               |
+|   Adguard   | 3000  | Initial config   |
+|   Adguard   | 8080  | UI               |
+| Main Nginx  |  80   | Dummy UI         |
 
-#### Firewall on Windows
+#### Firewall
+
+The only port at the moment that is required to be included on the firewall is the connectivity for port for [Wireguard][wireguard], port **51820**.
+
+##### Windows
 
 Search and open **Windows Defender Firewall**. Go to **Advanced settings**
 
@@ -183,7 +190,7 @@ Once completed, you will see the new rule on the Inbound Rules window. In this s
 
 ![windows-inbound-port-04](./README.assets/windows-defender-firewall-inbound-port-04.png)
 
-#### Firewall on Mac
+##### Mac
 
 Open the terminal and modify the next file
 
