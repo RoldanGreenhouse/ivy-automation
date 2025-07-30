@@ -34,9 +34,6 @@ services:
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"
-    environment:
-      WG_DEFAULT_DNS: "42.42.42.30" # Point clients to our DNS
-      WG_ALLOWED_IPS: "42.42.42.0/24,192.168.0.0/24"
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -52,6 +49,6 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./nginx/dev:/etc/nginx/conf.d:ro
-      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/dev/conf:/etc/nginx/conf.d:ro
+      - ./nginx/dev/html:/usr/share/nginx/html
     restart: always
