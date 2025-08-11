@@ -24,6 +24,3 @@ BICYA='\e[1;96m';   ON_CYA='\e[46m';    ON_ICYA='\e[0;106m';
 BIWHI='\e[1;97m';   ON_WHI='\e[47m';    ON_IWHI='\e[0;107m';
 
 export COLORS_SH_IMPORTED=true
-
-# echo -e "${GRE}#::colors.sh::#${RED} Regular    ${BRED}Bold    ${URED}Underline   ${IRED}High Intensity ${NC}"
-# echo -e "${GRE}#::colors.sh::#${BIRED}BoldHigh Intens    ${ON_RED}Background  ${ON_IRED}High Intensity Backgrounds ${NC}"

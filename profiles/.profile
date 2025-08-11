@@ -189,6 +189,16 @@ function DoGoTo() {
     fi
 }
 
+function gotoHelpAlias() {
+    echo -e "${BBLU}      gotow  ${BLU}= goto ${YEL}workspace ${NC}"
+    echo -e "${BBLU}      gotol  ${BLU}= goto ${YEL}lirio ${NC}"
+    echo -e "${BBLU}      gotoh  ${BLU}= goto ${YEL}home ${NC}"
+    echo -e "${BBLU}      gotodu ${BLU}= goto ${YEL}docker-udemy ${NC}"
+    echo -e "${BBLU}      gotogh ${BLU}= goto ${YEL}greenhouse ${NC}"
+    echo -e "${BBLU}      gotoi  ${BLU}= goto ${YEL}ivy ${NC}"
+    echo -e "${BBLU}      gotod  ${BLU}= goto ${YEL}ivy-docker ${NC}"
+}
+
 function gotoHelp() {
     echo -e "${YEL} You can go to....${NC}"
     echo -e "${BLU}      workspace       - $WORKSPACE_PATH ${NC}"
@@ -197,23 +207,17 @@ function gotoHelp() {
     echo -e "${BLU}      greenhouse|gh   - $GREENHOUSE_PATH ${NC}"
     echo -e "${BLU}      ivy|i           - $IVY_PATH ${NC}"
     echo -e "${BLU}      ivy-docker|d    - $IVY_PATH/docker ${NC}"
-    echo -e "${YEL} Alias defined:${NC}"
-    echo -e "${BLU}      gotow  = goto ${YEL}workspace ${NC}"
-    echo -e "${BLU}      gotol  = goto ${YEL}lirio ${NC}"
-    echo -e "${BLU}      gotoh  = goto ${YEL}home ${NC}"
-    echo -e "${BLU}      gotodu = goto ${YEL}docker-udemy ${NC}"
-    echo -e "${BLU}      gotogh = goto ${YEL}greenhouse ${NC}"
-    echo -e "${BLU}      gotoi  = goto ${YEL}ivy ${NC}"
-    echo -e "${BLU}      gotod  = goto ${YEL}ivy-docker ${NC}"
+    echo -e "${BYEL} Alias ${YEL}defined:${NC}"
+    gotoHelpAlias
 }
 
 function sshInfo() {
-    echo -e "${YEL}Available connections: ${#sshkeys[@]}${NC}"
+    echo -e "   ${YEL}Available connections: ${#sshkeys[@]}${NC}"
 
     for sshuser in "${sshusers[@]}"; do
         sshkey="${sshkeys[$sshuser]}"
         sship="${sships[$sshuser]}"
-        echo -e "   ${GRE}ssh -i ${YEL}$sshkey $sshuser${GRE}@${YEL}$sship${NC}"
+        echo -e "      ${GRE}ssh -i ${YEL}$sshkey $sshuser${GRE}@${YEL}$sship${NC}"
     done
 }
 
@@ -234,30 +238,46 @@ function ssh-with() {
     fi
 }
 
+function colors-info() {
+    echo -e "   ${BGRE}List of Colors:$NC"
+    echo -e "      ${BLA}BLA|BLACK      ${RED}RED      ${GRE}GRE|GREEN       ${CYA}CYA|CYAN"
+    echo -e "      ${YEL}YEL|YELLOW     ${BLU}BLUE     ${PUR}PUR|PURPLE      ${WHI}WHI|WHITE"
+    echo -e "   ${BGRE}Format:$NC"
+    echo -e "      ${RED}Regular|{COLOR}$NC    ${BRED}Bold|B{COLOR}$NC    ${URED}Underline|UN{COLOR}$NC "
+    echo -e "      ${BIRED}BoldHigh Intens|BI{COLOR}$NC    ${ON_RED}Background|ON_{COLOR}$NC   ${IRED}High Intensity|I{COLOR}$NC"
+    echo -e "      ${ON_IRED}High Intensity Backgrounds|ON_I{COLOR}$NC"
+}
+
 function info() {
     echo -e "${GRE} ############################################################################################${NC}"
     echo -e "${GRE} # ${YEL}Alias     ${GRE}################################################################################${NC}"
     echo -e "${GRE} ############################################################################################${NC}"
-    echo -e "${BLU}      ls     = ls -a${NC}"
+    echo ""
+    echo -e "${BBLU}      ls     ${BLU}= ls -a${NC}"
+    gotoHelpAlias
+    echo ""
     echo -e "${GRE} ############################################################################################${NC}"
     echo -e "${GRE} # ${YEL}Functions ${GRE}################################################################################${NC}"
     echo -e "${GRE} ############################################################################################${NC}"
     echo ""
-    echo -e "${RED} - loadProfiling ${GRE}:${YEL} Copy from the workspace ivy-greenhouse repository the profile ${BYEL}[$GREENHOUSE_PROFILE_SCRIPT]${YEL}.  ${NC}"
-    echo -e "${RED} - editProfile ${GRE}:${YEL} Edit main profile ${BYEL}[$PROFILE_SCRIPT]${YEL} opening VS Code. ${NC}"
-    echo -e "${RED} - editGhProfile ${GRE}:${YEL} Edit Greenhouse profile ${BYEL}[$GREENHOUSE_PROFILE_SCRIPT]${YEL} opening VS Code. ${NC}"
-    echo -e "${RED} - reloadProfile ${GRE}:${YEL} Reload profile ${BYEL}[$PROFILE_SCRIPT]${YEL}. ${NC}"
+    echo -e "${RED} -$BRED loadProfiling ${GRE}:${YEL} Copy from the workspace ivy-greenhouse repository the profile ${BYEL}[$GREENHOUSE_PROFILE_SCRIPT]${YEL}.  ${NC}"
+    echo -e "${RED} -$BRED editProfile ${GRE}:${YEL} Edit main profile ${BYEL}[$PROFILE_SCRIPT]${YEL} opening VS Code. ${NC}"
+    echo -e "${RED} -$BRED editGhProfile ${GRE}:${YEL} Edit Greenhouse profile ${BYEL}[$GREENHOUSE_PROFILE_SCRIPT]${YEL} opening VS Code. ${NC}"
+    echo -e "${RED} -$BRED reloadProfile ${GRE}:${YEL} Reload profile ${BYEL}[$PROFILE_SCRIPT]${YEL}. ${NC}"
     echo ""
-    echo -e "${RED} - getProfileOS ${GRE}:${YEL} Get OS Name. ${NC}"
-    echo -e "${RED} - getProfileOsName ${GRE}:${YEL} Get OS profile name. ${NC}"
+    echo -e "${RED} -$BRED getProfileOS ${GRE}:${YEL} Get OS Name. ${NC}"
+    echo -e "${RED} -$BRED getProfileOsName ${GRE}:${YEL} Get OS profile name. ${NC}"
     echo ""
-    echo -e "${RED} - goto ${GRE}:${YEL} giving the \"where\" will do a cd to that address. ${NC}"
+    echo -e "${RED} -$BRED goto ${GRE}:${YEL} giving the \"where\" will do a cd to that address. ${NC}"
     gotoHelp
     echo ""
-    echo -e "${RED} - sshWith ${GRE}:${YEL} giving the \"user\" will connect using ssh to the giving configured key & ip. ${NC}"
+    echo -e "${RED} -$BRED ssh-with ${GRE}:${YEL} giving the \"user\" will connect using ssh to the giving configured key & ip. ${NC}"
     echo -e "${YEL}   SSH Info: users stored [${#sshusers[@]}] | keys stored [${#sshkeys[@]}] | connections stored [${#sships[@]}].${NC}"
     echo -e "${RED}   WARN: If numbers are not matching, some connection could not work${NC}"
     sshInfo
+    echo ""
+    echo -e "${RED} -$BRED colors-info ${GRE}:${YEL} Shows list of colors and format. ${NC}"
+    colors-info
     echo ""
     echo -e "${GRE} ############################################################################################${NC}"
 }
