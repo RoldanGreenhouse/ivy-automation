@@ -2,7 +2,7 @@ http:
   pprof:
     port: 6060
     enabled: false
-  address: 192.168.42.30:80
+  address: 82.82.82.30:80
   session_ttl: 720h
 users:
   - name: admin
@@ -14,7 +14,7 @@ language: en
 theme: auto
 dns:
   bind_hosts:
-    - 192.168.42.30
+    - 82.82.82.30
   port: 53
   anonymize_client_ip: false
   ratelimit: 20
@@ -147,7 +147,7 @@ filtering:
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
     - domain: greenhouse.es
-      answer: 192.168.42.10
+      answer: 82.82.82.10
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576
