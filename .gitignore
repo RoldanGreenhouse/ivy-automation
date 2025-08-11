@@ -34,4 +34,4 @@ __pycache__/
 # Secrets from docker in local development
 docker/env
 # volume - bind 
-docker/adguard/dev/work
+docker/adguard/dev/work/**/**
