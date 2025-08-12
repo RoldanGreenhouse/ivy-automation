@@ -276,7 +276,7 @@ function info() {
     echo -e "${RED}   WARN: If numbers are not matching, some connection could not work${NC}"
     sshInfo
     echo ""
-    echo -e "${RED} -$BRED colors-info ${GRE}:${YEL} Shows list of colors and format. ${NC}"
+    echo -e "${RED} -$BRED colors-info ${GRE}:${YEL} Shows list of colors and formats. ${NC}"
     colors-info
     echo ""
     echo -e "${GRE} ############################################################################################${NC}"

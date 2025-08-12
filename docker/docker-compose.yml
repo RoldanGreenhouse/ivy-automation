@@ -1,5 +1,5 @@
 networks:
-  greenhouse-infra:
+  - greenhouse-infra:
     driver: bridge
     ipam:
       config:
