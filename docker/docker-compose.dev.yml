@@ -7,6 +7,11 @@ networks:
           gateway: 42.42.42.42
 
 services:
+  noip-sync:
+    image: noipcom/noip-duc:3.3.0
+    env_file: ./env/noip/.dev.env
+    restart: always
+
   adguard:
     image: adguard/adguardhome:v0.107.63
     networks:
