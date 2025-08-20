@@ -137,9 +137,7 @@ Explanation of Commands:
 
 ## Docker
 
-Starting with the design of the infrastructure for the application.
-
-*  [docker-compose.yml](docker/docker-compose.yml): [Nginx][nginx] + [Wireguard][wireguard]([wg-easy][ez_wg])  images.
+![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
 
 ### Development
 
@@ -159,6 +157,7 @@ The ports at the moment to be opened & forwarded are:
 |   Adguard   |   3000    |    3000    | Initial config   |
 |   Adguard   |   8080    |    8080    | UI               |
 | Main Nginx  |    80     |     80     | Dummy UI         |
+|  NoIP-duc   |     -     |     -      | No-IP sync       |
 
 #### Firewall
 
@@ -240,6 +239,8 @@ There are lot of webages that can provide this info ([ipinfo.io](https://ipinfo.
 The screenshot of below shows how the NoIp hostname page looks like. Here you will see your hostname plus the IP where is aiming at the moment. When you are developing, you can, a, ping directly your public IP or b, use this domain.
 
 ![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
+
+
 
 ### Configuration
 
