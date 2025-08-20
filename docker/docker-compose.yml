@@ -11,6 +11,11 @@ volumes:
   wireguard_conf:
 
 services:
+  noip-sync:
+    image: noipcom/noip-duc:3.3.0
+    env_file: ./env/noip/.env
+    restart: always
+
   adguard:
     image: adguard/adguardhome:v0.107.63
     networks:
