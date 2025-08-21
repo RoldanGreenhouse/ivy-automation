@@ -16,7 +16,7 @@ dns:
   bind_hosts:
     - 82.82.82.30
   port: 53
-  anonymize_client_ip: false
+  anonymize_client_ip: true
   ratelimit: 20
   ratelimit_subnet_len_ipv4: 24
   ratelimit_subnet_len_ipv6: 56
@@ -88,21 +88,21 @@ tls:
 querylog:
   dir_path: ""
   ignored: []
-  interval: 2160h
+  interval: 720h
   size_memory: 1000
   enabled: true
   file_enabled: true
 statistics:
   dir_path: ""
   ignored: []
-  interval: 24h
+  interval: 2160h
   enabled: true
 filters:
   - enabled: true
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
     name: AdGuard DNS filter
     id: 1
-  - enabled: false
+  - enabled: true
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
     name: AdAway Default Blocklist
     id: 2
@@ -134,7 +134,7 @@ filtering:
     ids: []
   protection_disabled_until: null
   safe_search:
-    enabled: false
+    enabled: true
     bing: true
     duckduckgo: true
     ecosia: true
