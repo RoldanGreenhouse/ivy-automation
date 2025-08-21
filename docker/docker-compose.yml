@@ -1,5 +1,65 @@
+networks:
+  greenhouse-infra:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 82.82.82.0/24
+          gateway: 82.82.82.1
+
+volumes:
+  adguard_work:
+  wireguard_conf:
+
 services:
-  nginx:
-    image: nginx:latest
+  noip-sync:
+    image: noipcom/noip-duc:3.3.0
+    env_file: ./env/noip/.env
+    restart: always
+
+  adguard:
+    image: adguard/adguardhome:v0.107.63
+    networks:
+      greenhouse-infra:
+        ipv4_address: 82.82.82.30
+    volumes:
+      - adguard_work:/opt/adguardhome/work
+      - ./adguard/prod/conf:/opt/adguardhome/conf
     ports:
-     - '80:80' 
+      - 53:53/tcp 
+      - 53:53/udp
+
+      - 8080:80/tcp
+      - 3000:3000/tcp
+    restart: unless-stopped
+
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:15.1.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: 82.82.82.20
+    volumes:
+      - wireguard_conf:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51800:51820/udp"
+      - "51801:51821/tcp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+    environment:
+      INSECURE: true
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25.3
+    networks:
+      greenhouse-infra:
+        ipv4_address: 82.82.82.10
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/prod/conf:/etc/nginx/conf.d:ro
+      - ./nginx/prod/html:/usr/share/nginx/html
+    restart: always

@@ -137,9 +137,7 @@ Explanation of Commands:
 
 ## Docker
 
-Starting with the design of the infrastructure for the application.
-
-*  [docker-compose.yml](docker/docker-compose.yml): [Nginx][nginx] + [Wireguard][wireguard]([wg-easy][ez_wg])  images.
+![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
 
 ### Development
 
@@ -152,13 +150,14 @@ To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the 
 
 The ports at the moment to be opened & forwarded are:
 
-| Application | Port  | Description      |
-| :---------: | :---: | ---------------- |
-|  Wireguard  | 51820 | VPN connectivity |
-|  Wireguard  | 51821 | UI               |
-|   Adguard   | 3000  | Initial config   |
-|   Adguard   | 8080  | UI               |
-| Main Nginx  |  80   | Dummy UI         |
+| Application | Ports DEV | Ports Prod | Description      |
+| :---------: | :-------: | :--------: | ---------------- |
+|  Wireguard  |   51820   |   51800    | VPN connectivity |
+|  Wireguard  |   51821   |   51801    | UI               |
+|   Adguard   |   3000    |    3000    | Initial config   |
+|   Adguard   |   8080    |    8080    | UI               |
+| Main Nginx  |    80     |     80     | Dummy UI         |
+|  NoIP-duc   |     -     |     -      | No-IP sync       |
 
 #### Firewall
 
@@ -240,6 +239,24 @@ There are lot of webages that can provide this info ([ipinfo.io](https://ipinfo.
 The screenshot of below shows how the NoIp hostname page looks like. Here you will see your hostname plus the IP where is aiming at the moment. When you are developing, you can, a, ping directly your public IP or b, use this domain.
 
 ![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
+
+
+
+### Configuration
+
+#### Wireguard
+
+For dev environment, the files are already committed on the repository, but at the time of doing it the deployment on your server, you will have to do it from the scratch.
+
+The current configuration that you will have to handle are:
+
+*  DNS configuration.
+* Host (in our case provided by NoIP).
+* User creation.
+
+> Make sure of doing all changes before creating any user. Once the user is imported to the client, there are configurations that if vary, you will have to reimport them, like DNS changes.
+
+A quick note over DNS configuration, is to add first the IP of Adguard, and later some extra DNS. [In our case we are using the DNS provided by the EU](https://www.joindns4.eu/for-public).
 
 ### Docker Hub Links
 
