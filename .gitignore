@@ -35,3 +35,4 @@ __pycache__/
 docker/env
 # volume - bind 
 docker/adguard/dev/work/**/**
+docker/timespeak/mariadb/**/**
