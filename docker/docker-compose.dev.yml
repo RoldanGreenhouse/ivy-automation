@@ -59,3 +59,38 @@ services:
       - ./nginx/dev/conf:/etc/nginx/conf.d:ro
       - ./nginx/dev/html:/usr/share/nginx/html
     restart: always
+
+  teamspeak:
+    image: teamspeak:3.13.7
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.40
+    ports:
+      - 9987:9987/udp         # Voice
+      - 127.0.0.1:10011:10011 # ServerQuery
+      - 127.0.0.1:30033:30033 # File transfer
+    env_file: ./env/teamspeak/.local.env
+    environment:
+      TS3SERVER_DB_PLUGIN: ts3db_mariadb
+      TS3SERVER_DB_SQLCREATEPATH: create_mariadb
+      TS3SERVER_DB_HOST: teamspeak-db
+      TS3SERVER_DB_NAME: teamspeak
+      TS3SERVER_DB_WAITUNTILREADY: 30
+      TS3SERVER_LICENSE: accept
+    volumes:
+      - /teamspeak/server:/var/ts3server
+    restart: always
+    depends_on:
+      teamspeak-db:
+        condition: service_started
+    
+  teamspeak-db:
+    image: mariadb:12.1.1-noble-rc
+    networks:
+      - greenhouse-infra
+    env_file: ./env/teamspeak/.local.env
+    environment:
+      MYSQL_DATABASE: teamspeak
+    volumes:
+      - ./teamspeak/mariadb:/var/lib/mysql:z
+    restart: always
