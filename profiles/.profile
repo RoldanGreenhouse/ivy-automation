@@ -30,7 +30,19 @@ function getProfileOS() {
 	fi
 }
 
-: "${BASE_PATH_SCRIPTS:="/Users/$USERNAME"}"
+function getBasePath() {
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "/c/Users/$USERNAME"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "/c/Users/$USERNAME"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "/Users/$USERNAME/.zshrc"
+	else # Linux
+		return "WIP"
+	fi
+}
+
+: "${BASE_PATH_SCRIPTS:=$(getBasePath)}"
 
 export PROFILE_SCRIPT="$BASE_PATH_SCRIPTS/$(getProfileOsName)"
 
@@ -39,6 +51,10 @@ export PROFILE_CONFIG_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAM
 
 export PROFILE_COLORS_SCRIPT_NAME=.greenhouse.colors
 export PROFILE_COLORS_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+
+echo "Loading Base Profile file [$PROFILE_SCRIPT]"
+echo "Loading Config for Profile from file [$PROFILE_CONFIG_SCRIPT_PATH]"
+echo "Loading Colors for Profile from file [$PROFILE_COLORS_SCRIPT_PATH]"
 
 if [[ -z "${CONFIG_IMPORTED}" ]]; then
     . $PROFILE_CONFIG_SCRIPT_PATH
