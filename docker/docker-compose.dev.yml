@@ -69,7 +69,7 @@ services:
       - 9987:9987/udp         # Voice
       - 127.0.0.1:10011:10011 # ServerQuery
       - 127.0.0.1:30033:30033 # File transfer
-    env_file: ./env/teamspeak/.local.env
+    env_file: ./env/teamspeak/.dev.env
     environment:
       TS3SERVER_DB_PLUGIN: ts3db_mariadb
       TS3SERVER_DB_SQLCREATEPATH: create_mariadb
@@ -78,7 +78,7 @@ services:
       TS3SERVER_DB_WAITUNTILREADY: 30
       TS3SERVER_LICENSE: accept
     volumes:
-      - /teamspeak/server:/var/ts3server
+      - ./teamspeak/server:/var/ts3server
     restart: always
     depends_on:
       teamspeak-db:
@@ -88,7 +88,7 @@ services:
     image: mariadb:12.1.1-noble-rc
     networks:
       - greenhouse-infra
-    env_file: ./env/teamspeak/.local.env
+    env_file: ./env/teamspeak/.dev.env
     environment:
       MYSQL_DATABASE: teamspeak
     volumes:
