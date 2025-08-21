@@ -36,3 +36,4 @@ docker/env
 # volume - bind 
 docker/adguard/dev/work/**/**
 docker/teamspeak/mariadb/**/**
+docker/teamspeak/server/logs/**/**
