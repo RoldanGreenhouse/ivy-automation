@@ -70,9 +70,9 @@ services:
       greenhouse-infra:
         ipv4_address: 82.82.82.40
     ports:
-      - 9987:9987/udp         # Voice
-      - 127.0.0.1:10011:10011 # ServerQuery
-      - 127.0.0.1:30033:30033 # File transfer
+      - "9987:9987/udp" # Voice
+      - "10011:10011"   # ServerQuery
+      - "30033:30033"   # File transfer
     environment:
       INIFILE: 1
       DIST_UPDATE: 0

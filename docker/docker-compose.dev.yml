@@ -69,8 +69,8 @@ services:
         ipv4_address: 42.42.42.40
     ports:
       - 9987:9987/udp         # Voice
-      - 127.0.0.1:10011:10011 # ServerQuery
-      - 127.0.0.1:30033:30033 # File transfer
+      - 10011:10011 # ServerQuery
+      - 30033:30033 # File transfer
     env_file: ./env/teamspeak/.dev.env
     environment:
       INIFILE: 1
