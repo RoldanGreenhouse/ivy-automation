@@ -139,8 +139,6 @@ Explanation of Commands:
 
 ![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
 
-### Development
-
 To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the VPN you will have to do some additional changes on the machine.
 
 > First of all, log in on your router, and apply the port forwarding for the machine that you will use as a host.
@@ -150,20 +148,23 @@ To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the 
 
 The ports at the moment to be opened & forwarded are:
 
-| Application | Ports DEV | Ports Prod | Description      |
-| :---------: | :-------: | :--------: | ---------------- |
-|  Wireguard  |   51820   |   51800    | VPN connectivity |
-|  Wireguard  |   51821   |   51801    | UI               |
-|   Adguard   |   3000    |    3000    | Initial config   |
-|   Adguard   |   8080    |    8080    | UI               |
-| Main Nginx  |    80     |     80     | Dummy UI         |
-|  NoIP-duc   |     -     |     -      | No-IP sync       |
+|           Application           | Ports DEV | Ports Prod | Description                                     |
+| :-----------------------------: | :-------: | :--------: | ----------------------------------------------- |
+|       [Wireguard][ez_wg]        |   51820   |   51800    | VPN connectivity                                |
+|       [Wireguard][ez_wg]        |   51821   |   51801    | UI                                              |
+|       [Adguard][adguard]        |   3000    |    3000    | Initial config                                  |
+|       [Adguard][adguard]        |   8080    |    8080    | UI                                              |
+|       [Main Nginx][nginx]       |    80     |     80     | Dummy UI                                        |
+|        [NoIP-duc][noip]         |     -     |     -      | No-IP sync                                      |
+| [Teamspeak (ertagh)][ts_ertagh] |   9987    |    9987    | Voice                                           |
+| [Teamspeak (ertagh)][ts_ertagh] |   10011   |   10011    | Server Query. **Not forwarded by the Router.**  |
+| [Teamspeak (ertagh)][ts_ertagh] |   30033   |   30033    | File transfer. **Not forwarded by the Router.** |
 
-#### Firewall
+### Firewall
 
 The only port at the moment that is required to be included on the firewall is the connectivity for port for [Wireguard][wireguard], port **51820**.
 
-##### Windows
+#### Windows
 
 Search and open **Windows Defender Firewall**. Go to **Advanced settings**
 
@@ -189,7 +190,7 @@ Once completed, you will see the new rule on the Inbound Rules window. In this s
 
 ![windows-inbound-port-04](./README.assets/windows-defender-firewall-inbound-port-04.png)
 
-##### Mac
+#### Mac
 
 Open the terminal and modify the next file
 
@@ -228,7 +229,7 @@ COMMAND    PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
 com.docke 3836   usename  199u  IPv6 0x0000000000000001      0t0  TCP *:51821 (LISTEN)
 ``````
 
-#### How to Forward traffic from [NoIp](https://www.noip.com/) to the computer
+### How to Forward traffic from [NoIp](https://www.noip.com/) to the computer
 
 The way how the Internet provider maintain our IP can be different. They can update our IP when we restart the router or in any moment. 
 
@@ -240,11 +241,7 @@ The screenshot of below shows how the NoIp hostname page looks like. Here you wi
 
 ![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
 
-
-
-### Configuration
-
-#### Wireguard
+### Wireguard
 
 For dev environment, the files are already committed on the repository, but at the time of doing it the deployment on your server, you will have to do it from the scratch.
 
@@ -258,13 +255,28 @@ The current configuration that you will have to handle are:
 
 A quick note over DNS configuration, is to add first the IP of Adguard, and later some extra DNS. [In our case we are using the DNS provided by the EU](https://www.joindns4.eu/for-public).
 
+### TeamSpeak
+
+On the first try I went for the [Official Image provided by Teamspeak][teamspeak], but they do not support the RPI architecture. 
+I did a little research and looking for number and [ertagh version][ts_ertagh] is the one that I like the most. The bad side of this is he does not use any volume, so if I run **down** or similar, the configuration will go bananas :D
+
+In any case. The port forwarding is only applied for port **9987** (voice channel), as for security reason, I will remain close access only on the local network for ports **10011** (Server Query) & **30033** (File Manager).
+
 ### Docker Hub Links
 
-+ [nginx]: https://hub.docker.com/_/nginx
++ [nginx]: https://hub.docker.com/_/nginx	"Official Nginx"
 
-+ [wireguard]: https://hub.docker.com/r/linuxserver/wireguard
++ [wireguard]: https://hub.docker.com/r/linuxserver/wireguard	"Official Wireguard"
 
-+ [ez_wg]: https://hub.docker.com/r/weejewel/wg-easy
++ [ez_wg]: https://hub.docker.com/r/weejewel/wg-easy	"Easy Wireguard"
+
++ [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard"
+
++ [teamspeak]: https://hub.docker.com/_/teamspeak "Official TeamSpeak"
+
++ [ts_ertagh]: https://hub.docker.com/r/ertagh/teamspeak3-server "TeamSpeak by ertagh"
+
++ [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
 
 ## Nice Readings
 
