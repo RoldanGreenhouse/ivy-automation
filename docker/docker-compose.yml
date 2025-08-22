@@ -9,8 +9,6 @@ networks:
 volumes:
   adguard_work:
   wireguard_conf:
-  teamspeak-server:
-  teamspeak-data-db:
 
 services:
   noip-sync:
@@ -67,36 +65,17 @@ services:
     restart: always
 
   teamspeak:
-    image: teamspeak:3.13.7
+    image: ertagh/teamspeak3-server:arm64v8-box-20240127
     networks:
       greenhouse-infra:
         ipv4_address: 82.82.82.40
     ports:
-      - 9987:9987/udp        
-      - 127.0.0.1:10011:10011
-      - 127.0.0.1:30033:30033
-    env_file: ./env/teamspeak/.env
+      - 9987:9987/udp         # Voice
+      - 127.0.0.1:10011:10011 # ServerQuery
+      - 127.0.0.1:30033:30033 # File transfer
     environment:
-      TS3SERVER_DB_PLUGIN: ts3db_mariadb
-      TS3SERVER_DB_SQLCREATEPATH: create_mariadb
-      TS3SERVER_DB_HOST: teamspeak-db
-      TS3SERVER_DB_NAME: teamspeak
-      TS3SERVER_DB_WAITUNTILREADY: 30
-      TS3SERVER_LICENSE: accept
-    volumes:
-      - teamspeak-server:/var/ts3server
-    restart: always
-    depends_on:
-      teamspeak-db:
-        condition: service_started
-    
-  teamspeak-db:
-    image: mariadb:12.1.1-noble-rc
-    networks:
-      - greenhouse-infra
-    env_file: ./env/teamspeak/.env
-    environment:
-      MYSQL_DATABASE: teamspeak
-    volumes:
-      - teamspeak-data-db:/var/lib/mysql:z
+      INIFILE: 1
+      DIST_UPDATE: 0
+      TS_UPDATE: 0
+      TS_UPDATE_BACKUP: 0
     restart: always
