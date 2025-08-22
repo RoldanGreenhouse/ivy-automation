@@ -63,3 +63,19 @@ services:
       - ./nginx/prod/conf:/etc/nginx/conf.d:ro
       - ./nginx/prod/html:/usr/share/nginx/html
     restart: always
+
+  teamspeak:
+    image: ertagh/teamspeak3-server:arm64v8-box-20240127
+    networks:
+      greenhouse-infra:
+        ipv4_address: 82.82.82.40
+    ports:
+      - "9987:9987/udp" # Voice
+      - "10011:10011"   # ServerQuery
+      - "30033:30033"   # File transfer
+    environment:
+      INIFILE: 1
+      DIST_UPDATE: 0
+      TS_UPDATE: 0
+      TS_UPDATE_BACKUP: 0
+    restart: always

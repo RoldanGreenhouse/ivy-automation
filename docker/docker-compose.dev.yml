@@ -59,3 +59,22 @@ services:
       - ./nginx/dev/conf:/etc/nginx/conf.d:ro
       - ./nginx/dev/html:/usr/share/nginx/html
     restart: always
+
+  # The official image does not support RPI, so I have to move to ertagh image.
+  # I'm not happy but it has half million o fdownloads...
+  teamspeak:
+    image: ertagh/teamspeak3-server:arm64v8-box-20240127
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.40
+    ports:
+      - 9987:9987/udp         # Voice
+      - 10011:10011 # ServerQuery
+      - 30033:30033 # File transfer
+    env_file: ./env/teamspeak/.dev.env
+    environment:
+      INIFILE: 1
+      DIST_UPDATE: 0
+      TS_UPDATE: 0
+      TS_UPDATE_BACKUP: 0
+    restart: always
