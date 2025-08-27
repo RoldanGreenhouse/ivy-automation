@@ -66,7 +66,10 @@ if [[ -z "${COLORS_SH_IMPORTED}" ]]; then
     : "${COLORS_SH_IMPORTED:? The variable needs to be defined}" 
 fi
 
-export WORKSPACE_PATH=$BASE_PATH_SCRIPTS/Workspace
+: "${WORKSPACE_PATH:=$BASE_PATH_SCRIPTS/Workspace}"
+echo "Workspace defined at: [$WORKSPACE_PATH]"
+echo -e "${YEL}Remember that this can be modified if you add the variable on your .greenhouse.config$NC"
+
 export DOCKER_UDEMY_PATH=$WORKSPACE_PATH/udemy-docker-mastery
 export GREENHOUSE_PATH=$WORKSPACE_PATH/greenhouse
 export IVY_PATH=$GREENHOUSE_PATH/ivy-automation
@@ -217,12 +220,12 @@ function gotoHelpAlias() {
 
 function gotoHelp() {
     echo -e "${YEL} You can go to....${NC}"
-    echo -e "${BLU}      workspace       - $WORKSPACE_PATH ${NC}"
-    echo -e "${BLU}      lirio|home      - $BASE_PATH_SCRIPTS ${NC}"
-    echo -e "${BLU}      docker-udemy|du - $DOCKER_UDEMY_PATH ${NC}"
-    echo -e "${BLU}      greenhouse|gh   - $GREENHOUSE_PATH ${NC}"
-    echo -e "${BLU}      ivy|i           - $IVY_PATH ${NC}"
-    echo -e "${BLU}      ivy-docker|d    - $IVY_PATH/docker ${NC}"
+    echo -e "${BLU}      workspace       ${BBLU}- ${BIBLU}$WORKSPACE_PATH ${NC}"
+    echo -e "${BLU}      lirio|home      ${BBLU}- ${BIBLU}$BASE_PATH_SCRIPTS ${NC}"
+    echo -e "${BLU}      docker-udemy|du ${BBLU}- ${BIBLU}$DOCKER_UDEMY_PATH ${NC}"
+    echo -e "${BLU}      greenhouse|gh   ${BBLU}- ${BIBLU}$GREENHOUSE_PATH ${NC}"
+    echo -e "${BLU}      ivy|i           ${BBLU}- ${BIBLU}$IVY_PATH ${NC}"
+    echo -e "${BLU}      ivy-docker|d    ${BBLU}- ${BIBLU}$IVY_PATH/docker ${NC}"
     echo -e "${BYEL} Alias ${YEL}defined:${NC}"
     gotoHelpAlias
 }
