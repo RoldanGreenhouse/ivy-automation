@@ -1,0 +1,43 @@
+networks:
+  greenhouse-infra:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 42.42.42.0/24
+          gateway: 42.42.42.42
+
+services:
+
+  traefik:
+    image: traefik:3.5.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.50
+    volumes:
+      - ./traefik/${ENV}/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80         # HTTP
+      - 53:53/tcp     # Adguard DNS
+      - 53:53/udp     # Adguard DNS
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.rule=PathPrefix(`/traefik`)"
+      - "traefik.http.routers.dashboard.entrypoints=http"
+  
+  whoami:
+    image: traefik/whoami
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.60
+    restart: always
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+      
+      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=http"
