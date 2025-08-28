@@ -15,8 +15,10 @@ api:
 entryPoints:
   http:
     address: ":80"
-  dns:
+  dns-tcp:
     address: ":53"
+  dns-udp:
+    address: ":53/udp"
 
 log:
   level: DEBUG # Default Error. Available: DEBUG INFO WARN ERROR FATAL PANIC
