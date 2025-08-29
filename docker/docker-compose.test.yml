@@ -41,3 +41,23 @@ services:
       
       - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
       - "traefik.http.routers.whoami.entrypoints=http"
+
+  adguard:
+    image: adguard/adguardhome:v0.107.65
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.30
+    volumes:
+      - ./adguard/dev/work:/opt/adguardhome/work
+      - ./adguard/dev/conf:/opt/adguardhome/conf
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.services.adguard.loadbalancer.server.port=80"
+      
+      - "traefik.http.routers.adguard.rule=PathPrefix(`/adguard`)"
+      - "traefik.http.routers.adguard.entrypoints=http"
+
+      - "traefik.http.middlewares.adguard-stripprefix.stripprefix.prefixes=/adguard"
+      - "traefik.http.routers.adguard.middlewares=adguard-stripprefix"
