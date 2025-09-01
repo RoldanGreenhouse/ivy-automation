@@ -7,38 +7,88 @@ networks:
           gateway: 42.42.42.42
 
 services:
+
   noip-sync:
     image: noipcom/noip-duc:3.3.0
-    env_file: ./env/noip/.dev.env
+    env_file: ./env/noip/.${ENV}.env
+    container_name: ${ENV}-noip-sync
+    labels:
+      traefik.enable: false
+
+
+  traefik:
+    image: traefik:3.5.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.50
+    container_name: ${ENV}-traefik
+    volumes:
+      - ./traefik/${ENV}/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80             # HTTP
+      - 53:53/tcp         # Adguard DNS
+      - 53:53/udp         # Adguard DNS
+      - 51820:51820/udp   # Wireguard VPN
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.dashboard.rule: Host(`${ENV}.traefik.localhost`)
+      traefik.http.routers.dashboard.entrypoints: http
+      traefik.http.routers.dashboard.service: api@internal
+      # SERVICE
+      # MIDDLEWARE
+  
+  whoami:
+    image: traefik/whoami
+    networks:
+      greenhouse-infra:
+        ipv4_address: 42.42.42.60
+    scale: 1
     restart: always
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.whoami.rule: Host(`${ENV}.traefik.localhost`) && Path(`/whoami`)
+      traefik.http.routers.whoami.entrypoints: http
+      traefik.http.routers.whoami.service: whoami-service
+      # SERVICE
+      traefik.http.services.whoami-service.loadbalancer.server.port: 80
+      # MIDDLEWARE
+      
 
   adguard:
-    image: adguard/adguardhome:v0.107.63
+    image: adguard/adguardhome:v0.107.65
     networks:
       greenhouse-infra:
         ipv4_address: 42.42.42.30
+    container_name: ${ENV}-adguard
     volumes:
-      - ./adguard/dev/work:/opt/adguardhome/work
-      - ./adguard/dev/conf:/opt/adguardhome/conf
-    ports:
-      - 53:53/tcp 
-      - 53:53/udp
-
-      - 8080:80/tcp
-      - 3000:3000/tcp
+      - ./adguard/${ENV}/work:/opt/adguardhome/work
+      - ./adguard/${ENV}/conf:/opt/adguardhome/conf
+      - ./env/adguard/.${ENV}.credentials:/opt/adguardhome/users-file
     restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.adguard.rule: Host(`${ENV}.adguard.localhost`)
+      traefik.http.routers.adguard.entrypoints: http
+      # SERVICE
+      traefik.http.services.adguard.loadbalancer.server.port: 80
+      # MIDDLEWARE
 
   wireguard:
     image: ghcr.io/wg-easy/wg-easy:15.1.0
     networks:
       greenhouse-infra:
         ipv4_address: 42.42.42.20
+    container_name: ${ENV}-wireguard
+    ports: 
+      - "51820:51820/tcp"
     volumes:
-      - ./wireguard/dev:/etc/wireguard
+      - ./wireguard/${ENV}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
-    ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -47,18 +97,33 @@ services:
     environment:
       INSECURE: true
     restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.vpn-dashboard.rule: Host(`${ENV}.vpn.localhost`)
+      traefik.http.routers.vpn-dashboard.entrypoints: http
+      # SERVICE
+      traefik.http.services.vpn-dashboard.loadbalancer.server.port: 51821
+      # MIDDLEWARE
 
   nginx:
     image: nginx:1.25.3
     networks:
       greenhouse-infra:
         ipv4_address: 42.42.42.10
-    ports:
-      - 80:80
+    container_name: ${ENV}-nginx-static-pages
     volumes:
-      - ./nginx/dev/conf:/etc/nginx/conf.d:ro
-      - ./nginx/dev/html:/usr/share/nginx/html
+      - ./nginx/${ENV}/conf:/etc/nginx/conf.d:ro
+      - ./nginx/${ENV}/html:/usr/share/nginx/html
     restart: always
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.nginx-static-pages.rule: Host(`${ENV}.localhost`)
+      traefik.http.routers.nginx-static-pages.entrypoints: http
+      # SERVICE
+      traefik.http.services.nginx-static-pages.loadbalancer.server.port: 80
+      # MIDDLEWARE
 
   # The official image does not support RPI, so I have to move to ertagh image.
   # I'm not happy but it has half million o fdownloads...
@@ -67,14 +132,17 @@ services:
     networks:
       greenhouse-infra:
         ipv4_address: 42.42.42.40
+    container_name: ${ENV}-teamspeak
     ports:
-      - 9987:9987/udp         # Voice
-      - 10011:10011 # ServerQuery
-      - 30033:30033 # File transfer
-    env_file: ./env/teamspeak/.dev.env
+      - 9987:9987/udp   # Voice
+      - 10011:10011     # ServerQuery
+      - 30033:30033     # File transfer
+    env_file: ./env/teamspeak/.${ENV}.env
     environment:
       INIFILE: 1
       DIST_UPDATE: 0
       TS_UPDATE: 0
       TS_UPDATE_BACKUP: 0
     restart: always
+    labels:
+      traefik.enable: true
