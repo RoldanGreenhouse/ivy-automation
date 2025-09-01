@@ -106,6 +106,38 @@ filters:
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
     name: AdAway Default Blocklist
     id: 2
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_59.txt
+    name: AdGuard DNS Popup Hosts filter
+    id: 1755859578
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_48.txt
+    name: HaGeZi's Pro Blocklist
+    id: 1755859579
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_47.txt
+    name: HaGeZi's Gambling Blocklist
+    id: 1755859580
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt
+    name: HaGeZi's Windows/Office Tracker Blocklist
+    id: 1755859581
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt
+    name: HaGeZi's Samsung Tracker Blocklist
+    id: 1755859582
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_55.txt
+    name: HaGeZi's Badware Hoster Blocklist
+    id: 1755859583
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_54.txt
+    name: HaGeZi's DynDNS Blocklist
+    id: 1755859584
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_10.txt
+    name: Scam Blocklist by DurableNapkin
+    id: 1755859585
 whitelist_filters: []
 user_rules: []
 dhcp:
@@ -131,7 +163,8 @@ filtering:
   blocked_services:
     schedule:
       time_zone: UTC
-    ids: []
+    ids:
+      - 500px
   protection_disabled_until: null
   safe_search:
     enabled: true
@@ -145,9 +178,7 @@ filtering:
   blocking_mode: default
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
-  rewrites:
-    - domain: greenhouse.es
-      answer: 82.82.82.10
+  rewrites: []
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576
@@ -181,4 +212,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 29
+schema_version: 30
