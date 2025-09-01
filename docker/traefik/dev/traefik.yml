@@ -1,0 +1,21 @@
+# Docker configuration backend
+providers:
+  docker:
+    exposedByDefault: false
+    endpoint: "unix:///var/run/docker.sock"
+
+# API and dashboard configuration
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  http:
+    address: ":80"
+  dns-tcp:
+    address: ":53"
+  dns-udp:
+    address: ":53/udp"
+
+log:
+  level: DEBUG # Default Error. Available: DEBUG INFO WARN ERROR FATAL PANIC
