@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenhouse - Panel de Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0f3443 0%, #34e89e 100%);
+            padding: 12px 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            max-width: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 25px;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: #fff;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.12);
+            border: 1px solid transparent;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .content-area {
+            flex: 1;
+            background: #162447;
+            overflow: hidden;
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.35);
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            border-radius: 12px;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #34e89e;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #34e89e;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+                justify-content: center;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .nav-link {
+                text-align: center;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .logo-text {
+                font-size: 18px;
+            }
+            
+            .nav-link {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .content-area {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-seedling logo-icon"></i>
+                <div class="logo-text">Greenhouse</div>
+            </div>
+            <nav>
+                <a href="http://dev.localhost/index.html" class="nav-link active" target="contentFrame">Index</a>
+                <a href="http://dev.adguard.localhost/" class="nav-link" target="contentFrame">AdGuard</a>
+                <a href="http://dev.vpn.localhost" class="nav-link" target="contentFrame">Wireguard - VPN</a>
+                <a href="http://dev.traefik.localhost/dashboard/" class="nav-link" target="contentFrame">Traefik</a>
+                <a href="http://dev.traefik.localhost/whoami" class="nav-link" target="contentFrame">Traefik - Who Am I?</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="content-area">
+        <iframe name="contentFrame" src="http://dev.localhost/index.html"></iframe>
+        <div class="loader">
+            <div class="spinner"></div>
+            <p>Cargando contenido...</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.nav-link');
+            const iframe = document.querySelector('iframe');
+            const loader = document.querySelector('.loader');
+            
+            // Cargar la primera página por defecto
+            iframe.src = "http://dev.localhost/index.html";
+            
+            // Manejar el evento de clic en los enlaces
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Remover la clase active de todos los enlaces
+                    links.forEach(l => l.classList.remove('active'));
+                    
+                    // Añadir la clase active al enlace clickeado
+                    this.classList.add('active');
+                    
+                    // Mostrar el loader
+                    loader.style.display = 'block';
+                });
+            });
+            
+            // Ocultar el loader cuando el iframe termine de cargar
+            iframe.addEventListener('load', function() {
+                loader.style.display = 'none';
+            });
+            
+            // Manejar errores de carga
+            iframe.addEventListener('error', function() {
+                loader.style.display = 'none';
+                iframe.srcdoc = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                height: 100vh; 
+                                margin: 0; 
+                                background-color: #162447; 
+                                color: #e6e6e6;
+                            }
+                            .error-content { 
+                                text-align: center; 
+                                padding: 20px;
+                            }
+                            h2 { 
+                                color: #ff6b6b; 
+                                margin-bottom: 10px;
+                            }
+                            p {
+                                margin-bottom: 15px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="error-content">
+                            <h2>Error de carga</h2>
+                            <p>No se pudo cargar el contenido solicitado.</p>
+                            <p>Es posible que el servicio no esté disponible en este momento.</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
