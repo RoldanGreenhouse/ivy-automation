@@ -3,14 +3,12 @@ providers:
   docker:
     exposedByDefault: false
     endpoint: "unix:///var/run/docker.sock"
-    defaultRule: "Host(`test.localhost`)"
     network: "test_greenhouse-infra"
 
 # API and dashboard configuration
 api:
   dashboard: true
   insecure: true
-  basePath: /traefik
 
 entryPoints:
   http:
