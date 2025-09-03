@@ -14,4 +14,4 @@ entryPoints:
     address: ":80"
 
 log:
-  level: DEBUG # Default Error. Available: DEBUG INFO WARN ERROR FATAL PANIC
+  level: INFO # Default Error. Available: DEBUG INFO WARN ERROR FATAL PANIC
