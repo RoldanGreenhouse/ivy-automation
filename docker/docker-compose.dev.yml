@@ -19,7 +19,7 @@ services:
     image: noipcom/noip-duc:3.3.0
     env_file: ./env/noip/.${ENV}.env
     container_name: ${ENV}-noip-sync
-    scale: 1
+    scale: ${greenhouse_scale_noip_sync:-0}
     labels:
       traefik.enable: false
 
@@ -29,7 +29,7 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_ip}
     container_name: ${ENV}-traefik
-    scale: 1
+    scale: ${greenhouse_scale_traefik:-1}
     volumes:
       - ${greenhouse_traefik_config:-./traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -50,7 +50,7 @@ services:
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_whoami_ip}
-    scale: 1
+    scale: ${greenhouse_scale_traefik_whoami:-1}
     restart: always
     labels:
       traefik.enable: true
@@ -68,7 +68,7 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
     container_name: ${ENV}-adguard
-    scale: 1
+    scale: ${greenhouse_scale_adguard:-1}
     ports:
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
@@ -91,7 +91,7 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_wireguard_ip}
     container_name: ${ENV}-wireguard
-    scale: 1
+    scale: ${greenhouse_scale_wireguard:-1}
     ports: 
       - ${greenhouse_wireguard_port_ui:-51821}:51821
       - ${greenhouse_wireguard_port_vpn:-51820}:51820/udp
@@ -121,7 +121,7 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_nginx_static_pages_ip}
     container_name: ${ENV}-nginx-static-pages
-    scale: 1
+    scale: ${greenhouse_scale_nginx:-1}
     volumes:
       - ${greenhouse_nginx_static_pages_volume_conf:-./nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
       - ${greenhouse_nginx_static_pages_volume_html:-./nginx/${ENV}/html}:/usr/share/nginx/html
@@ -143,7 +143,7 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_teamspeak_ip}
     container_name: ${ENV}-teamspeak
-    scale: 1
+    scale: ${greenhouse_scale_teamspeak:-0}
     ports:
       - ${greenhouse_teamspeak_port_voice:-9987}:9987/udp   # Voice
       - ${greenhouse_teamspeak_port_query:-10011}:10011     # ServerQuery
