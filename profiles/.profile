@@ -257,6 +257,30 @@ function ssh-with() {
     fi
 }
 
+function greenhouse-help() {
+    echo -e "${GRE}Usage: greenhouse ${BLU}<environment> ${PUR}<command>${NC}"
+    echo -e ""
+    echo -e "${GRE}Manage docker-compose environments.${NC}"
+    echo -e ""
+    echo -e "${YEL}Parameters:${NC}"
+    echo -e "  ${BLU}environment: ${GRE}Target environment ${BGRE}[dev | test | preprod | prod].${NC}"
+    echo -e "  ${PUR}command:     ${GRE}Action to perform.${NC}"
+    echo -e ""
+    echo -e "${YEL}Available commands:${NC}"
+    echo -e "${PUR}  up, u        ${BPUR}- ${GRE}Start containers in detached mode.${NC}"
+    echo -e "${PUR}  down, d      ${BPUR}- ${GRE}Stop and remove containers, networks.${NC}"
+    echo -e "${PUR}  stop, s      ${BPUR}- ${GRE}Stop containers without removing them.${NC}"
+    echo -e "${PUR}  restart, r   ${BPUR}- ${GRE}Restart containers.${NC}"
+    echo -e "${PUR}  stop-up, su  ${BPUR}- ${GRE}Stop containers then start them again.${NC}"
+    echo -e "${PUR}  down-up, du  ${BPUR}- ${GRE}Remove containers then start them again.${NC}"
+    echo -e ""
+    echo -e "${CYA}Examples:${NC}"
+    echo -e "  ${GRE}greenhouse ${BLU}dev ${PUR}up${NC}"
+    echo -e "  ${GRE}greenhouse ${BLU}prod ${PUR}stop${NC}"
+    echo -e "  ${GRE}greenhouse ${BLU}test ${PUR}restart${NC}"
+    echo -e "  ${GRE}greenhouse ${BLU}preprod ${PUR}su${NC}"
+}
+
 function colors-info() {
     echo -e "   ${BGRE}List of Colors:$NC"
     echo -e "      ${BLA}BLA|BLACK      ${RED}RED      ${GRE}GRE|GREEN       ${CYA}CYA|CYAN"
