@@ -3,8 +3,8 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 42.42.42.0/24
-          gateway: 42.42.42.42
+        - subnet: ${greenhouse_network_subnet}
+          gateway: ${greenhouse_network_gateway}
 
 services:
 
@@ -20,7 +20,7 @@ services:
     image: traefik:3.5.0
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.50
+        ipv4_address: ${greenhouse_traefik_ip}
     container_name: ${ENV}-traefik
     volumes:
       - ./traefik/${ENV}/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -33,7 +33,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.dashboard.rule: Host(`${ENV}.traefik.localhost`)
+      traefik.http.routers.dashboard.rule: Host(`${greenhouse_traefik_host}`)
       traefik.http.routers.dashboard.entrypoints: http
       traefik.http.routers.dashboard.service: api@internal
       # SERVICE
@@ -43,13 +43,13 @@ services:
     image: traefik/whoami
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.60
+        ipv4_address: ${greenhouse_traefik_whoami_ip}
     scale: 1
     restart: always
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.whoami.rule: Host(`${ENV}.traefik.localhost`) && Path(`/whoami`)
+      traefik.http.routers.whoami.rule: Host(`${greenhouse_traefik_whoami_host}`) && Path(`/whoami`)
       traefik.http.routers.whoami.entrypoints: http
       traefik.http.routers.whoami.service: whoami-service
       # SERVICE
@@ -61,7 +61,7 @@ services:
     image: adguard/adguardhome:v0.107.65
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.30
+        ipv4_address: ${greenhouse_adguard_ip}
     container_name: ${ENV}-adguard
     volumes:
       - ./adguard/${ENV}/work:/opt/adguardhome/work
@@ -71,7 +71,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.adguard.rule: Host(`${ENV}.adguard.localhost`)
+      traefik.http.routers.adguard.rule: Host(`${greenhouse_adguard_host}`)
       traefik.http.routers.adguard.entrypoints: http
       # SERVICE
       traefik.http.services.adguard.loadbalancer.server.port: 80
@@ -81,11 +81,11 @@ services:
     image: ghcr.io/wg-easy/wg-easy:15.1.0
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.20
+        ipv4_address: ${greenhouse_wireguard_ip}
     container_name: ${ENV}-wireguard
     ports: 
-      - "51821:51821"
-      - "51820:51820/udp"
+      - 51821:51821
+      - 51820:51820/udp
     volumes:
       - ./wireguard/${ENV}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
@@ -100,8 +100,9 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.vpn-dashboard.rule: Host(`${ENV}.vpn.localhost`)
+      traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host}`)
       traefik.http.routers.vpn-dashboard.entrypoints: http
+      
       # SERVICE
       traefik.http.services.vpn-dashboard.loadbalancer.server.port: 51821
       # MIDDLEWARE
@@ -110,7 +111,7 @@ services:
     image: nginx:1.25.3
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.10
+        ipv4_address: ${greenhouse_nginx_static_pages_ip}
     container_name: ${ENV}-nginx-static-pages
     volumes:
       - ./nginx/${ENV}/conf:/etc/nginx/conf.d:ro
@@ -119,7 +120,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.nginx-static-pages.rule: Host(`${ENV}.localhost`)
+      traefik.http.routers.nginx-static-pages.rule: Host(`${greenhouse_nginx_static_pages_host}`)
       traefik.http.routers.nginx-static-pages.entrypoints: http
       # SERVICE
       traefik.http.services.nginx-static-pages.loadbalancer.server.port: 80
@@ -128,10 +129,10 @@ services:
   # The official image does not support RPI, so I have to move to ertagh image.
   # I'm not happy but it has half million o fdownloads...
   teamspeak:
-    image: ertagh/teamspeak3-server:arm64v8-box-20240127
+    image: ${greenhouse_teamspeak_image:-ertagh/teamspeak3-server}
     networks:
       greenhouse-infra:
-        ipv4_address: 42.42.42.40
+        ipv4_address: ${greenhouse_teamspeak_ip}
     container_name: ${ENV}-teamspeak
     ports:
       - 9987:9987/udp   # Voice
