@@ -1,10 +1,17 @@
 networks:
   greenhouse-infra:
+    name: ${greenhouse_network_name:-${ENV}-greenhouse-infra}
     driver: bridge
     ipam:
       config:
         - subnet: ${greenhouse_network_subnet}
           gateway: ${greenhouse_network_gateway}
+
+volumes:
+  adguard_work:
+    name: ${greenhouse_adguard_volume_work_name:-${ENV}_adguard_work}
+  wireguard_conf:
+    name: ${greenhouse_wireguard_volume_work_name:-${ENV}_wireguard_conf}
 
 services:
 
@@ -12,6 +19,7 @@ services:
     image: noipcom/noip-duc:3.3.0
     env_file: ./env/noip/.${ENV}.env
     container_name: ${ENV}-noip-sync
+    scale: 1
     labels:
       traefik.enable: false
 
@@ -21,13 +29,12 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_ip}
     container_name: ${ENV}-traefik
+    scale: 1
     volumes:
-      - ./traefik/${ENV}/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ${greenhouse_traefik_config:-./traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80             # HTTP
-      - 53:53/tcp         # Adguard DNS
-      - 53:53/udp         # Adguard DNS
     restart: unless-stopped
     labels:
       traefik.enable: true
@@ -54,7 +61,6 @@ services:
       # SERVICE
       traefik.http.services.whoami-service.loadbalancer.server.port: 80
       # MIDDLEWARE
-      
 
   adguard:
     image: adguard/adguardhome:v0.107.65
@@ -62,10 +68,13 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
     container_name: ${ENV}-adguard
+    scale: 1
+    ports:
+      - 53:53/tcp # Adguard DNS
+      - 53:53/udp # Adguard DNS
     volumes:
-      - ./adguard/${ENV}/work:/opt/adguardhome/work
-      - ./adguard/${ENV}/conf:/opt/adguardhome/conf
-      - ./env/adguard/.${ENV}.credentials:/opt/adguardhome/users-file
+      - ${greenhouse_adguard_volume_work}:/opt/adguardhome/work
+      - ${greenhouse_adguard_volume_conf:-./adguard/${ENV}/conf}:/opt/adguardhome/conf
     restart: unless-stopped
     labels:
       traefik.enable: true
@@ -82,11 +91,12 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_wireguard_ip}
     container_name: ${ENV}-wireguard
+    scale: 1
     ports: 
       - ${greenhouse_wireguard_port_ui:-51821}:51821
       - ${greenhouse_wireguard_port_vpn:-51820}:51820/udp
     volumes:
-      - ./wireguard/${ENV}:/etc/wireguard
+      - ${greenhouse_wireguard_volume}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     cap_add:
       - NET_ADMIN
@@ -111,9 +121,10 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_nginx_static_pages_ip}
     container_name: ${ENV}-nginx-static-pages
+    scale: 1
     volumes:
-      - ./nginx/${ENV}/conf:/etc/nginx/conf.d:ro
-      - ./nginx/${ENV}/html:/usr/share/nginx/html
+      - ${greenhouse_nginx_static_pages_volume_conf:-./nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
+      - ${greenhouse_nginx_static_pages_volume_html:-./nginx/${ENV}/html}:/usr/share/nginx/html
     restart: always
     labels:
       traefik.enable: true
@@ -132,11 +143,11 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_teamspeak_ip}
     container_name: ${ENV}-teamspeak
+    scale: 1
     ports:
       - ${greenhouse_teamspeak_port_voice:-9987}:9987/udp   # Voice
       - ${greenhouse_teamspeak_port_query:-10011}:10011     # ServerQuery
       - ${greenhouse_teamspeak_port_file:-30033}:30033      # File transfer
-    env_file: ./env/teamspeak/.${ENV}.env
     environment:
       INIFILE: 1
       DIST_UPDATE: 0
