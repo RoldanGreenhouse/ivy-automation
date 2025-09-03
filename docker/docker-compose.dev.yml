@@ -15,7 +15,6 @@ services:
     labels:
       traefik.enable: false
 
-
   traefik:
     image: traefik:3.5.0
     networks:
@@ -84,8 +83,8 @@ services:
         ipv4_address: ${greenhouse_wireguard_ip}
     container_name: ${ENV}-wireguard
     ports: 
-      - 51821:51821
-      - 51820:51820/udp
+      - ${greenhouse_wireguard_port_ui:-51821}:51821
+      - ${greenhouse_wireguard_port_vpn:-51820}:51820/udp
     volumes:
       - ./wireguard/${ENV}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
@@ -102,9 +101,8 @@ services:
       # ROUTER
       traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host}`)
       traefik.http.routers.vpn-dashboard.entrypoints: http
-      
       # SERVICE
-      traefik.http.services.vpn-dashboard.loadbalancer.server.port: 51821
+      traefik.http.services.vpn-dashboard.loadbalancer.server.port: ${greenhouse_wireguard_port_ui}
       # MIDDLEWARE
 
   nginx:
@@ -135,9 +133,9 @@ services:
         ipv4_address: ${greenhouse_teamspeak_ip}
     container_name: ${ENV}-teamspeak
     ports:
-      - 9987:9987/udp   # Voice
-      - 10011:10011     # ServerQuery
-      - 30033:30033     # File transfer
+      - ${greenhouse_teamspeak_port_voice:-9987}:9987/udp   # Voice
+      - ${greenhouse_teamspeak_port_query:-10011}:10011     # ServerQuery
+      - ${greenhouse_teamspeak_port_file:-30033}:30033      # File transfer
     env_file: ./env/teamspeak/.${ENV}.env
     environment:
       INIFILE: 1
