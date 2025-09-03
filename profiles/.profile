@@ -281,6 +281,88 @@ function greenhouse-help() {
     echo -e "  ${GRE}greenhouse ${BLU}preprod ${PUR}su${NC}"
 }
 
+function greenhouse() {
+    # Check parameter count
+    if [ $# -ne 2 ]; then
+        echo -e "${RED}Error: ${YEL}Invalid number of parameters $NC"
+        greenhouse-help
+        return 1
+    fi
+
+    local environment="$1"
+    local command="$2"
+    local compose_file="docker-compose.${environment}.yml"
+    local env_file="./env/.${environment}.env"
+
+    # Validate environment
+    case "$environment" in
+        dev|test|prod|preprod)
+            # Valid environment, continue
+            ;;
+        *)
+            echo -e "${RED}Error: ${YEL}Invalid environment '$environment'$NC"
+            greenhouse-help
+            return 1
+            ;;
+    esac
+
+    # Check if we're in the correct directory
+    if [ "$(pwd)" != "$IVY_PATH/docker" ]; then
+        if ! command -v gotod >/dev/null 2>&1; then
+            echo -e "${RED}Error: ${BYEL}gotod ${YEL}function not available and not in correct directory$NC"
+            return 1
+        fi
+        gotod || return 1
+    fi
+
+    # Check if compose file exists
+    if [ ! -f "$compose_file" ]; then
+        echo -e "${RED}Error: ${YEL}Docker compose file not found: $compose_file $NC"
+        return 1
+    fi
+
+    # Check if env file exists
+    if [ ! -f "$env_file" ]; then
+        echo -e "${RED}Error: ${YEL}Environment file not found: $env_file $NC"
+        return 1
+    fi
+
+    # Execute the appropriate command
+    case "$command" in
+        up|u)
+            echo -e "${GRE}Starting $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" up -d
+            ;;
+        down|d)
+            echo -e "${GRE}Stopping and removing $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" down
+            ;;
+        stop|s)
+            echo -e "${GRE}Stopping $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" stop
+            ;;
+        restart|r)
+            echo -e "${GRE}Restarting $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" restart
+            ;;
+        stop-up|su)
+            echo -e "${GRE}Stopping then starting $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" stop
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" up -d
+            ;;
+        down-up|du)
+            echo -e "${GRE}Removing then starting $environment environment... $NC"
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" down
+            docker compose -f "$compose_file" --env-file "$env_file" -p "$environment" up -d
+            ;;
+        *)
+            echo -e "${RED}Error: ${YEL}Invalid command '$command'${NC}"
+            greenhouse-help
+            return 1
+            ;;
+    esac
+}
+
 function colors-info() {
     echo -e "   ${BGRE}List of Colors:$NC"
     echo -e "      ${BLA}BLA|BLACK      ${RED}RED      ${GRE}GRE|GREEN       ${CYA}CYA|CYAN"
@@ -310,6 +392,10 @@ function info() {
     echo ""
     echo -e "${RED} -$BRED getProfileOS ${GRE}:${YEL} Get OS Name. ${NC}"
     echo -e "${RED} -$BRED getProfileOsName ${GRE}:${YEL} Get OS profile name. ${NC}"
+    echo ""
+    echo -e "${RED} -$BRED greenhouse ${GRE}:${YEL} Deploy docker-compose of greenhouse. ${NC}"
+    echo -e "${RED} -$BRED greenhouse-help ${GRE}:${YEL} greenhouse documentation function. ${NC}"
+    greenhouse-help
     echo ""
     echo -e "${RED} -$BRED goto ${GRE}:${YEL} giving the \"where\" will do a cd to that address. ${NC}"
     gotoHelp
