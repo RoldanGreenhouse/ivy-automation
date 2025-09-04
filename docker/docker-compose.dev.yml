@@ -64,6 +64,7 @@ services:
     container_name: ${ENV}-adguard
     scale: ${greenhouse_scale_adguard:-1}
     ports:
+      # - 3000:3000 # Initial Config port. Remove comment only on initial setup.
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
     volumes:
