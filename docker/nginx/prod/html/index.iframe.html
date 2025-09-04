@@ -169,17 +169,17 @@
                 <div class="logo-text">Greenhouse</div>
             </div>
             <nav>
-                <a href="http://dev.localhost/index.html" class="nav-link active" target="contentFrame">Index</a>
-                <a href="http://dev.adguard.localhost/" class="nav-link" target="contentFrame">AdGuard</a>
-                <a href="http://dev.vpn.localhost" class="nav-link" target="contentFrame">Wireguard - VPN</a>
-                <a href="http://dev.traefik.localhost/dashboard/" class="nav-link" target="contentFrame">Traefik</a>
-                <a href="http://dev.traefik.localhost/whoami" class="nav-link" target="contentFrame">Traefik - Who Am I?</a>
+                <a href="http://greenhouse.servebeer.com/index.html" class="nav-link active" target="contentFrame">Index</a>
+                <a href="http://adguard.greenhouse.servebeer.com/" class="nav-link" target="contentFrame">AdGuard</a>
+                <a href="http://vpn.greenhouse.servebeer.com" class="nav-link" target="contentFrame">Wireguard - VPN</a>
+                <a href="http://traefik.greenhouse.servebeer.com/dashboard/" class="nav-link" target="contentFrame">Traefik</a>
+                <a href="http://traefik.greenhouse.servebeer.com/whoami" class="nav-link" target="contentFrame">Traefik - Who Am I?</a>
             </nav>
         </div>
     </header>
     
     <main class="content-area">
-        <iframe name="contentFrame" src="http://dev.localhost/index.html"></iframe>
+        <iframe name="contentFrame" src="http://greenhouse.servebeer.com/index.html"></iframe>
         <div class="loader">
             <div class="spinner"></div>
             <p>Cargando contenido...</p>
@@ -193,7 +193,7 @@
             const loader = document.querySelector('.loader');
             
             // Cargar la primera página por defecto
-            iframe.src = "http://dev.localhost/index.html";
+            iframe.src = "http://greenhouse.servebeer.com/index.html";
             
             // Manejar el evento de clic en los enlaces
             links.forEach(link => {

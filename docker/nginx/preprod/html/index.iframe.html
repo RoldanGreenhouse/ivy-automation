@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greenhouse - Panel de Control</title>
+    <title>PREPROD - Greenhouse - Panel de Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -166,20 +166,20 @@
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-seedling logo-icon"></i>
-                <div class="logo-text">Greenhouse</div>
+                <div class="logo-text">PREPROD - Greenhouse</div>
             </div>
             <nav>
-                <a href="http://dev.localhost/index.html" class="nav-link active" target="contentFrame">Index</a>
-                <a href="http://dev.adguard.localhost/" class="nav-link" target="contentFrame">AdGuard</a>
-                <a href="http://dev.vpn.localhost" class="nav-link" target="contentFrame">Wireguard - VPN</a>
-                <a href="http://dev.traefik.localhost/dashboard/" class="nav-link" target="contentFrame">Traefik</a>
-                <a href="http://dev.traefik.localhost/whoami" class="nav-link" target="contentFrame">Traefik - Who Am I?</a>
+                <a href="http://preprod.greenhouse.servebeer.com/index.html" class="nav-link active" target="contentFrame">Index</a>
+                <a href="http://preprod.adguard.greenhouse.servebeer.com/" class="nav-link" target="contentFrame">AdGuard</a>
+                <a href="http://preprod.vpn.greenhouse.servebeer.com" class="nav-link" target="contentFrame">Wireguard - VPN</a>
+                <a href="http://preprod.traefik.greenhouse.servebeer.com/dashboard/" class="nav-link" target="contentFrame">Traefik</a>
+                <a href="http://preprod.traefik.greenhouse.servebeer.com/whoami" class="nav-link" target="contentFrame">Traefik - Who Am I?</a>
             </nav>
         </div>
     </header>
     
     <main class="content-area">
-        <iframe name="contentFrame" src="http://dev.localhost/index.html"></iframe>
+        <iframe name="contentFrame" src="http://preprod.greenhouse.servebeer.com/index.html"></iframe>
         <div class="loader">
             <div class="spinner"></div>
             <p>Cargando contenido...</p>
@@ -193,7 +193,7 @@
             const loader = document.querySelector('.loader');
             
             // Cargar la primera página por defecto
-            iframe.src = "http://dev.localhost/index.html";
+            iframe.src = "http://preprod..greenhouse.servebeer.com/index.html";
             
             // Manejar el evento de clic en los enlaces
             links.forEach(link => {
