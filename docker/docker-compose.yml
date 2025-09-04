@@ -89,7 +89,7 @@ services:
     scale: ${greenhouse_scale_wireguard:-1}
     ports: 
       - ${greenhouse_wireguard_port_ui:-51821}:51821
-      - ${greenhouse_wireguard_port_vpn:-51820}/udp
+      - ${greenhouse_wireguard_port_vpn:-51820}:${greenhouse_wireguard_port_vpn}/udp
     volumes:
       - ${greenhouse_wireguard_volume:-./wireguard/${ENV}}:/etc/wireguard
       - /lib/modules:/lib/modules:ro

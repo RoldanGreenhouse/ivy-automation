@@ -182,7 +182,7 @@ filtering:
   rewrites:
     - domain: '*.greenhouse.servebeer.com'
       answer: 82.82.82.50
-    - domain: 'greenhouse.servebeer.com'
+    - domain: greenhouse.servebeer.com
       answer: 82.82.82.50
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
