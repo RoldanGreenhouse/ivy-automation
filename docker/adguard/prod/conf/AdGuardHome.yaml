@@ -180,10 +180,10 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-  - domain: '*.greenhouse.servebeer.com'
-    answer: 82.82.82.50
-  - domain: 'greenhouse.servebeer.com'
-    answer: 82.82.82.50
+    - domain: '*.greenhouse.servebeer.com'
+      answer: 82.82.82.50
+    - domain: 'greenhouse.servebeer.com'
+      answer: 82.82.82.50
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576
