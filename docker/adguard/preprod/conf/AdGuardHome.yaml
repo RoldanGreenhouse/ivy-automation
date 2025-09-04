@@ -2,7 +2,7 @@ http:
   pprof:
     port: 6060
     enabled: false
-  address: 100.100.100.30:80
+  address: 82.82.82.30:80
   session_ttl: 720h
 users:
   - name: admin
@@ -14,7 +14,7 @@ language: en
 theme: auto
 dns:
   bind_hosts:
-    - 100.100.100.30
+    - 82.82.82.30
   port: 53
   anonymize_client_ip: true
   ratelimit: 20
