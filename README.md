@@ -139,26 +139,94 @@ Explanation of Commands:
 
 ![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
 
-To wake up the [docker-compose.dev.yml](docker/docker-compose.dev.yml), for the VPN you will have to do some additional changes on the machine.
+### Environment File
 
-> First of all, log in on your router, and apply the port forwarding for the machine that you will use as a host.
-> The list of ports would be listed on the table of below.
+To wake up this project you will require to setup several environment files:
+
+- Main environment file
+- Each service that require his environment file (example [NoIP-duc][noip] for credentials)
+
+You can follow the templates defined on [.template.env](docker\env\.template.env). The service that requires the file, should have a .template file as well.
+
+```yaml
+ENV="dev"
+MAIN_DOMAIN="localhost"
+
+# Scales
+# Info pill. This are the number of instances that will be
+# created once is running the Docker Compose. Most of the 
+# services will only accept one.
+# So summarizing:
+# - Do 0 or 1 if you want the service to be deployed.
+# - If you want multiple instances of one service.... be sure that is going to work
+greenhouse_scale_noip_sync=0
+greenhouse_scale_traefik=1
+greenhouse_scale_traefik_whoami=1
+greenhouse_scale_adguard=1
+greenhouse_scale_wireguard=1
+greenhouse_scale_nginx=1
+greenhouse_scale_teamspeak=1
+
+# Networking
+greenhouse_network_name="${ENV}-greenhouse-infra"
+greenhouse_network_subnet="192.168.42.0/24"
+greenhouse_network_gateway="192.168.42.42"
+
+# Main Page
+greenhouse_nginx_static_pages_ip="192.168.42.10"
+greenhouse_nginx_static_pages_host="${ENV}.${MAIN_DOMAIN}"
+greenhouse_nginx_static_pages_volume_conf="./nginx/${ENV}/conf"
+greenhouse_nginx_static_pages_volume_html="./nginx/${ENV}/html"
+
+# AdGuardHome
+greenhouse_adguard_ip="192.168.42.30"
+greenhouse_adguard_host="${ENV}.adguard.${MAIN_DOMAIN}"
+greenhouse_adguard_volume_work="./adguard/${ENV}/work"
+greenhouse_adguard_volume_conf="./adguard/${ENV}/conf"
+
+# TeamSpeak
+greenhouse_teamspeak_ip="192.168.42.40"
+greenhouse_teamspeak_port_voice=9987
+greenhouse_teamspeak_port_query=10011
+greenhouse_teamspeak_port_file=30033
+greenhouse_teamspeak_image="ertagh/teamspeak3-server"
+
+# Traefik
+greenhouse_traefik_ip="192.168.42.50"
+greenhouse_traefik_host="${ENV}.traefik.${MAIN_DOMAIN}"
+greenhouse_traefik_volume_config="./traefik/${ENV}/traefik.yml"
+
+greenhouse_traefik_whoami_ip="192.168.42.60"
+greenhouse_traefik_whoami_host="${ENV}.traefik.${MAIN_DOMAIN}"
+
+# Wireguard VPN
+greenhouse_wireguard_ip="192.168.42.20"
+greenhouse_wireguard_port_ui=51821
+greenhouse_wireguard_port_vpn=51820
+greenhouse_wireguard_host="${ENV}.vpn.${MAIN_DOMAIN}"
+greenhouse_wireguard_volume="./wireguard/${ENV}"
+```
+
+### Ports
+
+> First of all, log in on your router, and apply the port forwarding for the machine that you will use as a host pf this project.
 >
 > Each router has their own way of configuring this, so time to use Google.
 
-The ports at the moment to be opened & forwarded are:
-
-|           Application           | Ports DEV | Ports Prod | Description                                     |
-| :-----------------------------: | :-------: | :--------: | ----------------------------------------------- |
-|       [Wireguard][ez_wg]        |   51820   |   51800    | VPN connectivity                                |
-|       [Wireguard][ez_wg]        |   51821   |   51801    | UI                                              |
-|       [Adguard][adguard]        |   3000    |    3000    | Initial config                                  |
-|       [Adguard][adguard]        |   8080    |    8080    | UI                                              |
-|       [Main Nginx][nginx]       |    80     |     80     | Dummy UI                                        |
-|        [NoIP-duc][noip]         |     -     |     -      | No-IP sync                                      |
-| [Teamspeak (ertagh)][ts_ertagh] |   9987    |    9987    | Voice                                           |
-| [Teamspeak (ertagh)][ts_ertagh] |   10011   |   10011    | Server Query. **Not forwarded by the Router.**  |
-| [Teamspeak (ertagh)][ts_ertagh] |   30033   |   30033    | File transfer. **Not forwarded by the Router.** |
+|           Application           |        Default Ports         | Description                                                  |  Port Forwarding   |
+| :-----------------------------: | :--------------------------: | ------------------------------------------------------------ | :----------------: |
+|       [Wireguard][ez_wg]        |            51820             | VPN connectivity                                             | :white_check_mark: |
+|       [Wireguard][ez_wg]        |            51821             | UI                                                           |         ❌          |
+|       [Adguard][adguard]        |             3000             | Initial config                                               |         ❌          |
+|       [Adguard][adguard]        |              53              | DNS                                                          |         ❌          |
+|       [Adguard][adguard]        |              80              | UI                                                           |         ❌          |
+|       [Main Nginx][nginx]       |              80              | Dummy UI                                                     |         ❌          |
+|        [NoIP-duc][noip]         |              -               | No-IP sync                                                   |         ❌          |
+| [Teamspeak (ertagh)][ts_ertagh] |             9987             | Voice                                                        | :white_check_mark: |
+| [Teamspeak (ertagh)][ts_ertagh] |            10011             | Server Query                                                 | :white_check_mark: |
+| [Teamspeak (ertagh)][ts_ertagh] |            30033             | File transfer                                                | :white_check_mark: |
+|       [Traefik][traefik]        |             8080             | Dashboard                                                    |         ❌          |
+|       [Traefik][traefik]        | Any Port required to forward | You should move the port from the service to Traefik to handle the request instead of expose it directly |     :question:     |
 
 ### Firewall
 
@@ -255,6 +323,10 @@ The current configuration that you will have to handle are:
 
 A quick note over DNS configuration, is to add first the IP of Adguard, and later some extra DNS. [In our case we are using the DNS provided by the EU](https://www.joindns4.eu/for-public).
 
+### Traefik
+
+We will be using this service as Proxy Reverse.
+
 ### TeamSpeak
 
 On the first try I went for the [Official Image provided by Teamspeak][teamspeak], but they do not support the RPI architecture. 
@@ -277,6 +349,8 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 + [ts_ertagh]: https://hub.docker.com/r/ertagh/teamspeak3-server "TeamSpeak by ertagh"
 
 + [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
+
++ [traefik]: https://hub.docker.com/_/traefik "Official Traefik"
 
 ## Nice Readings
 
