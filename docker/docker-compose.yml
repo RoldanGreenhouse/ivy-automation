@@ -41,8 +41,8 @@ services:
     command:
       - --log.level=${greenhouse_traefik_log_level:-INFO}
       
-      - --api.dashboard=${greenhouse_traefik_dashboard:-false}
-      - --api.insecure=true
+      - --api.dashboard=${greenhouse_traefik_api_dashboard:-false}
+      - --api.insecure=${greenhouse_traefik_api_dashboard:-false}
 
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=${greenhouse_network_name:-${ENV}-greenhouse-infra}

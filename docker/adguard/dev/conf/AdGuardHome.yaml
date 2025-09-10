@@ -24,6 +24,14 @@ dns:
   refuse_any: true
   upstream_dns:
     - https://dns10.quad9.net/dns-query
+    - '# Greenhouse Configuration'
+    - '[/dev.greenhouse.servebeer.com/]42.42.42.30'
+    - '[/*.dev.greenhouse.servebeer.com/]42.42.42.30'
+    - '# DNS-over-HTTPS DoH'
+    - '#https://adguard.dev.greenhouse.servebeer.com/dns-query'
+    - '# DNS-over-QUIC  | DoQ'
+    - '# DNS-over-TLS   | DoT'
+    - '# tls://adguard.dev.greenhouse.servebeer.com'
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
@@ -136,7 +144,7 @@ filtering:
     ids: []
   protection_disabled_until: null
   safe_search:
-    enabled: false
+    enabled: true
     bing: true
     duckduckgo: true
     ecosia: true
