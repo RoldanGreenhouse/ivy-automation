@@ -11,7 +11,7 @@ services:
 
   noip-sync:
     image: noipcom/noip-duc:3.3.0
-    env_file: ./env/noip/.${ENV}.env
+    env_file: ${PWD}/env/noip/.${ENV}.env
     container_name: ${ENV}-noip-sync
     scale: ${greenhouse_scale_noip_sync:-0}
     labels:
@@ -25,7 +25,7 @@ services:
     container_name: ${ENV}-traefik
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
-      - ${greenhouse_traefik_volume_config:-./traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
+      - ${greenhouse_traefik_volume_config:-${PWD}/traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
       - ${greenhouse_traifik_ssl_certificate:-./traefik/${ENV}/acme.json}:/certificate/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -40,7 +40,7 @@ services:
       # ROUTER
       traefik.http.routers.dashboard.rule: Host(`${greenhouse_traefik_host}`)
       traefik.http.routers.dashboard.entrypoints: https
-      traefik.http.routers.dashboard.service: api@internal∫
+      traefik.http.routers.dashboard.service: api@internal
       # SERVICE
       # MIDDLEWARE
   
@@ -75,9 +75,9 @@ services:
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
     volumes:
-      - ${greenhouse_adguard_volume_work:-./adguard/${ENV}/work}:/opt/adguardhome/work
-      - ${greenhouse_adguard_volume_conf:-./adguard/${ENV}/conf}:/opt/adguardhome/conf
-      - ${greenhouse_traifik_ssl_certificate:-./traefik/${ENV}/acme.json}:/opt/adguardhome/acme.json:ro
+      - ${greenhouse_adguard_volume_work:-${PWD}/adguard/${ENV}/work}:/opt/adguardhome/work
+      - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
+      - ${greenhouse_traifik_ssl_certificate:-${PWD}/traefik/${ENV}/acme.json}:/certificate/acme.json:ro
     restart: unless-stopped
     labels:
       traefik.enable: true
@@ -100,7 +100,7 @@ services:
       - ${greenhouse_wireguard_port_ui:-51821}:51821
       - ${greenhouse_wireguard_port_vpn:-51820}:${greenhouse_wireguard_port_vpn}/udp
     volumes:
-      - ${greenhouse_wireguard_volume:-./wireguard/${ENV}}:/etc/wireguard
+      - ${greenhouse_wireguard_volume:-${PWD}/wireguard/${ENV}}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     cap_add:
       - NET_ADMIN
@@ -127,8 +127,8 @@ services:
     container_name: ${ENV}-nginx-static-pages
     scale: ${greenhouse_scale_nginx:-1}
     volumes:
-      - ${greenhouse_nginx_static_pages_volume_conf:-./nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
-      - ${greenhouse_nginx_static_pages_volume_html:-./nginx/${ENV}/html}:/usr/share/nginx/html
+      - ${greenhouse_nginx_static_pages_volume_conf:-${PWD}/nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
+      - ${greenhouse_nginx_static_pages_volume_html:-${PWD}/nginx/${ENV}/html}:/usr/share/nginx/html
     restart: always
     labels:
       traefik.enable: true
