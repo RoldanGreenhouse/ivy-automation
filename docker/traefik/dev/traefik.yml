@@ -2,6 +2,7 @@
 providers:
   docker:
     exposedByDefault: false
+    watch: true
     endpoint: "unix:///var/run/docker.sock"
 
 # API and dashboard configuration
@@ -12,6 +13,25 @@ api:
 entryPoints:
   http:
     address: ":80"
+    #http:
+    #  redirections:
+    #    entryPoint:
+    #      to: https
+    #      scheme: https
+  https:
+    address: ":443"
+    asDefault: true
 
+certificatesresolvers:
+  greenhouse-resolver:
+    acme:
+      email: mike.and.anaisabel@gmail.com
+      storage: /certificate/acme.json
+      certificatesDuration: 168 # Weekly Refresh
+      httpchallenge:
+        entrypoint: http
+      # caServer: http://42.42.42.30/dns-query
+      caServer: http://adguard.dev.greenhouse.servebeer.com/dns-query
+      # tlsChallenge: {}
 log:
   level: DEBUG # Default Error. Available: DEBUG INFO WARN ERROR FATAL PANIC

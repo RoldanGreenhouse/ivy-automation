@@ -26,16 +26,21 @@ services:
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
       - ${greenhouse_traefik_volume_config:-./traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
+      - ${greenhouse_traifik_ssl_certificate:-./traefik/${ENV}/acme.json}:/certificate/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 80:80
+      - 80:80   # HTTP
+      - 443:443 # HTTPS
+    dns: ${greenhouse_adguard_ip}
     restart: unless-stopped
+    depends_on:
+      - adguard
     labels:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.dashboard.rule: Host(`${greenhouse_traefik_host}`)
-      traefik.http.routers.dashboard.entrypoints: http
-      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.entrypoints: https
+      traefik.http.routers.dashboard.service: api@internal∫
       # SERVICE
       # MIDDLEWARE
   
@@ -65,17 +70,21 @@ services:
     scale: ${greenhouse_scale_adguard:-1}
     ports:
       # - 3000:3000 # Initial Config port. Remove comment only on initial setup.
+      # - 80:80
+      - 8080:80
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
     volumes:
       - ${greenhouse_adguard_volume_work:-./adguard/${ENV}/work}:/opt/adguardhome/work
       - ${greenhouse_adguard_volume_conf:-./adguard/${ENV}/conf}:/opt/adguardhome/conf
+      - ${greenhouse_traifik_ssl_certificate:-./traefik/${ENV}/acme.json}:/opt/adguardhome/acme.json:ro
     restart: unless-stopped
     labels:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.adguard.rule: Host(`${greenhouse_adguard_host}`)
-      traefik.http.routers.adguard.entrypoints: http
+      traefik.http.routers.adguard.entrypoints: https
+      traefik.http.routers.adguard.tls.certresolver: greenhouse-resolver
       # SERVICE
       traefik.http.services.adguard.loadbalancer.server.port: 80
       # MIDDLEWARE

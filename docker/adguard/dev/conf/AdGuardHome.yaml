@@ -148,7 +148,9 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: dev.greenhouse.es
+    - domain: dev.greenhouse.servebeer.com
+      answer: 42.42.42.10
+    - domain: '*.dev.greenhouse.servebeer.com'
       answer: 42.42.42.10
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
