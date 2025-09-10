@@ -291,7 +291,7 @@ function greenhouse() {
 
     local environment="$1"
     local command="$2"
-    local compose_file="docker-compose.${environment}.yml"
+    local compose_file="docker-compose.yml"
     local env_file="./env/.${environment}.env"
 
     # Validate environment
