@@ -309,6 +309,32 @@ The screenshot of below shows how the NoIp hostname page looks like. Here you wi
 
 ![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
 
+### Certificate Authority Server
+
+For this, we will be using [smallstep/step-ca][ca] image. 
+
+[Follow their documentation page to make a initial setup of the server before continue](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/).
+
+Greenhouse is aiming to have your own local domain only accessible once you are connected with the VPN. Because of that, you will not need buy any domain or trust any external CA for much open-source they are.
+
+> Be aware if you are using a Raspberry Pi as I am, [to check this link](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/#raspberry-pi-badger-database-errors).
+
+Probaly to install the certificates in all the devices that will be used along the intranet, I will require to handle it with Ansible and propagate everything. 
+
+https://smallstep.com/docs/step-cli/installation/#windows
+
+step ca provisioner add greenhouse-acme --type ACME
+
+https://smallstep.com/docs/step-ca/acme-basics/#configure-step-ca-for-acme
+
+```bash
+# First, add the new ACME provisioner. After this, ensure to restart to asure the config has been applied.
+> step ca provisioner add greenhouse-acme --type ACME
+#
+```
+
+
+
 ### Wireguard
 
 For dev environment, the files are already committed on the repository, but at the time of doing it the deployment on your server, you will have to do it from the scratch.
@@ -351,6 +377,8 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 + [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
 
 + [traefik]: https://hub.docker.com/_/traefik "Official Traefik"
+
++ [ca]: https://hub.docker.com/r/smallstep/step-ca "Official Step-CA image"
 
 ## Nice Readings
 
