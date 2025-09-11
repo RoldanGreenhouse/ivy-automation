@@ -84,7 +84,7 @@ services:
       - --entrypoints.http.http.redirections.entrypoint.to=https
       - --entryPoints.http.http.redirections.entrypoint.scheme=https
       - --entryPoints.https.address=:443
-      - --entryPoints.dot.address=:853/tcp
+      - --entryPoints.DnsOverTls.address=:853/tcp
 
       - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
       - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
@@ -163,7 +163,7 @@ services:
       ### DoT Router - Uses port 853
       # ROUTER
       traefik.tcp.routers.adguard-dot.rule: HostSNI(`${greenhouse_adguard_host}`)
-      traefik.tcp.routers.adguard-dot.entrypoints: dot
+      traefik.tcp.routers.adguard-dot.entrypoints: DnsOverTls
       traefik.tcp.routers.adguard-dot.tls.certresolver: greenhouse-resolver
       traefik.tcp.routers.adguard-dot.service: adguard-dot
       # SERVICE

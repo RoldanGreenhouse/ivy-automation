@@ -327,6 +327,8 @@ step ca provisioner add greenhouse-acme --type ACME
 
 https://smallstep.com/docs/step-ca/acme-basics/#configure-step-ca-for-acme
 
+https://smallstep.com/docs/step-ca/provisioners/#acme
+
 ```bash
 # First, add the new ACME provisioner. After this, ensure to restart to asure the config has been applied.
 > step ca provisioner add greenhouse-acme --type ACME
