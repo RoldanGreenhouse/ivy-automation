@@ -24,6 +24,8 @@ dns:
   refuse_any: true
   upstream_dns:
     - https://dns10.quad9.net/dns-query
+    - '# European Union'
+    - https://noads.joindns4.eu/dns-query
     - '# Greenhouse Configuration'
     - '[/dev.greenhouse.ogt/]42.42.42.30'
     - '[/*.dev.greenhouse.ogt/]42.42.42.30'
@@ -158,9 +160,9 @@ filtering:
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
     - domain: dev.greenhouse.ogt
-      answer: 42.42.42.10
+      answer: 42.42.42.50
     - domain: '*.dev.greenhouse.ogt'
-      answer: 42.42.42.10
+      answer: 42.42.42.50
     - domain: ca.dev.greenhouse.ogt
       answer: 42.42.42.70
   safe_fs_patterns:
