@@ -36,7 +36,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
 		echo "/c/Users/$USERNAME"
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		echo "/Users/$USERNAME/.zshrc"
+		echo "/Users/$USERNAME"
 	else # Linux
 		return "WIP"
 	fi
