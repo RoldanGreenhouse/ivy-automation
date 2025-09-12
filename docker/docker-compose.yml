@@ -46,7 +46,8 @@ services:
       - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
       - ${greenhouse_ca_volume_database:-${PWD}/step-ca/${ENV}/db}:/home/step/db
     labels:
-      traefik.enable: true
+      traefik.enable: false
+      traefik.docker.network: none
 
   traefik:
     image: traefik:3.5.2
@@ -90,6 +91,7 @@ services:
       - --entryPoints.https.address=:443
       - --entryPoints.DnsOverTls.address=:853/tcp
 
+
       - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
       - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
       - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
@@ -97,13 +99,15 @@ services:
       - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
       
       # Challenges
-      #- --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=false
-      #- --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=true
-      #- --certificatesresolvers.greenhouse-resolver.acme.httpchallenge.entrypoint=https
-      #- --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
-      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=true
-      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge.provider=generic
-      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge.delaybeforecheck=5
+      - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=false
+      
+      # http challenge
+      - --entrypoints.http.http.middlewares=acme-allow@docker
+      - --entrypoints.http.http.redirections.entrypoint.permanent=false
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=true
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge.entrypoint=http
+      
+      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
       
     labels:
       traefik.enable: true
@@ -113,6 +117,9 @@ services:
       traefik.http.routers.dashboard.service: api@internal
       # SERVICE
       # MIDDLEWARE
+      traefik.http.middlewares.acme-allow.redirectregex.regex: "^https://(.+)/\\.well-known/acme-challenge/(.*)"
+      traefik.http.middlewares.acme-allow.redirectregex.replacement: "http://$${1}/.well-known/acme-challenge/$${2}"
+      traefik.http.middlewares.acme-allow.redirectregex.permanent: false
   
   whoami:
     image: traefik/whoami
