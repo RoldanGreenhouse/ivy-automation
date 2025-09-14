@@ -74,7 +74,9 @@ echo -e "${YEL}Remember that this can be modified if you add the variable on you
 
 export DOCKER_UDEMY_PATH=$WORKSPACE_PATH/udemy-docker-mastery
 export GREENHOUSE_PATH=$WORKSPACE_PATH/greenhouse
-export IVY_PATH=$GREENHOUSE_PATH/ivy-automation
+: "${IVY_PATH:=$GREENHOUSE_PATH/ivy-automation}"
+echo "IVY_PATH defined at: [$IVY_PATH]"
+echo -e "${YEL}Remember that this can be modified if you add the variable on your .greenhouse.config$NC"
 export GREENHOUSE_PROFILE_SCRIPT=$IVY_PATH/profiles/.profile
 
 FPATH="$BASE_PATH_SCRIPTS/.zshrc.docker.completion:$FPATH"
