@@ -26,7 +26,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "/Users/$USERNAME/.zshrc"
 	else # Linux or in this case Raspberry Pi OS
-		return "/home/$USERNAME"
+		echo "/home/$USERNAME"
 	fi
 }
 
