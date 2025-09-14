@@ -12,6 +12,8 @@ networks:
 volumes:
   traefik-letsencrypt:
     name: traefik-letsencrypt
+  ca-db:
+    name: ${ENV}-ca-db
 
 services:
 
@@ -46,7 +48,7 @@ services:
       - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/home/step/certs
       - ${greenhouse_ca_volume_secrets:-${PWD}/step-ca/${ENV}/secrets}:/home/step/secrets
       - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
-      - ${greenhouse_ca_volume_database:-${PWD}/step-ca/${ENV}/db}:/home/step/db
+      - ca-db:/home/step/db
     labels:
       traefik.enable: false
       traefik.docker.network: none
