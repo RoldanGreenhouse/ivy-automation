@@ -317,24 +317,81 @@ For this, we will be using [smallstep/step-ca][ca] image.
 
 Greenhouse is aiming to have your own local domain only accessible once you are connected with the VPN. Because of that, you will not need buy any domain or trust any external CA for much open-source they are.
 
-> Be aware if you are using a Raspberry Pi as I am, [to check this link](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/#raspberry-pi-badger-database-errors).
+> Be aware if you are using a Raspberry Pi as I am, [to check this link](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/#raspberry-pi-badger-database-errors). In my case it happen 2 issues:
+>
+> First one was fixed applying the changes on the link regarding the DB:
+>
+> ```json
+>     "db": {
+>           "type": "badger",
+>           "dataSource": "/home/step/db",
+>           "badgerFileLoadingMode": "FileIO"
+>     },
+> ```
+>
+> And later, I had to update the permissions of my volume folders. But this is my issue as my users are not very well configured:
+>
+>     docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
 
-Probaly to install the certificates in all the devices that will be used along the intranet, I will require to handle it with Ansible and propagate everything. 
-
-https://smallstep.com/docs/step-cli/installation/#windows
-
-step ca provisioner add greenhouse-acme --type ACME
-
-https://smallstep.com/docs/step-ca/acme-basics/#configure-step-ca-for-acme
-
-https://smallstep.com/docs/step-ca/provisioners/#acme
+If everything works as expected, execute the commands of below to include the new provisioner.
 
 ```bash
-# First, add the new ACME provisioner. After this, ensure to restart to asure the config has been applied.
+# Log to the container the 
+> docker exec -it ca sh
+
+# Add the new ACME provisioner. After this, ensure to restart to asure the config has been applied.
 > step ca provisioner add greenhouse-acme --type ACME
-#
 ```
 
+With this, should be enough to make it work!
+
+> DONT FORGET TO INCLUDE THE NEW CERTIFICATES IN YOUR DEVICES !
+
+Additionally, I added few improvements on the ca.json. Not sure if neccesary but I will list them below:
+
+    ...
+    	"dnsNames": [
+    		"localhost",
+    		"ca.dev.greenhouse.ogt",
+    		"traefik.dev.greenhouse.ogt",
+    		"vpn.dev.greenhouse.ogt",
+    		"traefik.dev.greenhouse.ogt",
+    		"dev.greenhouse.ogt"
+    	],
+    ...
+    	"policy": {
+    		"x509": {
+    			"allow": {
+    				"dns": ["*.dev.greenhouse.ogt"]
+    			},
+    			"allowWildcardNames": false
+    		},
+    		"host": {
+              "allow": {
+    				"dns": ["*.dev.greenhouse.ogt"]
+              }
+            }
+    	},
+    ...
+    			{
+    				"type": "ACME",
+    				"name": "greenhouse-acme",
+    				"claims": {
+    					...
+    				},
+    				"challenges": [
+    					"http-01"
+    				],
+    				"attestationFormats": [
+    					"apple",
+    					"step",
+    					"tpm"
+    				],
+    				"options": {
+    					"x509": {},
+    					"ssh": {}
+    				}
+    			}
 
 
 ### Wireguard
