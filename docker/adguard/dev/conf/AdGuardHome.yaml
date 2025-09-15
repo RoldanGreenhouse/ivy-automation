@@ -24,14 +24,7 @@ dns:
   refuse_any: true
   upstream_dns:
     - https://dns10.quad9.net/dns-query
-    - '# Greenhouse Configuration'
-    - '[/dev.greenhouse.servebeer.com/]42.42.42.30'
-    - '[/*.dev.greenhouse.servebeer.com/]42.42.42.30'
-    - '# DNS-over-HTTPS DoH'
-    - '#https://adguard.dev.greenhouse.servebeer.com/dns-query'
-    - '# DNS-over-QUIC  | DoQ'
-    - '# DNS-over-TLS   | DoT'
-    - '# tls://adguard.dev.greenhouse.servebeer.com'
+    - https://noads.joindns4.eu/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
@@ -39,7 +32,7 @@ dns:
     - 2620:fe::10
     - 2620:fe::fe:10
   fallback_dns: []
-  upstream_mode: load_balance
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
@@ -52,9 +45,9 @@ dns:
     - 127.0.0.0/8
     - ::1/128
   cache_enabled: true
-  cache_size: 4194304
-  cache_ttl_min: 0
-  cache_ttl_max: 0
+  cache_size: 16777216
+  cache_ttl_min: 300
+  cache_ttl_max: 3600
   cache_optimistic: false
   bogus_nxdomain: []
   aaaa_disabled: false
@@ -68,7 +61,7 @@ dns:
   ipset: []
   ipset_file: ""
   bootstrap_prefer_ipv6: false
-  upstream_timeout: 10s
+  upstream_timeout: 4s
   private_networks: []
   use_private_ptr_resolvers: false
   local_ptr_upstreams: []
@@ -112,10 +105,42 @@ filters:
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
     name: AdGuard DNS filter
     id: 1
-  - enabled: false
+  - enabled: true
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
     name: AdAway Default Blocklist
     id: 2
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_59.txt
+    name: AdGuard DNS Popup Hosts filter
+    id: 1755859578
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_48.txt
+    name: HaGeZi's Pro Blocklist
+    id: 1755859579
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_47.txt
+    name: HaGeZi's Gambling Blocklist
+    id: 1755859580
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt
+    name: HaGeZi's Windows/Office Tracker Blocklist
+    id: 1755859581
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt
+    name: HaGeZi's Samsung Tracker Blocklist
+    id: 1755859582
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_55.txt
+    name: HaGeZi's Badware Hoster Blocklist
+    id: 1755859583
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_54.txt
+    name: HaGeZi's DynDNS Blocklist
+    id: 1755859584
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_10.txt
+    name: Scam Blocklist by DurableNapkin
+    id: 1755859585
 whitelist_filters: []
 user_rules: []
 dhcp:
@@ -148,18 +173,20 @@ filtering:
     bing: true
     duckduckgo: true
     ecosia: true
-    google: true
+    google: false
     pixabay: true
     yandex: true
-    youtube: true
+    youtube: false
   blocking_mode: default
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: dev.greenhouse.servebeer.com
-      answer: 42.42.42.10
-    - domain: '*.dev.greenhouse.servebeer.com'
-      answer: 42.42.42.10
+    - domain: dev.greenhouse.ogt
+      answer: 42.42.42.50
+    - domain: '*.dev.greenhouse.ogt'
+      answer: 42.42.42.50
+    - domain: ca.dev.greenhouse.ogt
+      answer: 42.42.42.70
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576

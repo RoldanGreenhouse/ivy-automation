@@ -13,20 +13,8 @@ function getProfileOsName() {
 		echo ".bash_profile"
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo ".zshrc"
-	else # Linux
-		echo "WIP"
-	fi
-}
-
-function getProfileOS() {
-    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
-		echo "/c/Users/$USERNAME/.bash_profile"
-	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
-		echo "/c/Users/$USERNAME/.bash_profile"
-	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		echo "/Users/$USERNAME/.zshrc"
-	else # Linux
-		return "WIP"
+	else # Linux or in this case Raspberry Pi OS
+		echo ".bash_aliases"
 	fi
 }
 
@@ -36,9 +24,23 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
 		echo "/c/Users/$USERNAME"
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		echo "/Users/$USERNAME/.zshrc"
-	else # Linux
-		return "WIP"
+		echo "/Users/$USERNAME"
+	else # Linux or in this case Raspberry Pi OS
+		echo "/home/$USERNAME"
+	fi
+}
+
+function getProfileOS() {
+    profileHome=$(getBasePath)
+    profileName=$(getProfileOsName)
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "$profileHome/$profileName"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "$profileHome/$profileName"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "$profileHome/$profileName"
+	else # Linux or in this case Raspberry Pi OS
+		echo "$profileHome/$profileName"
 	fi
 }
 
@@ -72,7 +74,9 @@ echo -e "${YEL}Remember that this can be modified if you add the variable on you
 
 export DOCKER_UDEMY_PATH=$WORKSPACE_PATH/udemy-docker-mastery
 export GREENHOUSE_PATH=$WORKSPACE_PATH/greenhouse
-export IVY_PATH=$GREENHOUSE_PATH/ivy-automation
+: "${IVY_PATH:=$GREENHOUSE_PATH/ivy-automation}"
+echo "IVY_PATH defined at: [$IVY_PATH]"
+echo -e "${YEL}Remember that this can be modified if you add the variable on your .greenhouse.config$NC"
 export GREENHOUSE_PROFILE_SCRIPT=$IVY_PATH/profiles/.profile
 
 FPATH="$BASE_PATH_SCRIPTS/.zshrc.docker.completion:$FPATH"
