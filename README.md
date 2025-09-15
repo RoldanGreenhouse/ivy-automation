@@ -309,6 +309,91 @@ The screenshot of below shows how the NoIp hostname page looks like. Here you wi
 
 ![noip-hostname-howto](./README.assets/noip-hostname-howto.png)
 
+### Certificate Authority Server
+
+For this, we will be using [smallstep/step-ca][ca] image. 
+
+[Follow their documentation page to make a initial setup of the server before continue](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/).
+
+Greenhouse is aiming to have your own local domain only accessible once you are connected with the VPN. Because of that, you will not need buy any domain or trust any external CA for much open-source they are.
+
+> Be aware if you are using a Raspberry Pi as I am, [to check this link](https://smallstep.com/docs/tutorials/docker-tls-certificate-authority/#raspberry-pi-badger-database-errors). In my case it happen 2 issues:
+>
+> First one was fixed applying the changes on the link regarding the DB:
+>
+> ```json
+>     "db": {
+>           "type": "badger",
+>           "dataSource": "/home/step/db",
+>           "badgerFileLoadingMode": "FileIO"
+>     },
+> ```
+>
+> And later, I had to update the permissions of my volume folders. But this is my issue as my users are not very well configured:
+>
+>     docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
+
+If everything works as expected, execute the commands of below to include the new provisioner.
+
+```bash
+# Log to the container the 
+> docker exec -it ca sh
+
+# Add the new ACME provisioner. After this, ensure to restart to asure the config has been applied.
+> step ca provisioner add greenhouse-acme --type ACME
+```
+
+With this, should be enough to make it work!
+
+> DONT FORGET TO INCLUDE THE NEW CERTIFICATES IN YOUR DEVICES !
+
+Additionally, I added few improvements on the ca.json. Not sure if neccesary but I will list them below:
+
+    ...
+    	"dnsNames": [
+    		"localhost",
+    		"ca.dev.greenhouse.ogt",
+    		"traefik.dev.greenhouse.ogt",
+    		"vpn.dev.greenhouse.ogt",
+    		"traefik.dev.greenhouse.ogt",
+    		"dev.greenhouse.ogt"
+    	],
+    ...
+    	"policy": {
+    		"x509": {
+    			"allow": {
+    				"dns": ["*.dev.greenhouse.ogt"]
+    			},
+    			"allowWildcardNames": false
+    		},
+    		"host": {
+              "allow": {
+    				"dns": ["*.dev.greenhouse.ogt"]
+              }
+            }
+    	},
+    ...
+    			{
+    				"type": "ACME",
+    				"name": "greenhouse-acme",
+    				"claims": {
+    					...
+    				},
+    				"challenges": [
+    					"http-01"
+    				],
+    				"attestationFormats": [
+    					"apple",
+    					"step",
+    					"tpm"
+    				],
+    				"options": {
+    					"x509": {},
+    					"ssh": {}
+    				}
+    			}
+
+
 ### Wireguard
 
 For dev environment, the files are already committed on the repository, but at the time of doing it the deployment on your server, you will have to do it from the scratch.
@@ -351,6 +436,8 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 + [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
 
 + [traefik]: https://hub.docker.com/_/traefik "Official Traefik"
+
++ [ca]: https://hub.docker.com/r/smallstep/step-ca "Official Step-CA image"
 
 ## Nice Readings
 

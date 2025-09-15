@@ -2,42 +2,124 @@ networks:
   greenhouse-infra:
     name: ${greenhouse_network_name:-${ENV}-greenhouse-infra}
     driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1500"
     ipam:
       config:
         - subnet: ${greenhouse_network_subnet}
           gateway: ${greenhouse_network_gateway}
 
+volumes:
+  traefik-letsencrypt:
+    name: traefik-letsencrypt
+  ca-db:
+    name: ${ENV}-ca-db
+
 services:
 
   noip-sync:
     image: noipcom/noip-duc:3.3.0
-    env_file: ./env/noip/.${ENV}.env
+    env_file: ${PWD}/env/noip/.${ENV}.env
     container_name: ${ENV}-noip-sync
     scale: ${greenhouse_scale_noip_sync:-0}
     labels:
       traefik.enable: false
 
+  ca-server:
+    image: smallstep/step-ca:0.28.4
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_ca_ip}
+    container_name: ${ENV}-ca
+    scale: ${greenhouse_scale_ca}
+    dns: ${greenhouse_adguard_ip}
+    ports:
+      - ${greenhouse_ca_port:-9000}:9000
+    restart: unless-stopped
+    depends_on:
+      - adguard
+    environment:
+      DOCKER_STEPCA_INIT_NAME: ${greenhouse_ca_config_name}
+      DOCKER_STEPCA_INIT_DNS_NAMES: ${greenhouse_ca_config_dns_names}
+      DOCKER_STEPCA_INIT_PROVISIONER_NAME: ${greenhouse_ca_config_provisioner_name:-admin}
+      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-greenhouse}
+      DOCKER_STEPCA_INIT_PASSWORD: ${greenhouse_ca_config_password}
+    volumes:
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/home/step/certs
+      - ${greenhouse_ca_volume_secrets:-${PWD}/step-ca/${ENV}/secrets}:/home/step/secrets
+      - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
+      - ca-db:/home/step/db
+    labels:
+      traefik.enable: false
+      traefik.docker.network: none
+
   traefik:
-    image: traefik:3.5.0
+    image: traefik:3.5.2
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_ip}
     container_name: ${ENV}-traefik
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
-      - ${greenhouse_traefik_volume_config:-./traefik/${ENV}/traefik.yml}:/etc/traefik/traefik.yml:ro
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/ca-certs:ro
+      - traefik-letsencrypt:/certificate
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 80:80
+      - 8081:8080
+      - 80:80          # HTTP
+      - 443:443/tcp    # HTTPS & DoH
+      - 443:443/udp    # HTTPS & DoH
+      - 853:853/tcp    # DNS-over-TLS (DoT)
+    dns: ${greenhouse_adguard_ip}
     restart: unless-stopped
+    depends_on:
+      - adguard
+      - ca-server
+    environment:
+      LEGO_CA_CERTIFICATES: /ca-certs/root_ca.crt
+    command:
+      - --log.level=${greenhouse_traefik_log_level:-INFO}
+      
+      - --api.dashboard=${greenhouse_traefik_api_dashboard:-false}
+      - --api.insecure=${greenhouse_traefik_api_dashboard:-false}
+
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.network=${greenhouse_network_name:-${ENV}-greenhouse-infra}
+      - --providers.docker.watch=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+
+      - --entryPoints.http.address=:80
+      - --entrypoints.http.http.redirections.entrypoint.to=https
+      - --entryPoints.http.http.redirections.entrypoint.scheme=https
+      - --entryPoints.https.address=:443
+      - --entryPoints.DnsOverTls.address=:853/tcp
+
+      - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
+      - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
+      - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
+      - --certificatesresolvers.greenhouse-resolver.acme.storage=/certificate/acme.json
+      - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
+      
+      # Challenges
+      - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
+      
+      # http challenge
+      - --entrypoints.http.http.middlewares=acme-allow@docker
+      - --entrypoints.http.http.redirections.entrypoint.permanent=false
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=true
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge.entrypoint=http
     labels:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.dashboard.rule: Host(`${greenhouse_traefik_host}`)
-      traefik.http.routers.dashboard.entrypoints: http
+      traefik.http.routers.dashboard.entrypoints: https
       traefik.http.routers.dashboard.service: api@internal
       # SERVICE
       # MIDDLEWARE
+      traefik.http.middlewares.acme-allow.redirectregex.regex: "^https://(.+)/\\.well-known/acme-challenge/(.*)"
+      traefik.http.middlewares.acme-allow.redirectregex.replacement: "http://$${1}/.well-known/acme-challenge/$${2}"
+      traefik.http.middlewares.acme-allow.redirectregex.permanent: false
   
   whoami:
     image: traefik/whoami
@@ -50,8 +132,8 @@ services:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.whoami.rule: Host(`${greenhouse_traefik_whoami_host}`) && Path(`/whoami`)
-      traefik.http.routers.whoami.entrypoints: http
-      traefik.http.routers.whoami.service: whoami-service
+      traefik.http.routers.whoami.entrypoints: https
+      traefik.http.routers.whoami.tls.certresolver: greenhouse-resolver
       # SERVICE
       traefik.http.services.whoami-service.loadbalancer.server.port: 80
       # MIDDLEWARE
@@ -65,19 +147,23 @@ services:
     scale: ${greenhouse_scale_adguard:-1}
     ports:
       # - 3000:3000 # Initial Config port. Remove comment only on initial setup.
+      - 8080:80
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
     volumes:
-      - ${greenhouse_adguard_volume_work:-./adguard/${ENV}/work}:/opt/adguardhome/work
-      - ${greenhouse_adguard_volume_conf:-./adguard/${ENV}/conf}:/opt/adguardhome/conf
+      - ${greenhouse_adguard_volume_work:-${PWD}/adguard/${ENV}/work}:/opt/adguardhome/work
+      - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
+      - ${greenhouse_ca_volume_certs:-./step-ca/${ENV}/certs}:/opt/adguardhome/certs
     restart: unless-stopped
     labels:
       traefik.enable: true
+      ### Web UI Router
       # ROUTER
-      traefik.http.routers.adguard.rule: Host(`${greenhouse_adguard_host}`)
-      traefik.http.routers.adguard.entrypoints: http
+      traefik.http.routers.adguard-ui.rule: Host(`${greenhouse_adguard_host}`)
+      traefik.http.routers.adguard-ui.entrypoints: https
+      traefik.http.routers.adguard-ui.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.adguard.loadbalancer.server.port: 80
+      traefik.http.services.adguard-ui.loadbalancer.server.port: 80
       # MIDDLEWARE
 
   wireguard:
@@ -91,7 +177,7 @@ services:
       - ${greenhouse_wireguard_port_ui:-51821}:51821
       - ${greenhouse_wireguard_port_vpn:-51820}:${greenhouse_wireguard_port_vpn}/udp
     volumes:
-      - ${greenhouse_wireguard_volume:-./wireguard/${ENV}}:/etc/wireguard
+      - ${greenhouse_wireguard_volume:-${PWD}/wireguard/${ENV}}:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     cap_add:
       - NET_ADMIN
@@ -99,13 +185,14 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
     environment:
-      INSECURE: true
+      INSECURE: ${greenhouse_wireguard_ui_insecure:-false}
     restart: unless-stopped
     labels:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host}`)
-      traefik.http.routers.vpn-dashboard.entrypoints: http
+      traefik.http.routers.vpn-dashboard.entrypoints: https
+      traefik.http.routers.vpn-dashboard.tls.certresolver: greenhouse-resolver
       # SERVICE
       traefik.http.services.vpn-dashboard.loadbalancer.server.port: ${greenhouse_wireguard_port_ui}
       # MIDDLEWARE
@@ -118,14 +205,15 @@ services:
     container_name: ${ENV}-nginx-static-pages
     scale: ${greenhouse_scale_nginx:-1}
     volumes:
-      - ${greenhouse_nginx_static_pages_volume_conf:-./nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
-      - ${greenhouse_nginx_static_pages_volume_html:-./nginx/${ENV}/html}:/usr/share/nginx/html
+      - ${greenhouse_nginx_static_pages_volume_conf:-${PWD}/nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
+      - ${greenhouse_nginx_static_pages_volume_html:-${PWD}/nginx/${ENV}/html}:/usr/share/nginx/html
     restart: always
     labels:
       traefik.enable: true
       # ROUTER
       traefik.http.routers.nginx-static-pages.rule: Host(`${greenhouse_nginx_static_pages_host}`)
-      traefik.http.routers.nginx-static-pages.entrypoints: http
+      traefik.http.routers.nginx-static-pages.entrypoints: https
+      traefik.http.routers.nginx-static-pages.tls.certresolver: greenhouse-resolver
       # SERVICE
       traefik.http.services.nginx-static-pages.loadbalancer.server.port: 80
       # MIDDLEWARE
