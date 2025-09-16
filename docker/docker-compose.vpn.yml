@@ -1,0 +1,32 @@
+services:
+
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:15.1.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_wireguard_ip}
+    container_name: ${ENV}-wireguard
+    scale: ${greenhouse_scale_wireguard:-1}
+    ports: 
+      - ${greenhouse_wireguard_port_ui:-51821}:51821
+      - ${greenhouse_wireguard_port_vpn:-51820}:${greenhouse_wireguard_port_vpn}/udp
+    volumes:
+      - ${greenhouse_wireguard_volume:-${PWD}/wireguard/${ENV}}:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+    environment:
+      INSECURE: ${greenhouse_wireguard_ui_insecure:-false}
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host}`)
+      traefik.http.routers.vpn-dashboard.entrypoints: https
+      traefik.http.routers.vpn-dashboard.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.vpn-dashboard.loadbalancer.server.port: ${greenhouse_wireguard_port_ui}
+      # MIDDLEWARE

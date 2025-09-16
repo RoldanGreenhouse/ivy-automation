@@ -139,6 +139,19 @@ Explanation of Commands:
 
 ![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
 
+### Docker Compose
+
+The  [main file](docker/docker-compose.yml)  has been split to avoid to have one big file wiht eveything. This will make the maintenance and review changes more confortable.
+
+| Filename                                                     | Description & Content                                        |
+| :----------------------------------------------------------- | ------------------------------------------------------------ |
+| [docker-compose.yml](docker/docker-compose.yml)              | Network, Volumes and Include the rest of the docker-compose files. |
+| [docker-compose.critical.yml](docker/docker-compose.critical.yml) | [CA Server][ca] & [AdGuardHome][adguard]                     |
+| [docker-compose.proxy.yml](docker/docker-compose.proxy.yml)  | [Traefik][traefik]                                           |
+| [docker-compose.frontend.yml](docker/docker-compose.frontend.yml) | Greenhouse Main Page.                                        |
+| [docker-compose.apps.yml](docker/docker-compose.apps.yml)    | [NoIP][noip], [TeamSpeak][teamspeak] & Traefik Dummy Whoami  |
+| [docker-compose.vpn.yml](docker/docker-compose.vpn.yml)      | [Wireguard EZ][ez_wg]                                        |
+
 ### Environment File
 
 To wake up this project you will require to setup several environment files:
@@ -150,7 +163,7 @@ You can follow the templates defined on [.template.env](docker\env\.template.env
 
 ```yaml
 ENV="dev"
-MAIN_DOMAIN="localhost"
+DOMAIN="${ENV}.greenhouse.ogt"
 
 # Scales
 # Info pill. This are the number of instances that will be
@@ -162,10 +175,11 @@ MAIN_DOMAIN="localhost"
 greenhouse_scale_noip_sync=0
 greenhouse_scale_traefik=1
 greenhouse_scale_traefik_whoami=1
+greenhouse_scale_ca=1
 greenhouse_scale_adguard=1
 greenhouse_scale_wireguard=1
 greenhouse_scale_nginx=1
-greenhouse_scale_teamspeak=1
+greenhouse_scale_teamspeak=0
 
 # Networking
 greenhouse_network_name="${ENV}-greenhouse-infra"
@@ -174,15 +188,30 @@ greenhouse_network_gateway="192.168.42.42"
 
 # Main Page
 greenhouse_nginx_static_pages_ip="192.168.42.10"
-greenhouse_nginx_static_pages_host="${ENV}.${MAIN_DOMAIN}"
-greenhouse_nginx_static_pages_volume_conf="./nginx/${ENV}/conf"
-greenhouse_nginx_static_pages_volume_html="./nginx/${ENV}/html"
+greenhouse_nginx_static_pages_host="${DOMAIN}"
+greenhouse_nginx_static_pages_volume_conf="${PWD}/nginx/${ENV}/conf"
+greenhouse_nginx_static_pages_volume_html="${PWD}/nginx/${ENV}/html"
+
+# Step CA - Certificate Authority Sever
+greenhouse_ca_ip="192.168.42.70"
+greenhouse_ca_port=9000
+greenhouse_ca_host="ca.${DOMAIN}"
+
+greenhouse_ca_volume_certs="${PWD}/step-ca/${ENV}/certs"
+greenhouse_ca_volume_secrets="${PWD}/step-ca/${ENV}/secrets"
+greenhouse_ca_volume_config="${PWD}/step-ca/${ENV}/config"
+
+greenhouse_ca_config_name="Greenhouse ${ENV} CA Server"
+greenhouse_ca_config_dns_names="localhost,*.${DOMAIN},${DOMAIN}"
+greenhouse_ca_config_provisioner_name=admin
+greenhouse_ca_config_ssh=greenhouse
+greenhouse_ca_config_password=ogt-0123456789-@@
 
 # AdGuardHome
 greenhouse_adguard_ip="192.168.42.30"
-greenhouse_adguard_host="${ENV}.adguard.${MAIN_DOMAIN}"
-greenhouse_adguard_volume_work="./adguard/${ENV}/work"
-greenhouse_adguard_volume_conf="./adguard/${ENV}/conf"
+greenhouse_adguard_host="adguard.${DOMAIN}"
+greenhouse_adguard_volume_work="${PWD}/adguard/${ENV}/work"
+greenhouse_adguard_volume_conf="${PWD}/adguard/${ENV}/conf"
 
 # TeamSpeak
 greenhouse_teamspeak_ip="192.168.42.40"
@@ -192,19 +221,25 @@ greenhouse_teamspeak_port_file=30033
 greenhouse_teamspeak_image="ertagh/teamspeak3-server"
 
 # Traefik
+greenhouse_traefik_log_level=INFO # Default INFO. Available: DEBUG INFO WARN ERROR FATAL PANIC
+greenhouse_traefik_api_dashboard=false
+greenhouse_traefik_api_insecure=false
 greenhouse_traefik_ip="192.168.42.50"
-greenhouse_traefik_host="${ENV}.traefik.${MAIN_DOMAIN}"
-greenhouse_traefik_volume_config="./traefik/${ENV}/traefik.yml"
+greenhouse_traefik_host="traefik.${DOMAIN}"
+
+greenhouse_traefik_acme_email=your_email@provider.com
+greenhouse_traefik_acme_certificates_duration=168 # Weekly Refresh
 
 greenhouse_traefik_whoami_ip="192.168.42.60"
-greenhouse_traefik_whoami_host="${ENV}.traefik.${MAIN_DOMAIN}"
+greenhouse_traefik_whoami_host="traefik.${DOMAIN}"
 
 # Wireguard VPN
 greenhouse_wireguard_ip="192.168.42.20"
 greenhouse_wireguard_port_ui=51821
 greenhouse_wireguard_port_vpn=51820
-greenhouse_wireguard_host="${ENV}.vpn.${MAIN_DOMAIN}"
-greenhouse_wireguard_volume="./wireguard/${ENV}"
+greenhouse_wireguard_host="vpn.${DOMAIN}"
+greenhouse_wireguard_volume="${PWD}/wireguard/${ENV}"
+greenhouse_wireguard_ui_insecure=false
 ```
 
 ### Ports
