@@ -1,0 +1,69 @@
+services:
+
+  traefik:
+    image: traefik:3.5.2
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_traefik_ip}
+    container_name: ${ENV}-traefik
+    scale: ${greenhouse_scale_traefik:-1}
+    volumes:
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/ca-certs:ro
+      - traefik-letsencrypt:/certificate
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8081:8080
+      - 80:80          # HTTP
+      - 443:443/tcp    # HTTPS & DoH
+      - 443:443/udp    # HTTPS & DoH
+      - 853:853/tcp    # DNS-over-TLS (DoT)
+    dns: ${greenhouse_adguard_ip}
+    restart: unless-stopped
+    depends_on:
+      - adguard
+      - ca-server
+    environment:
+      LEGO_CA_CERTIFICATES: /ca-certs/root_ca.crt
+    command:
+      - --log.level=${greenhouse_traefik_log_level:-INFO}
+      
+      - --api.dashboard=${greenhouse_traefik_api_dashboard:-false}
+      - --api.insecure=${greenhouse_traefik_api_dashboard:-false}
+
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.network=${greenhouse_network_name:-${ENV}-greenhouse-infra}
+      - --providers.docker.watch=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+
+      - --entryPoints.http.address=:80
+      - --entrypoints.http.http.redirections.entrypoint.to=https
+      - --entryPoints.http.http.redirections.entrypoint.scheme=https
+      - --entryPoints.https.address=:443
+      - --entryPoints.DnsOverTls.address=:853/tcp
+
+      - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
+      - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
+      - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
+      - --certificatesresolvers.greenhouse-resolver.acme.storage=/certificate/acme.json
+      - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
+      
+      # Challenges
+      - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
+      
+      # http challenge
+      - --entrypoints.http.http.middlewares=acme-allow@docker
+      - --entrypoints.http.http.redirections.entrypoint.permanent=false
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=true
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge.entrypoint=http
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.dashboard.rule: Host(`${greenhouse_traefik_host}`)
+      traefik.http.routers.dashboard.entrypoints: https
+      traefik.http.routers.dashboard.service: api@internal
+      # SERVICE
+      # MIDDLEWARE
+      traefik.http.middlewares.acme-allow.redirectregex.regex: "^https://(.+)/\\.well-known/acme-challenge/(.*)"
+      traefik.http.middlewares.acme-allow.redirectregex.replacement: "http://$${1}/.well-known/acme-challenge/$${2}"
+      traefik.http.middlewares.acme-allow.redirectregex.permanent: false

@@ -1,0 +1,57 @@
+services:
+
+  ca-server:
+    image: smallstep/step-ca:0.28.4
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_ca_ip}
+    container_name: ${ENV}-ca
+    scale: ${greenhouse_scale_ca}
+    dns: ${greenhouse_adguard_ip}
+    ports:
+      - ${greenhouse_ca_port:-9000}:9000
+    restart: unless-stopped
+    depends_on:
+      - adguard
+    environment:
+      DOCKER_STEPCA_INIT_NAME: ${greenhouse_ca_config_name}
+      DOCKER_STEPCA_INIT_DNS_NAMES: ${greenhouse_ca_config_dns_names}
+      DOCKER_STEPCA_INIT_PROVISIONER_NAME: ${greenhouse_ca_config_provisioner_name:-admin}
+      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-greenhouse}
+      DOCKER_STEPCA_INIT_PASSWORD: ${greenhouse_ca_config_password}
+    volumes:
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/home/step/certs
+      - ${greenhouse_ca_volume_secrets:-${PWD}/step-ca/${ENV}/secrets}:/home/step/secrets
+      - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
+      - ca-db:/home/step/db
+    labels:
+      traefik.enable: false
+      traefik.docker.network: none
+
+  adguard:
+    image: adguard/adguardhome:v0.107.65
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_adguard_ip}
+    container_name: ${ENV}-adguard
+    scale: ${greenhouse_scale_adguard:-1}
+    ports:
+      # - 3000:3000 # Initial Config port. Remove comment only on initial setup.
+      - 8080:80
+      - 53:53/tcp # Adguard DNS
+      - 53:53/udp # Adguard DNS
+    volumes:
+      - ${greenhouse_adguard_volume_work:-${PWD}/adguard/${ENV}/work}:/opt/adguardhome/work
+      - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
+      - ${greenhouse_ca_volume_certs:-./step-ca/${ENV}/certs}:/opt/adguardhome/certs
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      ### Web UI Router
+      # ROUTER
+      traefik.http.routers.adguard-ui.rule: Host(`${greenhouse_adguard_host}`)
+      traefik.http.routers.adguard-ui.entrypoints: https
+      traefik.http.routers.adguard-ui.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.adguard-ui.loadbalancer.server.port: 80
+      # MIDDLEWARE
