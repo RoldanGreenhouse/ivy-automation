@@ -183,10 +183,28 @@ filtering:
   rewrites:
     - domain: dev.greenhouse.ogt
       answer: 42.42.42.50
-    - domain: '*.dev.greenhouse.ogt'
-      answer: 42.42.42.50
+      enabled: true
+    - domain: dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
     - domain: ca.dev.greenhouse.ogt
       answer: 42.42.42.70
+      enabled: true
+    - domain: ca.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: adguard.dev.greenhouse.ogt
+      answer: 42.42.42.50
+      enabled: true
+    - domain: adguard.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: traefik.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: traefik.dev.greenhouse.ogt
+      answer: 42.42.42.50
+      enabled: true
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576
@@ -196,6 +214,7 @@ filtering:
   filters_update_interval: 24
   blocked_response_ttl: 10
   filtering_enabled: true
+  rewrites_enabled: true
   parental_enabled: false
   safebrowsing_enabled: false
   protection_enabled: true
@@ -220,4 +239,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 30
+schema_version: 31
