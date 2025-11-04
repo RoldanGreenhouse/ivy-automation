@@ -357,16 +357,20 @@ Greenhouse is aiming to have your own local domain only accessible once you are 
 > First one was fixed applying the changes on the link regarding the DB:
 >
 > ```json
->     "db": {
->           "type": "badger",
->           "dataSource": "/home/step/db",
->           "badgerFileLoadingMode": "FileIO"
->     },
+>  "db": {
+>        "type": "badger",
+>        "dataSource": "/home/step/db",
+>        "badgerFileLoadingMode": "FileIO"
+>  },
 > ```
 >
 > And later, I had to update the permissions of my volume folders. But this is my issue as my users are not very well configured:
 >
->     docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
+> >  docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
+>
+> For windows, run this command on Powershell to avoid 
+>
+> > docker run --rm -v de-ca-db:/home/step/db alpine chown -R 1000:1000 /home/step/db
 
 If everything works as expected, execute the commands of below to include the new provisioner.
 
@@ -390,7 +394,7 @@ Additionally, I added few improvements on the ca.json. Not sure if neccesary but
     		"ca.dev.greenhouse.ogt",
     		"traefik.dev.greenhouse.ogt",
     		"vpn.dev.greenhouse.ogt",
-    		"traefik.dev.greenhouse.ogt",
+    		"adguard.dev.greenhouse.ogt",
     		"dev.greenhouse.ogt"
     	],
     ...
@@ -443,9 +447,54 @@ The current configuration that you will have to handle are:
 
 A quick note over DNS configuration, is to add first the IP of Adguard, and later some extra DNS. [In our case we are using the DNS provided by the EU](https://www.joindns4.eu/for-public).
 
+### Twingate
+
+I agree that using an external provider to connect to your local network is not one of the best ideas but they provide security and the most important thing. My ISP was blocking my external connections and I wasn't able to make the VPN work. Basically, Twingate offer me an opportunity of connecting to all my setup without having to expose any port of the internet or maintain any domain as I was doing with No-IP.
+
+#### Configuration
+
+It's very simple once you start to play with it a little bit. 
+In my case, only for dev, I created a Network called **gh-sobremesa** and attach to it 4 items as you can see on the screenshot of below:
+
+<img src="./README.assets/tg_resources.png" alt="TG_Resources" style="zoom:80%;" />
+
+* **Dev | AdGuardHome**: This resourse has the port 443 exposed plus the alias of adguard.dev.greenhouse.ogt. Basically is for be able to access to the dashboard. The IP belongs to the Traefik service, remember that is the proxy who is serving the dashboard.
+* **Dev | AdGuardHome DNS**: As the port 53 is exposed on the service, you have to create a new Resource only for that.
+* **Dev | Main Page**: It serves dev.greenhouse.ogt on 443.
+* **Dev | Traefik**: It serve traefik.dev.greenhouse.ogt with his dashboard as well as the service WhoAmI. Both on the 443.
+
+Inside the configuration you can select how you want to define the resource:
+<img src="./README.assets/TW_Resource_Config.png" alt="TW_RESOURCE_CONFIG"  />
+
+Based on value that you provided on the dropdown, later will appear or not once you are logged and connected to Twingate. Making easy to navigate between your services and hiding API or any other resources. Quite cool.
+
+<img src="./README.assets/TW_SAMPLE_MAC.png" alt="TW_SAMPLE_MAC" style="zoom:50%;" />
+
+### AdGuardHome
+
+The most important configuration to perform on Adguard at the moment are **the DNS Rewrite** and **the DNS blocklist**.
+
+#### DNS blocklist
+
+This is easy, read Reddit or just a quick search on the internet and select those that seems to be the ones you like it. As simple as that.
+
+#### DNS Rewrite
+
+![AGH_DNS_REWRITE](./README.assets/AdGuardHome_dns_rewrite.png)
+
+This is the sample that I use on my dev environment. I will explain below some issues and problem that I face when I was configuring this.
+
+#### Why multiple lines by Domain?
+
+The reason of having multiple lines by domain is to let AdGuardHome to provide the most efficient IP to the client. In case you are connected with VPN or Twingate or just in local. The DNS will rewrite the best option.
+
+#### Why are you not using *.dev.greenhouse.ogt?
+
+Traefik is being configured on the project to serve the content by domain, but using the *.dev.greenhouse.ogt will redirect as well the traffic of the CA to Traefik and it should not do that.
+
 ### Traefik
 
-We will be using this service as Proxy Reverse.
+We will be using this service as Proxy Reverse. Each Service will be configured to use the correct subdomain plus to challenge against the CA using Traefik.
 
 ### TeamSpeak
 
@@ -461,6 +510,8 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 + [wireguard]: https://hub.docker.com/r/linuxserver/wireguard	"Official Wireguard"
 
 + [ez_wg]: https://hub.docker.com/r/weejewel/wg-easy	"Easy Wireguard"
+
++ [tw]: https://www.twingate.com/ "Twingate Main Page"
 
 + [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard"
 
