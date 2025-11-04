@@ -27,7 +27,7 @@ services:
       traefik.docker.network: none
 
   adguard:
-    image: adguard/adguardhome:v0.107.65
+    image: adguard/adguardhome:v0.107.69
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
