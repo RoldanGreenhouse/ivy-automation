@@ -14,7 +14,7 @@ function getProfileOsName() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo ".zshrc"
 	else # Linux or in this case Raspberry Pi OS
-		echo ".bash_aliases"
+		echo "greenhouse.sh"
 	fi
 }
 
@@ -26,7 +26,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "/Users/$USERNAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/home/$USERNAME"
+		echo "/etc/profile.d"
 	fi
 }
 
@@ -44,15 +44,43 @@ function getProfileOS() {
 	fi
 }
 
+function getProfilePath() {
+    echo "$BASE_PATH_SCRIPTS/$(getProfileOsName)"
+}
+
+function getProfileConfigPath() {
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	else # Linux or in this case Raspberry Pi OS
+		echo "/home/$USERNAME/$PROFILE_CONFIG_SCRIPT_NAME"
+	fi
+}
+
+function getProfileColorsPath() {
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	else # Linux or in this case Raspberry Pi OS
+		echo "/etc/profile.d/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
+	fi
+}
+
 : "${BASE_PATH_SCRIPTS:=$(getBasePath)}"
 
-export PROFILE_SCRIPT="$BASE_PATH_SCRIPTS/$(getProfileOsName)"
+export PROFILE_SCRIPT=$(getProfilePath)
 
 export PROFILE_CONFIG_SCRIPT_NAME=.greenhouse.config
-export PROFILE_CONFIG_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+export PROFILE_CONFIG_SCRIPT_PATH=$(getProfileConfigPath)
 
 export PROFILE_COLORS_SCRIPT_NAME=.greenhouse.colors
-export PROFILE_COLORS_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+export PROFILE_COLORS_SCRIPT_PATH=$(getProfileColorsPath)
 
 echo "Loading Base Profile file [$PROFILE_SCRIPT]"
 echo "Loading Config for Profile from file [$PROFILE_CONFIG_SCRIPT_PATH]"
