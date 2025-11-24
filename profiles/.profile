@@ -344,7 +344,7 @@ function greenhouse() {
             echo -e "${RED}Error: ${BYEL}gotod ${YEL}function not available and not in correct directory$NC"
             return 1
         fi
-        gotod || return 1
+        goto docker || return 1
     fi
 
     # Check if compose file exists
