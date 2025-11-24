@@ -382,7 +382,16 @@ function info() {
     echo -e "${GRE} # ${YEL}Alias     ${GRE}################################################################################${NC}"
     echo -e "${GRE} ############################################################################################${NC}"
     echo ""
-    echo -e "${BBLU}      ls     ${BLU}= ls -a${NC}"
+    echo -e "${BBLU}      ls      ${BLU}= ls -a${NC}"
+    echo ""
+    echo -e "${BBLU}      status  ${BLU}= git status${NC}"
+    echo -e "${BBLU}      commit  ${BLU}= git commit -m${NC}"
+    echo -e "${BBLU}      pull    ${BLU}= git pull${NC}"
+    echo -e "${BBLU}      push    ${BLU}= git push${NC}"
+    echo -e "${BBLU}      add     ${BLU}= git add${NC}"
+    echo -e "${BBLU}      restore ${BLU}= git restore${NC}"
+    echo -e "${BBLU}      dbranch ${BLU}= git branch -d${NC}"
+    echo ""
     gotoHelpAlias
     echo ""
     echo -e "${GRE} ############################################################################################${NC}"
@@ -415,12 +424,27 @@ function info() {
     echo -e "${GRE} ############################################################################################${NC}"
 }
 
+# GoTo Aliases
+
 alias gotow="goto workspace"
 alias gotol="goto lirio"
 alias gotoh="goto home"
 alias gotod="goto docker"
 alias gotogh="goto greenhouse"
 alias gotoi="goto ivy"
+
+# Git Aliases
+
+alias status="git status"
+alias commit="git commit -m"
+alias pull="git pull"
+alias push="git push"
+alias add="git add"
+alias restore="git restore"
+alias dbranch="git branch -d"
+
+# Other Aliases
+
 alias ls="ls -a"
 
 info
