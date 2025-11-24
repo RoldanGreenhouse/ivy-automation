@@ -56,7 +56,7 @@ function getProfileConfigPath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/home/$USERNAME/$PROFILE_CONFIG_SCRIPT_NAME"
+		echo "/home/$USER/$PROFILE_CONFIG_SCRIPT_NAME"
 	fi
 }
 
