@@ -324,7 +324,6 @@ function greenhouse() {
     local environment="$1"
     local command="$2"
     local compose_file="docker-compose.yml"
-    local env_file="./env/.${environment}.env"
 
     # Validate environment
     case "$environment" in
@@ -337,6 +336,7 @@ function greenhouse() {
             return 1
             ;;
     esac
+    
 
     # Check if we're in the correct directory
     if [ "$(pwd)" != "$IVY_PATH/docker" ]; then
@@ -354,6 +354,13 @@ function greenhouse() {
     fi
 
     # Check if env file exists
+    if [ "$(environment)" == "prod" ]; then
+        local env_file="$GREENHOUSE_PATH/config/.${environment}.env"
+    if [ "$(environment)" == "preprod" ]; then
+        local env_file="$GREENHOUSE_PATH/config/.${environment}.env"
+    else
+        local env_file="./env/.${environment}.env"
+
     if [ ! -f "$env_file" ]; then
         echo -e "${RED}Error: ${YEL}Environment file not found: $env_file $NC"
         return 1
