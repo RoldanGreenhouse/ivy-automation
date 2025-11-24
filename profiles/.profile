@@ -344,7 +344,7 @@ function greenhouse() {
             echo -e "${RED}Error: ${BYEL}gotod ${YEL}function not available and not in correct directory$NC"
             return 1
         fi
-        goto docker || return 1
+        goto docker
     fi
 
     # Check if compose file exists
@@ -353,14 +353,17 @@ function greenhouse() {
         return 1
     fi
 
+    local env_file=""
     # Check if env file exists
     if [ "$(environment)" == "prod" ]; then
-        local env_file="$GREENHOUSE_PATH/config/.${environment}.env"
-    if [ "$(environment)" == "preprod" ]; then
-        local env_file="$GREENHOUSE_PATH/config/.${environment}.env"
+        env_file="$GREENHOUSE_PATH/config/.${environment}.env"
+    elif [ "$(environment)" == "preprod" ]; then
+        env_file="$GREENHOUSE_PATH/config/.${environment}.env"
     else
-        local env_file="./env/.${environment}.env"
+        env_file="./env/.${environment}.env"
+    fi
 
+    echo "Using env file [$env_file]"
     if [ ! -f "$env_file" ]; then
         echo -e "${RED}Error: ${YEL}Environment file not found: $env_file $NC"
         return 1
