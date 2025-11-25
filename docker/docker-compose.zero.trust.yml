@@ -1,7 +1,7 @@
 services:
 
   twingate-connector:
-    image: twingate/connector:1.79.0
+    image: twingate/connector:1.80.0
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_twingate_ip}
