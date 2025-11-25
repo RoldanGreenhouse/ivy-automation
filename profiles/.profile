@@ -355,10 +355,10 @@ function greenhouse() {
 
     local env_file=""
     # Check if env file exists
-    if [ "$(environment)" == "prod" ]; then
-        env_file="$GREENHOUSE_PATH/config/.${environment}.env"
-    elif [ "$(environment)" == "preprod" ]; then
-        env_file="$GREENHOUSE_PATH/config/.${environment}.env"
+    if [ "$environment" == "prod" ]; then
+        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
+    elif [ "$environment" == "preprod" ]; then
+        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
     else
         env_file="./env/.${environment}.env"
     fi
@@ -484,5 +484,49 @@ alias dbranch="git branch -d"
 # Other Aliases
 
 alias ls="ls -a"
+
+function parse_git_branch() {
+    local branch
+    branch=$(git branch --show-current 2> /dev/null)
+    if [[ -n "$branch" ]]; then
+        # Check for uncommitted changes
+        if ! git diff --no-ext-diff --quiet --exit-code 2>/dev/null || \
+           ! git diff --no-ext-diff --cached --quiet --exit-code 2>/dev/null; then
+            echo "*${branch}*"  # Asterisk for dirty state
+        else
+            echo "$branch"     # No asterisk for clean state
+        fi
+    else
+        echo ""
+    fi
+}
+
+function customizePS1() {
+    local bla="\[\033[1;30m\]"
+    local red="\[\033[1;31m\]"
+    local gre="\[\033[1;32m\]"
+    local yel="\[\033[1;33m\]"
+    local blu="\[\033[1;34m\]"
+    local cya="\[\033[3;36m\]" # 3 gives italic <3
+    local whi="\[\033[1;37m\]"
+    local rst="\[\033[00m\]"
+    
+    local time="${whi}[${blu}\D{%Y/%m/%d} \t${whi}]"
+    local user_host="${gre}\u@\h"
+    local current_path="${whi}| ${yel}\w"
+
+    # Get git branch dynamically
+    local branch="$(parse_git_branch)"
+    local git=""
+    if [[ -n "$branch" ]]; then
+        git="${whi}| ${blu}Branch ${cya}${branch} ${rst}"
+    fi
+
+    # Set PS1 directly in the function
+    PS1="${time} ${user_host} ${current_path} ${git}${gre}\\\$ ${rst}"
+}
+
+# This runs customizePS1 before each prompt
+export PROMPT_COMMAND="customizePS1"
 
 info
