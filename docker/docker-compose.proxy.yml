@@ -1,7 +1,7 @@
 services:
 
   traefik:
-    image: traefik:3.5.2
+    image: traefik:3.6.2
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_ip}
@@ -48,14 +48,12 @@ services:
       - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
       
       # Challenges
-      - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=false
-      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
-      
-      # http challenge
       - --entrypoints.http.http.middlewares=acme-allow@docker
       - --entrypoints.http.http.redirections.entrypoint.permanent=false
-      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=true
-      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge.entrypoint=http
+
+      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=true
     labels:
       traefik.enable: true
       # ROUTER

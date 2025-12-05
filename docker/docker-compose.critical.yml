@@ -11,8 +11,6 @@ services:
     ports:
       - ${greenhouse_ca_port:-9000}:9000
     restart: unless-stopped
-    depends_on:
-      - adguard
     environment:
       DOCKER_STEPCA_INIT_NAME: ${greenhouse_ca_config_name}
       DOCKER_STEPCA_INIT_DNS_NAMES: ${greenhouse_ca_config_dns_names}
@@ -29,7 +27,7 @@ services:
       traefik.docker.network: none
 
   adguard:
-    image: adguard/adguardhome:v0.107.65
+    image: adguard/adguardhome:v0.107.69
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
@@ -37,7 +35,6 @@ services:
     scale: ${greenhouse_scale_adguard:-1}
     ports:
       # - 3000:3000 # Initial Config port. Remove comment only on initial setup.
-      - 8080:80
       - 53:53/tcp # Adguard DNS
       - 53:53/udp # Adguard DNS
     volumes:
@@ -45,6 +42,8 @@ services:
       - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
       - ${greenhouse_ca_volume_certs:-./step-ca/${ENV}/certs}:/opt/adguardhome/certs
     restart: unless-stopped
+    depends_on:
+      - ca-server
     labels:
       traefik.enable: true
       ### Web UI Router

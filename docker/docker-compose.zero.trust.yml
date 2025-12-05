@@ -1,0 +1,19 @@
+services:
+
+  twingate-connector:
+    image: twingate/connector:1.80.0
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_twingate_ip}
+    container_name: ${ENV}-twingate-connector
+    scale: ${greenhouse_scale_twingate_connector:-1}
+    environment:
+      TWINGATE_NETWORK: ${greenhouse_twingate_network}
+      TWINGATE_ACCESS_TOKEN: ${greenhouse_twingate_access_token}
+      TWINGATE_REFRESH_TOKEN: ${greenhouse_twingate_refresh_token}
+      TWINGATE_DNS: ${greenhouse_twingate_dns}
+      TWINGATE_LABEL_HOSTNAME: ${greenhouse_twingate_label_hostname}
+      TWINGATE_LABEL_DEPLOYED_BY: ${greenhouse_twingate_label_deployed_by}
+    restart: unless-stopped
+    labels:
+      traefik.enable: false

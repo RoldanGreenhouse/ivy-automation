@@ -14,7 +14,7 @@ function getProfileOsName() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo ".zshrc"
 	else # Linux or in this case Raspberry Pi OS
-		echo ".bash_aliases"
+		echo "greenhouse.sh"
 	fi
 }
 
@@ -26,7 +26,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "/Users/$USERNAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/home/$USERNAME"
+		echo "/etc/profile.d"
 	fi
 }
 
@@ -44,15 +44,43 @@ function getProfileOS() {
 	fi
 }
 
+function getProfilePath() {
+    echo "$BASE_PATH_SCRIPTS/$(getProfileOsName)"
+}
+
+function getProfileConfigPath() {
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+	else # Linux or in this case Raspberry Pi OS
+		echo "/home/$USER/$PROFILE_CONFIG_SCRIPT_NAME"
+	fi
+}
+
+function getProfileColorsPath() {
+    if [[ "$OSTYPE" == "msys"* ]]; then # Windows | GitBash
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "cygwin"* ]]; then # Windows | Cygwin
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+	else # Linux or in this case Raspberry Pi OS
+		echo "/etc/profile.d/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
+	fi
+}
+
 : "${BASE_PATH_SCRIPTS:=$(getBasePath)}"
 
-export PROFILE_SCRIPT="$BASE_PATH_SCRIPTS/$(getProfileOsName)"
+export PROFILE_SCRIPT=$(getProfilePath)
 
 export PROFILE_CONFIG_SCRIPT_NAME=.greenhouse.config
-export PROFILE_CONFIG_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
+export PROFILE_CONFIG_SCRIPT_PATH=$(getProfileConfigPath)
 
 export PROFILE_COLORS_SCRIPT_NAME=.greenhouse.colors
-export PROFILE_COLORS_SCRIPT_PATH="$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
+export PROFILE_COLORS_SCRIPT_PATH=$(getProfileColorsPath)
 
 echo "Loading Base Profile file [$PROFILE_SCRIPT]"
 echo "Loading Config for Profile from file [$PROFILE_CONFIG_SCRIPT_PATH]"
@@ -296,7 +324,6 @@ function greenhouse() {
     local environment="$1"
     local command="$2"
     local compose_file="docker-compose.yml"
-    local env_file="./env/.${environment}.env"
 
     # Validate environment
     case "$environment" in
@@ -309,6 +336,7 @@ function greenhouse() {
             return 1
             ;;
     esac
+    
 
     # Check if we're in the correct directory
     if [ "$(pwd)" != "$IVY_PATH/docker" ]; then
@@ -316,7 +344,7 @@ function greenhouse() {
             echo -e "${RED}Error: ${BYEL}gotod ${YEL}function not available and not in correct directory$NC"
             return 1
         fi
-        gotod || return 1
+        goto docker
     fi
 
     # Check if compose file exists
@@ -325,7 +353,17 @@ function greenhouse() {
         return 1
     fi
 
+    local env_file=""
     # Check if env file exists
+    if [ "$environment" == "prod" ]; then
+        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
+    elif [ "$environment" == "preprod" ]; then
+        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
+    else
+        env_file="./env/.${environment}.env"
+    fi
+
+    echo "Using env file [$env_file]"
     if [ ! -f "$env_file" ]; then
         echo -e "${RED}Error: ${YEL}Environment file not found: $env_file $NC"
         return 1
@@ -382,7 +420,16 @@ function info() {
     echo -e "${GRE} # ${YEL}Alias     ${GRE}################################################################################${NC}"
     echo -e "${GRE} ############################################################################################${NC}"
     echo ""
-    echo -e "${BBLU}      ls     ${BLU}= ls -a${NC}"
+    echo -e "${BBLU}      ls      ${BLU}= ls -a${NC}"
+    echo ""
+    echo -e "${BBLU}      status  ${BLU}= git status${NC}"
+    echo -e "${BBLU}      commit  ${BLU}= git commit -m${NC}"
+    echo -e "${BBLU}      pull    ${BLU}= git pull${NC}"
+    echo -e "${BBLU}      push    ${BLU}= git push${NC}"
+    echo -e "${BBLU}      add     ${BLU}= git add${NC}"
+    echo -e "${BBLU}      restore ${BLU}= git restore${NC}"
+    echo -e "${BBLU}      dbranch ${BLU}= git branch -d${NC}"
+    echo ""
     gotoHelpAlias
     echo ""
     echo -e "${GRE} ############################################################################################${NC}"
@@ -415,12 +462,71 @@ function info() {
     echo -e "${GRE} ############################################################################################${NC}"
 }
 
+# GoTo Aliases
+
 alias gotow="goto workspace"
 alias gotol="goto lirio"
 alias gotoh="goto home"
 alias gotod="goto docker"
 alias gotogh="goto greenhouse"
 alias gotoi="goto ivy"
+
+# Git Aliases
+
+alias status="git status"
+alias commit="git commit -m"
+alias pull="git pull"
+alias push="git push"
+alias add="git add"
+alias restore="git restore"
+alias dbranch="git branch -d"
+
+# Other Aliases
+
 alias ls="ls -a"
+
+function parse_git_branch() {
+    local branch
+    branch=$(git branch --show-current 2> /dev/null)
+    if [[ -n "$branch" ]]; then
+        # Check for uncommitted changes
+        if ! git diff --no-ext-diff --quiet --exit-code 2>/dev/null || \
+           ! git diff --no-ext-diff --cached --quiet --exit-code 2>/dev/null; then
+            echo "*${branch}*"  # Asterisk for dirty state
+        else
+            echo "$branch"     # No asterisk for clean state
+        fi
+    else
+        echo ""
+    fi
+}
+
+function customizePS1() {
+    local bla="\[\033[1;30m\]"
+    local red="\[\033[1;31m\]"
+    local gre="\[\033[1;32m\]"
+    local yel="\[\033[1;33m\]"
+    local blu="\[\033[1;34m\]"
+    local cya="\[\033[3;36m\]" # 3 gives italic <3
+    local whi="\[\033[1;37m\]"
+    local rst="\[\033[00m\]"
+    
+    local time="${whi}[${blu}\D{%Y/%m/%d} \t${whi}]"
+    local user_host="${gre}\u@\h"
+    local current_path="${whi}| ${yel}\w"
+
+    # Get git branch dynamically
+    local branch="$(parse_git_branch)"
+    local git=""
+    if [[ -n "$branch" ]]; then
+        git="${whi}| ${blu}Branch ${cya}${branch} ${rst}"
+    fi
+
+    # Set PS1 directly in the function
+    PS1="${time} ${user_host} ${current_path} ${git}${gre}\\\$ ${rst}"
+}
+
+# This runs customizePS1 before each prompt
+export PROMPT_COMMAND="customizePS1"
 
 info

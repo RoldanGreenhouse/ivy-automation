@@ -135,9 +135,143 @@ Explanation of Commands:
 - `systemctl stop <service>`: Stops the service immediately.
 - `systemctl disable <service>`: Disables the service from starting at boot.
 
+## Proxmox
+
+### LXC in Raspberry Pi
+
+
+
+### [Optional] Proxmox through Wifi - Desactualizado....
+
+At the time this README file is being written, the Server where I install Proxmox does not have the capability to be connected directly to the internet using cable. So I have to do a little bit of research....
+
+[I ended up on this post](https://forum.proxmox.com/threads/howto-proxmox-ve-8-x-x-wifi-with-routed-configuration.147714/). So, let's go:
+
+The first steps require cable, just to update the packages and install **wpasupplicant**.
+
+```shell
+> apt update && apt install wpasupplicant
+> systemctl disable wpa_supplicant
+# OBVIOUSLY, replace SSIDNAME and PASSWORD by yours
+> wpa_passphrase SSIDNAME PASSWORD >> /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+I have the same verification message than the offer on the Tutorial:
+
+```shell
+> dmesg | grep wlp
+[    4.021984] rtw89_8852be 0000:04:00.0 wlp4s0: renamed from wlan0
+```
+
+Create `/etc/systemd/system/wpa_supplicant.service` and add configuration. As show above, it's **wlp4s0**.
+
+```shell
+touch /etc/systemd/system/wpa_supplicant.service
+```
+
+Code:
+
+```shell
+[Unit]
+Description=WPA supplicant
+Before=network.target
+After=dbus.service
+Wants=network.target
+IgnoreOnIsolate=true
+ 
+[Service]
+Type=dbus
+BusName=fi.w1.wpa_supplicant1
+ExecStart=/sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant/wpa_supplicant.conf -i wlp4s0
+Restart=always
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=dbus-fi.w1.wpa_supplicant1.service
+```
+
+Now, enable again **wpasupplicant**.
+
+```shell
+> systemctl enable wpa_supplicant
+```
+
+Modify again `/etc/network/interfaces` file:
+
+```shell
+auto lo
+iface lo inet loopback
+
+iface enp3s0 inet manual
+
+# This block are the lines that I edit
+auto wlp4s0
+iface wlp4s0 inet static
+    address 192.168.3.10/22
+    gateway 192.168.0.1
+#
+
+auto vmbr0
+iface vmbr0 inet static
+        address 192.168.1.11/22
+        bridge-ports enp3s0
+        bridge-stp off
+        bridge-fd 0
+
+source /etc/network/interfaces.d/*
+```
+
+Restart **wpasupplicant** and **networking services** to connect wireless adapter to wifi network
+
+```shell
+> systemctl restart wpa_supplicant && systemctl restart networking
+```
+
+Finally, as the tutorial said, I made the last update on `/etc/network/interface`:
+
+```shell
+auto lo
+iface lo inet loopback
+
+iface enp3s0 inet manual
+
+auto wlp4s0
+iface wlp4s0 inet static
+        address 192.168.3.11/22
+        gateway 192.168.0.1
+
+auto vmbr0
+iface vmbr0 inet static
+        address 192.168.3.10/22
+        bridge-ports none
+        bridge-stp off
+        bridge-fd 0
+
+auto home
+iface home inet static
+        address 192.168.3.12/22
+        bridge-ports none
+        bridge-stp off
+        bridge-fd 0
+        hwaddress 0b:a0:e2:b6:b6:08
+        post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+        post-up iptables -A FORWARD -i wlp4s0 -j ACCEPT
+        post-up iptables -A FORWARD -o wlp4s0 -j ACCEPT
+        post-up iptables -A FORWARD -i home -j ACCEPT
+        post-up iptables -A FORWARD -o home -j ACCEPT
+
+source /etc/network/interfaces.d/*
+```
+
 ## Docker
 
+### (old) VPN Diagram
+
 ![Current Diagram.drawio](./README.assets/Current%20Diagram.drawio.png)
+
+### Zero Trust Diagram
+
+![Zero Trust Diagram.drawio](./README.assets/Zero%20Trust%20Diagram.drawio.png)
 
 ### Docker Compose
 
@@ -160,87 +294,6 @@ To wake up this project you will require to setup several environment files:
 - Each service that require his environment file (example [NoIP-duc][noip] for credentials)
 
 You can follow the templates defined on [.template.env](docker\env\.template.env). The service that requires the file, should have a .template file as well.
-
-```yaml
-ENV="dev"
-DOMAIN="${ENV}.greenhouse.ogt"
-
-# Scales
-# Info pill. This are the number of instances that will be
-# created once is running the Docker Compose. Most of the 
-# services will only accept one.
-# So summarizing:
-# - Do 0 or 1 if you want the service to be deployed.
-# - If you want multiple instances of one service.... be sure that is going to work
-greenhouse_scale_noip_sync=0
-greenhouse_scale_traefik=1
-greenhouse_scale_traefik_whoami=1
-greenhouse_scale_ca=1
-greenhouse_scale_adguard=1
-greenhouse_scale_wireguard=1
-greenhouse_scale_nginx=1
-greenhouse_scale_teamspeak=0
-
-# Networking
-greenhouse_network_name="${ENV}-greenhouse-infra"
-greenhouse_network_subnet="192.168.42.0/24"
-greenhouse_network_gateway="192.168.42.42"
-
-# Main Page
-greenhouse_nginx_static_pages_ip="192.168.42.10"
-greenhouse_nginx_static_pages_host="${DOMAIN}"
-greenhouse_nginx_static_pages_volume_conf="${PWD}/nginx/${ENV}/conf"
-greenhouse_nginx_static_pages_volume_html="${PWD}/nginx/${ENV}/html"
-
-# Step CA - Certificate Authority Sever
-greenhouse_ca_ip="192.168.42.70"
-greenhouse_ca_port=9000
-greenhouse_ca_host="ca.${DOMAIN}"
-
-greenhouse_ca_volume_certs="${PWD}/step-ca/${ENV}/certs"
-greenhouse_ca_volume_secrets="${PWD}/step-ca/${ENV}/secrets"
-greenhouse_ca_volume_config="${PWD}/step-ca/${ENV}/config"
-
-greenhouse_ca_config_name="Greenhouse ${ENV} CA Server"
-greenhouse_ca_config_dns_names="localhost,*.${DOMAIN},${DOMAIN}"
-greenhouse_ca_config_provisioner_name=admin
-greenhouse_ca_config_ssh=greenhouse
-greenhouse_ca_config_password=ogt-0123456789-@@
-
-# AdGuardHome
-greenhouse_adguard_ip="192.168.42.30"
-greenhouse_adguard_host="adguard.${DOMAIN}"
-greenhouse_adguard_volume_work="${PWD}/adguard/${ENV}/work"
-greenhouse_adguard_volume_conf="${PWD}/adguard/${ENV}/conf"
-
-# TeamSpeak
-greenhouse_teamspeak_ip="192.168.42.40"
-greenhouse_teamspeak_port_voice=9987
-greenhouse_teamspeak_port_query=10011
-greenhouse_teamspeak_port_file=30033
-greenhouse_teamspeak_image="ertagh/teamspeak3-server"
-
-# Traefik
-greenhouse_traefik_log_level=INFO # Default INFO. Available: DEBUG INFO WARN ERROR FATAL PANIC
-greenhouse_traefik_api_dashboard=false
-greenhouse_traefik_api_insecure=false
-greenhouse_traefik_ip="192.168.42.50"
-greenhouse_traefik_host="traefik.${DOMAIN}"
-
-greenhouse_traefik_acme_email=your_email@provider.com
-greenhouse_traefik_acme_certificates_duration=168 # Weekly Refresh
-
-greenhouse_traefik_whoami_ip="192.168.42.60"
-greenhouse_traefik_whoami_host="traefik.${DOMAIN}"
-
-# Wireguard VPN
-greenhouse_wireguard_ip="192.168.42.20"
-greenhouse_wireguard_port_ui=51821
-greenhouse_wireguard_port_vpn=51820
-greenhouse_wireguard_host="vpn.${DOMAIN}"
-greenhouse_wireguard_volume="${PWD}/wireguard/${ENV}"
-greenhouse_wireguard_ui_insecure=false
-```
 
 ### Ports
 
@@ -357,16 +410,20 @@ Greenhouse is aiming to have your own local domain only accessible once you are 
 > First one was fixed applying the changes on the link regarding the DB:
 >
 > ```json
->     "db": {
->           "type": "badger",
->           "dataSource": "/home/step/db",
->           "badgerFileLoadingMode": "FileIO"
->     },
+>  "db": {
+>        "type": "badger",
+>        "dataSource": "/home/step/db",
+>        "badgerFileLoadingMode": "FileIO"
+>  },
 > ```
 >
 > And later, I had to update the permissions of my volume folders. But this is my issue as my users are not very well configured:
 >
->     docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
+> >  docker run --rm -v prod-ca-db:/data alpine chown -R 1000:1000 /data
+>
+> For windows, run this command on Powershell to avoid 
+>
+> > docker run --rm -v dev-ca-db:/home/step/db alpine chown -R 1000:1000 /home/step/db
 
 If everything works as expected, execute the commands of below to include the new provisioner.
 
@@ -390,7 +447,7 @@ Additionally, I added few improvements on the ca.json. Not sure if neccesary but
     		"ca.dev.greenhouse.ogt",
     		"traefik.dev.greenhouse.ogt",
     		"vpn.dev.greenhouse.ogt",
-    		"traefik.dev.greenhouse.ogt",
+    		"adguard.dev.greenhouse.ogt",
     		"dev.greenhouse.ogt"
     	],
     ...
@@ -443,9 +500,60 @@ The current configuration that you will have to handle are:
 
 A quick note over DNS configuration, is to add first the IP of Adguard, and later some extra DNS. [In our case we are using the DNS provided by the EU](https://www.joindns4.eu/for-public).
 
+### Twingate
+
+I agree that using an external provider to connect to your local network is not one of the best ideas but they provide security and the most important thing. My ISP was blocking my external connections and I wasn't able to make the VPN work. Basically, Twingate offer me an opportunity of connecting to all my setup without having to expose any port of the internet or maintain any domain as I was doing with No-IP.
+
+#### Configuration
+
+It's very simple once you start to play with it a little bit. 
+In my case, only for dev, I created a Network called **gh-sobremesa** and attach to it 4 items as you can see on the screenshot of below:
+
+<img src="./README.assets/tg_resources.png" alt="TG_Resources" style="zoom:80%;" />
+
+* **Dev | AdGuardHome**: This resourse has the port 443 exposed plus the alias of adguard.dev.greenhouse.ogt. Basically is for be able to access to the dashboard. The IP belongs to the Traefik service, remember that is the proxy who is serving the dashboard.
+* **Dev | AdGuardHome DNS**: As the port 53 is exposed on the service, you have to create a new Resource only for that.
+* **Dev | Main Page**: It serves dev.greenhouse.ogt on 443.
+* **Dev | Traefik**: It serve traefik.dev.greenhouse.ogt with his dashboard as well as the service WhoAmI. Both on the 443.
+
+Inside the configuration you can select how you want to define the resource:
+<img src="./README.assets/TW_Resource_Config.png" alt="TW_RESOURCE_CONFIG"  />
+
+Based on value that you provided on the dropdown, later will appear or not once you are logged and connected to Twingate. Making easy to navigate between your services and hiding API or any other resources. Quite cool.
+
+<img src="./README.assets/TW_SAMPLE_MAC.png" alt="TW_SAMPLE_MAC" style="zoom:50%;" />
+
+#### The Problem!
+
+The DNS is not working as expected. Twingate is not using as DNS my internal container, is resolving using his internal DNS. I can use external or third party DNS, where I would be able to expose my DNS and use it, as a solution to this but my current ISP is not allowing me to do it...
+
+On AdGuardHome, all request are going encrypted to Twingate, not allowing to filter the requests....
+
+### AdGuardHome
+
+The most important configuration to perform on Adguard at the moment are **the DNS Rewrite** and **the DNS blocklist**.
+
+#### DNS blocklist
+
+This is easy, read Reddit or just a quick search on the internet and select those that seems to be the ones you like it. As simple as that.
+
+#### DNS Rewrite
+
+![AGH_DNS_REWRITE](./README.assets/AdGuardHome_dns_rewrite.png)
+
+This is the sample that I use on my dev environment. I will explain below some issues and problem that I face when I was configuring this.
+
+#### Why multiple lines by Domain?
+
+The reason of having multiple lines by domain is to let AdGuardHome to provide the most efficient IP to the client. In case you are connected with VPN or Twingate or just in local. The DNS will rewrite the best option.
+
+#### Why are you not using *.dev.greenhouse.ogt?
+
+Traefik is being configured on the project to serve the content by domain, but using the *.dev.greenhouse.ogt will redirect as well the traffic of the CA to Traefik and it should not do that.
+
 ### Traefik
 
-We will be using this service as Proxy Reverse.
+We will be using this service as Proxy Reverse. Each Service will be configured to use the correct subdomain plus to challenge against the CA using Traefik.
 
 ### TeamSpeak
 
@@ -461,6 +569,8 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 + [wireguard]: https://hub.docker.com/r/linuxserver/wireguard	"Official Wireguard"
 
 + [ez_wg]: https://hub.docker.com/r/weejewel/wg-easy	"Easy Wireguard"
+
++ [tw]: https://www.twingate.com/ "Twingate Main Page"
 
 + [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard"
 
