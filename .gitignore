@@ -35,5 +35,8 @@ __pycache__/
 docker/env
 # volume - bind 
 docker/adguard/dev/work/**/**
+docker/jellyfin/**/**
+docker/step-ca/**/**
+docker/wireguard/**/**
 docker/teamspeak/mariadb/**/**
 docker/teamspeak/server/logs/**/**

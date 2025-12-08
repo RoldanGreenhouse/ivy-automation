@@ -1,0 +1,27 @@
+services:
+
+  jellyfin:
+    image: jellyfin/jellyfin:2025120105
+    container_name: ${ENV}-jellyfin
+    scale: ${greenhouse_scale_jellyfin:-0}
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_jellyfin_ip}
+    ports:
+      - 7359:7359/udp # Client Discovery
+      - 1900:1900/udp # DLNA
+    volumes:
+      - ${greenhouse_jellyfin_config_path:-${PWD}/jellyfin/${ENV}/config}:/config
+      - ${greenhouse_jellyfin_cache_path:-${PWD}/jellyfin/${ENV}/cache}:/cache
+      - type: bind
+        source: ${greenhouse_jellyfin_bind_media_path}
+        target: /media
+    restart: 'unless-stopped'
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.jellyfin.rule: Host(`${greenhouse_jellyfin_host}`)
+      traefik.http.routers.jellyfin.entrypoints: https
+      traefik.http.routers.jellyfin.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.jellyfin-service.loadbalancer.server.port: 8096
