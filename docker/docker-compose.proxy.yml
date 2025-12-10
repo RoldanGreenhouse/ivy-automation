@@ -44,7 +44,7 @@ services:
 
       - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
       - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
-      - --certificatesresolvers.greenhouse-resolver.acme.certificatesDration=${greenhouse_traefik_acme_certificates_duration:-24}
+      - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
       - --certificatesresolvers.greenhouse-resolver.acme.storage=/certificate/acme.json
       - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
       
