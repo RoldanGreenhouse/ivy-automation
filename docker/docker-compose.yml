@@ -23,3 +23,4 @@ include:
   - docker-compose.apps.yml
   - docker-compose.zero.trust.yml
   - docker-compose.cloud.yml
+  - docker-compose.monitoring.yml
