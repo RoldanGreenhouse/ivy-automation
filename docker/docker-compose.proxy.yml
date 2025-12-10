@@ -36,24 +36,17 @@ services:
       - --providers.docker.endpoint=unix:///var/run/docker.sock
 
       - --entryPoints.http.address=:80
-      # - --entrypoints.http.http.redirections.entrypoint.to=https
       - --entrypoints.http.http.redirections.entrypoint.to=:443
       - --entryPoints.http.http.redirections.entrypoint.scheme=https
       - --entryPoints.https.address=:443
-      # - --entryPoints.DnsOverTls.address=:853/tcp
 
       - --entrypoints.https.http.tls.certresolver=greenhouse-resolver
       - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
       - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
       - --certificatesresolvers.greenhouse-resolver.acme.storage=/certificate/acme.json
       - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
-      
-      # Challenges
-      # - --entrypoints.http.http.middlewares=acme-allow@docker
-      # - --entrypoints.http.http.redirections.entrypoint.permanent=false
-
-      # - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
-      # - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
+      - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=false
       - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=true
     labels:
       traefik.enable: true
