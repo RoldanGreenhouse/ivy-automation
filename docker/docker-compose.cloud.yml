@@ -25,3 +25,86 @@ services:
       traefik.http.routers.jellyfin.tls.certresolver: greenhouse-resolver
       # SERVICE
       traefik.http.services.jellyfin-service.loadbalancer.server.port: 8096
+  
+  nextcloud:
+    image: nextcloud:31.0.12
+    container_name: ${ENV}-nextcloud
+    scale: ${greenhouse_scale_nextcloud:-0}
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_nextcloud_ip}
+    ports:
+      - 8080:80
+    secrets:
+      - nextcloud_admin_username
+      - nextcloud_admin_password
+
+      - postgres_db
+      - postgres_username
+      - postgres_password
+    environment:
+      POSTGRES_HOST: nextcloud-postgres
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      
+      NEXTCLOUD_ADMIN_USER_FILE: /run/secrets/nextcloud_admin_username
+      NEXTCLOUD_ADMIN_PASSWORD_FILE: /run/secrets/nextcloud_admin_password
+
+      REDIS_HOST: nexcloud-redis
+    depends_on:
+      - nexcloud-redis
+      - nextcloud-postgres
+    volumes:
+      - ${greenhouse_nextcloud_vol_main:-${PWD}/nextcloud/main}:/var/www/html
+      - ${greenhouse_nextcloud_vol_apps:-${PWD}/nextcloud/apps}:/var/www/html/custom_apps
+      - ${greenhouse_nextcloud_vol_config:-${PWD}/nextcloud/config}:/var/www/html/config
+      - ${greenhouse_nextcloud_vol_data:-${PWD}/nextcloud/data}:/var/www/html/data
+    restart: always
+    labels:
+        traefik.enable: false
+
+  nextcloud-postgres:
+    image: postgres:18.1
+    container_name: ${ENV}-nextcloud-db
+    scale: ${greenhouse_scale_nextcloud:-0}
+    networks:
+      greenhouse-infra:
+    secrets:
+      - postgres_db
+      - postgres_username
+      - postgres_password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - ${greenhouse_nextcloud_vol_postgres:-${PWD}/nextcloud/postgres}:/var/lib/postgresql
+    restart: always
+    labels:
+      traefik.enable: false
+
+  nexcloud-redis:
+    image: redis:8.4.0
+    container_name: ${ENV}-nextcloud-redis
+    scale: ${greenhouse_scale_nextcloud:-0}
+    networks:
+      greenhouse-infra:
+    volumes:
+      - ${greenhouse_nextcloud_vol_redis:-${PWD}/nextcloud/redis}:/data
+    restart: always
+    labels:
+      traefik.enable: false
+
+secrets:
+  nextcloud_admin_username:
+    file: ${greenhouse_nextcloud_secret_username_filepath:-${PWD}/env/secrets/nextcloud_admin_username}
+  nextcloud_admin_password:
+    file: ${greenhouse_nextcloud_secret_password_filepath:-${PWD}/env/secrets/nextcloud_admin_password}
+  
+  postgres_db:
+    file: ${greenhouse_nextcloud_secret_postgres_db_filepath:-${PWD}/env/secrets/postgres_db}
+  postgres_username:
+    file: ${greenhouse_nextcloud_secret_postgres_username_filepath:-${PWD}/env/secrets/postgres_username}
+  postgres_password:
+    file: ${greenhouse_nextcloud_secret_postgres_password_filepath:-${PWD}/env/secrets/postgres_password}
