@@ -16,7 +16,7 @@ services:
       labels:
         traefik.enable: true
         # ROUTER
-        traefik.http.routers.rpi-monitor.rule: Host(`${greenhouse_rpi_monitor_host}`)
+        traefik.http.routers.rpi-monitor.rule: Host(`${greenhouse_rpi_monitor_host:-rpi.${DOMAIN}}`)
         traefik.http.routers.rpi-monitor.entrypoints: https
         traefik.http.routers.rpi-monitor.tls.certresolver: greenhouse-resolver
         # SERVICE

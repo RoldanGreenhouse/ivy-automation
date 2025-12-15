@@ -15,7 +15,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.nginx-static-pages.rule: Host(`${greenhouse_nginx_static_pages_host}`)
+      traefik.http.routers.nginx-static-pages.rule: Host(`${greenhouse_nginx_static_pages_host:-${DOMAIN}}`)
       traefik.http.routers.nginx-static-pages.entrypoints: https
       traefik.http.routers.nginx-static-pages.tls.certresolver: greenhouse-resolver
       # SERVICE

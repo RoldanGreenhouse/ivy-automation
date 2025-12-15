@@ -24,7 +24,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host}`)
+      traefik.http.routers.vpn-dashboard.rule: Host(`${greenhouse_wireguard_host:-vpn.${DOMAIN}}`)
       traefik.http.routers.vpn-dashboard.entrypoints: https
       traefik.http.routers.vpn-dashboard.tls.certresolver: greenhouse-resolver
       # SERVICE

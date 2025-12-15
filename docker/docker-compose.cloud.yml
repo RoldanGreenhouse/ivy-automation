@@ -20,7 +20,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.jellyfin.rule: Host(`${greenhouse_jellyfin_host}`)
+      traefik.http.routers.jellyfin.rule: Host(`${greenhouse_jellyfin_host:-jellyfin.${DOMAIN}}`)
       traefik.http.routers.jellyfin.entrypoints: https
       traefik.http.routers.jellyfin.tls.certresolver: greenhouse-resolver
       # SERVICE
