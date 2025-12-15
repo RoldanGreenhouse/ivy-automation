@@ -36,6 +36,7 @@ docker/env
 # volume - bind 
 docker/adguard/dev/work/**/**
 docker/jellyfin/**/**
+docker/nextcloud/**/**
 docker/step-ca/**/**
 docker/wireguard/**/**
 docker/teamspeak/mariadb/**/**
