@@ -451,6 +451,7 @@ Additionally, I added few improvements on the ca.json. Not sure if neccesary but
     		"traefik.dev.greenhouse.ogt",
     		"vpn.dev.greenhouse.ogt",
     		"adguard.dev.greenhouse.ogt",
+    		...
     		"dev.greenhouse.ogt"
     	],
     ...
@@ -553,6 +554,18 @@ The reason of having multiple lines by domain is to let AdGuardHome to provide t
 #### Why are you not using *.dev.greenhouse.ogt?
 
 Traefik is being configured on the project to serve the content by domain, but using the *.dev.greenhouse.ogt will redirect as well the traffic of the CA to Traefik and it should not do that.
+
+### [Jellyfin](https://jellyfin.org/)
+
+I really like the app for serve local movies and show that I have in my computer. In any case was really heavy for the Raspberry Pi. I was trying to watch a movie and was enough laggy to stop it.
+
+### Monitoring
+
+At the moment I did only deploy [Rpi Monitor][rpi_mon] to watch the resources that [Jellyfin][jellyfin] was using plus knowing how was the status of the raspberry. I will improve this part with Grafana as well as centralizing the logs. WIP.
+
+#### RPi Monitor
+
+![rpi-monitor](./README.assets/rpi-monitor.sample.png)
 
 ### Traefik
 
