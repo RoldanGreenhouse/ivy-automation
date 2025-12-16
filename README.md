@@ -1,4 +1,7 @@
+![logo.tiny](./README.assets/logo.tiny.png)
+
 # Greenhouse Ivy - Automations & Utils
+
 ## Ansible
 
 ### Configuration
