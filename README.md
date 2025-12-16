@@ -570,6 +570,62 @@ At the moment I did only deploy [Rpi Monitor][rpi_mon] to watch the resources th
 
 ![rpi-monitor](./README.assets/rpi-monitor.sample.png)
 
+### Nextcloud
+
+Raspberry Pi seems to be handling  Nextcloud with the databases really well. I just make the install and perform the next changes on the configuration. 
+
+```php
+<?php
+$CONFIG = array (
+  ...
+  'default_language' => 'es',
+  'default_locale' => 'es_ES',
+  'default_phone_region' => 'ES',
+  'default_timezone' => 'Europe/Madrid',
+  ...
+  'trusted_domains' => 
+  array (
+    0 => 'localhost',
+    1 => '*.dev.greenhouse.ogt',
+    2 => '127.0.0.1',
+    3 => '42.42.42.100',
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '127.0.0.1',
+    1 => '42.42.42.50',
+  ),
+  'forwarded_for_headers' => 
+  array (
+    0 => 'HTTP_X_FORWARDED',
+    1 => 'HTTP_FORWARDED_FOR',
+  ),
+  ...
+  'mail_smtpmode' => 'smtp',
+  'mail_sendmailmode' => 'smtp',
+  'mail_smtpport' => '587',
+  'mail_smtphost' => 'smtp.gmail.com',
+  'mail_domain' => 'gmail.com',
+  'mail_from_address' => 'dev-account',
+  'mail_smtpauth' => true,
+  'mail_smtpname' => 'dev-account@gmail.com',
+  'mail_smtppassword' => 'a_p@ssw0rd',
+  'skeletondirectory' => '',
+  'templatedirectory' => '',
+  'logo_url' => 'https://raw.githubusercontent.com/RoldanGreenhouse/ivy-automation/refs/heads/56-add-cloud-services-and-multimedia-player-on-rpi/drawio/logo.png',
+  'mail_domain' => 'dev.greenhouse.com',
+  'mail_from_address' => 'admin',
+  ...
+);
+
+```
+
+After this, I just modified the theme and everything was working smoothly.
+
+> IMPORTANT for **GMAIL**! To make the email work, go to the Profile of the admin user and assign an email, the same given on the IMAP configuration. Is what I did to make it work.
+>
+> https://www.reddit.com/r/NextCloud/comments/1jydvvb/using_gmail_as_email_server/
+
 ### Traefik
 
 We will be using this service as Proxy Reverse. Each Service will be configured to use the correct subdomain plus to challenge against the CA using Traefik.
