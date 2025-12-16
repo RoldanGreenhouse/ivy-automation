@@ -205,6 +205,18 @@ filtering:
     - domain: traefik.dev.greenhouse.ogt
       answer: 42.42.42.50
       enabled: true
+    - domain: jellyfin.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: jellyfin.dev.greenhouse.ogt
+      answer: 42.42.42.50
+      enabled: true
+    - domain: cloud.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: cloud.dev.greenhouse.ogt
+      answer: 42.42.42.50
+      enabled: true
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
   safebrowsing_cache_size: 1048576

@@ -1,0 +1,24 @@
+services:
+    rpi-monitor:
+      image: michaelmiklis/rpi-monitor:latest
+      scale: ${greenhouse_scale_rpi_monitor:-0}
+      container_name: ${ENV}-rpi-monitor
+      networks:
+        greenhouse-infra:
+          ipv4_address: ${greenhouse_rpi_monitor_ip}
+      volumes:
+        - /opt/vc:/opt/vc 
+        - /boot:/boot 
+        - /sys:/dockerhost/sys:ro 
+        - /etc:/dockerhost/etc:ro 
+        - /proc:/dockerhost/proc:ro 
+        - /usr/lib:/dockerhost/usr/lib:ro
+      labels:
+        traefik.enable: true
+        # ROUTER
+        traefik.http.routers.rpi-monitor.rule: Host(`${greenhouse_rpi_monitor_host:-rpi.${DOMAIN}}`)
+        traefik.http.routers.rpi-monitor.entrypoints: https
+        traefik.http.routers.rpi-monitor.tls.certresolver: greenhouse-resolver
+        # SERVICE
+        traefik.http.services.rpi-monitor-service.loadbalancer.server.port: 8888
+        # MIDDLEWARE

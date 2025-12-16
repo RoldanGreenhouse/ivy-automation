@@ -18,7 +18,7 @@ services:
     labels:
       traefik.enable: true
       # ROUTER
-      traefik.http.routers.whoami.rule: Host(`${greenhouse_traefik_whoami_host}`) && Path(`/whoami`)
+      traefik.http.routers.whoami.rule: Host(`${greenhouse_traefik_whoami_host:-traefik.${DOMAIN}}`) && Path(`/whoami`)
       traefik.http.routers.whoami.entrypoints: https
       traefik.http.routers.whoami.tls.certresolver: greenhouse-resolver
       # SERVICE

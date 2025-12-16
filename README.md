@@ -1,4 +1,7 @@
+![logo.tiny](./README.assets/logo.tiny.png)
+
 # Greenhouse Ivy - Automations & Utils
+
 ## Ansible
 
 ### Configuration
@@ -285,6 +288,9 @@ The  [main file](docker/docker-compose.yml)  has been split to avoid to have one
 | [docker-compose.frontend.yml](docker/docker-compose.frontend.yml) | Greenhouse Main Page.                                        |
 | [docker-compose.apps.yml](docker/docker-compose.apps.yml)    | [NoIP][noip], [TeamSpeak][teamspeak] & Traefik Dummy Whoami  |
 | [docker-compose.vpn.yml](docker/docker-compose.vpn.yml)      | [Wireguard EZ][ez_wg]                                        |
+| [docker-compose.zero.trust.yml](docker/docker-compose.zero.trust.yml) | [Twingate Connector][tw_con]                                 |
+| [docker-compose.monitoring.yml](docker/docker-compose.monitoring.yml) | [RPi Monitor][rpi_mon]                                       |
+| [docker-compose.cloud.yml](docker/docker-compose.cloud.yml)  | [Jellyfin][jellyfin] and [Nexcloud][nextcloud] with his own [Redis][redis] & [Postgres][postgres]. |
 
 ### Environment File
 
@@ -448,6 +454,7 @@ Additionally, I added few improvements on the ca.json. Not sure if neccesary but
     		"traefik.dev.greenhouse.ogt",
     		"vpn.dev.greenhouse.ogt",
     		"adguard.dev.greenhouse.ogt",
+    		...
     		"dev.greenhouse.ogt"
     	],
     ...
@@ -551,6 +558,74 @@ The reason of having multiple lines by domain is to let AdGuardHome to provide t
 
 Traefik is being configured on the project to serve the content by domain, but using the *.dev.greenhouse.ogt will redirect as well the traffic of the CA to Traefik and it should not do that.
 
+### [Jellyfin](https://jellyfin.org/)
+
+I really like the app for serve local movies and show that I have in my computer. In any case was really heavy for the Raspberry Pi. I was trying to watch a movie and was enough laggy to stop it.
+
+### Monitoring
+
+At the moment I did only deploy [Rpi Monitor][rpi_mon] to watch the resources that [Jellyfin][jellyfin] was using plus knowing how was the status of the raspberry. I will improve this part with Grafana as well as centralizing the logs. WIP.
+
+#### RPi Monitor
+
+![rpi-monitor](./README.assets/rpi-monitor.sample.png)
+
+### Nextcloud
+
+Raspberry Pi seems to be handling  Nextcloud with the databases really well. I just make the install and perform the next changes on the configuration. 
+
+```php
+<?php
+$CONFIG = array (
+  ...
+  'default_language' => 'es',
+  'default_locale' => 'es_ES',
+  'default_phone_region' => 'ES',
+  'default_timezone' => 'Europe/Madrid',
+  ...
+  'trusted_domains' => 
+  array (
+    0 => 'localhost',
+    1 => '*.dev.greenhouse.ogt',
+    2 => '127.0.0.1',
+    3 => '42.42.42.100',
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '127.0.0.1',
+    1 => '42.42.42.50',
+  ),
+  'forwarded_for_headers' => 
+  array (
+    0 => 'HTTP_X_FORWARDED',
+    1 => 'HTTP_FORWARDED_FOR',
+  ),
+  ...
+  'mail_smtpmode' => 'smtp',
+  'mail_sendmailmode' => 'smtp',
+  'mail_smtpport' => '587',
+  'mail_smtphost' => 'smtp.gmail.com',
+  'mail_domain' => 'gmail.com',
+  'mail_from_address' => 'dev-account',
+  'mail_smtpauth' => true,
+  'mail_smtpname' => 'dev-account@gmail.com',
+  'mail_smtppassword' => 'a_p@ssw0rd',
+  'skeletondirectory' => '',
+  'templatedirectory' => '',
+  'logo_url' => 'https://raw.githubusercontent.com/RoldanGreenhouse/ivy-automation/refs/heads/56-add-cloud-services-and-multimedia-player-on-rpi/drawio/logo.png',
+  'mail_domain' => 'dev.greenhouse.com',
+  'mail_from_address' => 'admin',
+  ...
+);
+
+```
+
+After this, I just modified the theme and everything was working smoothly.
+
+> IMPORTANT for **GMAIL**! To make the email work, go to the Profile of the admin user and assign an email, the same given on the IMAP configuration. Is what I did to make it work.
+>
+> https://www.reddit.com/r/NextCloud/comments/1jydvvb/using_gmail_as_email_server/
+
 ### Traefik
 
 We will be using this service as Proxy Reverse. Each Service will be configured to use the correct subdomain plus to challenge against the CA using Traefik.
@@ -572,17 +647,29 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 
 + [tw]: https://www.twingate.com/ "Twingate Main Page"
 
-+ [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard"
++ [tw_con]: https://hub.docker.com/r/twingate/connector "Official Twingate Connector Image"
 
-+ [teamspeak]: https://hub.docker.com/_/teamspeak "Official TeamSpeak"
++ [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard image"
+
++ [teamspeak]: https://hub.docker.com/_/teamspeak "Official TeamSpeak image"
 
 + [ts_ertagh]: https://hub.docker.com/r/ertagh/teamspeak3-server "TeamSpeak by ertagh"
 
 + [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
 
-+ [traefik]: https://hub.docker.com/_/traefik "Official Traefik"
++ [traefik]: https://hub.docker.com/_/traefik "Official Traefik image"
 
 + [ca]: https://hub.docker.com/r/smallstep/step-ca "Official Step-CA image"
+
++ [jellyfin]: https://hub.docker.com/r/jellyfin/jellyfin "Official Jelllyfin image"
+
++ [nextcloud]: https://hub.docker.com/_/nextcloud "Official Nexcloud Image"
+
++ [redis]: https://hub.docker.com/_/redis "Official Redis Image"
+
++ [postgres]: https://hub.docker.com/_/postgres "Official Postgres Image"
+
++ [rpi_mon]: https://hub.docker.com/r/michaelmiklis/rpi-monitor "A simple monitor for RPi"
 
 ## Nice Readings
 

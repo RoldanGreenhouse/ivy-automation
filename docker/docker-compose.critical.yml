@@ -48,7 +48,7 @@ services:
       traefik.enable: true
       ### Web UI Router
       # ROUTER
-      traefik.http.routers.adguard-ui.rule: Host(`${greenhouse_adguard_host}`)
+      traefik.http.routers.adguard-ui.rule: Host(`${greenhouse_adguard_host:-adguard.${DOMAIN}}`)
       traefik.http.routers.adguard-ui.entrypoints: https
       traefik.http.routers.adguard-ui.tls.certresolver: greenhouse-resolver
       # SERVICE
