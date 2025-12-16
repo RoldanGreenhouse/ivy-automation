@@ -285,6 +285,9 @@ The  [main file](docker/docker-compose.yml)  has been split to avoid to have one
 | [docker-compose.frontend.yml](docker/docker-compose.frontend.yml) | Greenhouse Main Page.                                        |
 | [docker-compose.apps.yml](docker/docker-compose.apps.yml)    | [NoIP][noip], [TeamSpeak][teamspeak] & Traefik Dummy Whoami  |
 | [docker-compose.vpn.yml](docker/docker-compose.vpn.yml)      | [Wireguard EZ][ez_wg]                                        |
+| [docker-compose.zero.trust.yml](docker/docker-compose.zero.trust.yml) | [Twingate Connector][tw_con]                                 |
+| [docker-compose.monitoring.yml](docker/docker-compose.monitoring.yml) | [RPi Monitor][rpi_mon]                                       |
+| [docker-compose.cloud.yml](docker/docker-compose.cloud.yml)  | [Jellyfin][jellyfin] and [Nexcloud][nextcloud] with his own [Redis][redis] & [Postgres][postgres]. |
 
 ### Environment File
 
@@ -572,17 +575,29 @@ In any case. The port forwarding is only applied for port **9987** (voice channe
 
 + [tw]: https://www.twingate.com/ "Twingate Main Page"
 
-+ [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard"
++ [tw_con]: https://hub.docker.com/r/twingate/connector "Official Twingate Connector Image"
 
-+ [teamspeak]: https://hub.docker.com/_/teamspeak "Official TeamSpeak"
++ [adguard]: https://hub.docker.com/r/adguard/adguardhome "Official Adguard image"
+
++ [teamspeak]: https://hub.docker.com/_/teamspeak "Official TeamSpeak image"
 
 + [ts_ertagh]: https://hub.docker.com/r/ertagh/teamspeak3-server "TeamSpeak by ertagh"
 
 + [noip]: https://hub.docker.com/r/noipcom/noip-duc "Official NoIP for Ip Synchronization"
 
-+ [traefik]: https://hub.docker.com/_/traefik "Official Traefik"
++ [traefik]: https://hub.docker.com/_/traefik "Official Traefik image"
 
 + [ca]: https://hub.docker.com/r/smallstep/step-ca "Official Step-CA image"
+
++ [jellyfin]: https://hub.docker.com/r/jellyfin/jellyfin "Official Jelllyfin image"
+
++ [nextcloud]: https://hub.docker.com/_/nextcloud "Official Nexcloud Image"
+
++ [redis]: https://hub.docker.com/_/redis "Official Redis Image"
+
++ [postgres]: https://hub.docker.com/_/postgres "Official Postgres Image"
+
++ [rpi_mon]: https://hub.docker.com/r/michaelmiklis/rpi-monitor "A simple monitor for RPi"
 
 ## Nice Readings
 
