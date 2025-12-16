@@ -16,8 +16,6 @@ services:
       - 80:80          # HTTP
       - 443:443/tcp    # HTTPS & DoH
       - 443:443/udp    # HTTPS & DoH
-      # - 853:853/tcp    # DNS-over-TLS (DoT)
-    # dns: ${greenhouse_adguard_ip}
     restart: unless-stopped
     depends_on:
       - adguard
