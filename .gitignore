@@ -36,6 +36,10 @@ docker/env
 # volume - bind 
 docker/adguard/dev/work/**/**
 docker/jellyfin/**/**
+docker/redis/**/**
+docker/authentik-postgres/**/**
+docker/authentik/**/**
+docker/ca-postgres/**/**
 docker/nextcloud/**/**
 docker/step-ca/**/**
 docker/wireguard/**/**

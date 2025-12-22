@@ -431,6 +431,8 @@ Greenhouse is aiming to have your own local domain only accessible once you are 
 >
 > > docker run --rm -v dev-ca-db:/home/step/db alpine chown -R 1000:1000 /home/step/db
 
+> Issue from above avoided if you use a database instead of the default way.
+
 If everything works as expected, execute the commands of below to include the new provisioner.
 
 ```bash
@@ -447,50 +449,67 @@ With this, should be enough to make it work!
 
 Additionally, I added few improvements on the ca.json. Not sure if neccesary but I will list them below:
 
-    ...
-    	"dnsNames": [
-    		"localhost",
-    		"ca.dev.greenhouse.ogt",
-    		"traefik.dev.greenhouse.ogt",
-    		"vpn.dev.greenhouse.ogt",
-    		"adguard.dev.greenhouse.ogt",
-    		...
-    		"dev.greenhouse.ogt"
-    	],
-    ...
-    	"policy": {
-    		"x509": {
-    			"allow": {
-    				"dns": ["*.dev.greenhouse.ogt"]
-    			},
-    			"allowWildcardNames": false
-    		},
-    		"host": {
-              "allow": {
-    				"dns": ["*.dev.greenhouse.ogt"]
-              }
-            }
-    	},
-    ...
-    			{
-    				"type": "ACME",
-    				"name": "greenhouse-acme",
-    				"claims": {
-    					...
-    				},
-    				"challenges": [
-    					"http-01"
-    				],
-    				"attestationFormats": [
-    					"apple",
-    					"step",
-    					"tpm"
-    				],
-    				"options": {
-    					"x509": {},
-    					"ssh": {}
-    				}
-    			}
+```json
+...
+	"dnsNames": [
+		"localhost",
+		"ca.dev.greenhouse.ogt",
+		"traefik.dev.greenhouse.ogt",
+		"vpn.dev.greenhouse.ogt",
+		"adguard.dev.greenhouse.ogt",
+		...
+		"dev.greenhouse.ogt"
+	],
+...
+	"policy": {
+		"x509": {
+			"allow": {
+				"dns": ["*.dev.greenhouse.ogt"]
+			},
+			"allowWildcardNames": false
+		},
+		"host": {
+          "allow": {
+				"dns": ["*.dev.greenhouse.ogt"]
+          }
+        }
+	},
+...
+	"db": {
+		"type": "postgresql",
+		"dataSource": "",
+		"badgerFileLoadingMode": ""
+	},
+...
+    {
+        "type": "ACME",
+        "name": "greenhouse-acme",
+        "claims": {
+            ...
+        },
+        "challenges": [
+            "tls-alpn-01"
+        ],
+        "attestationFormats": [
+            "apple",
+            "step",
+            "tpm"
+        ],
+        "options": {
+            "x509": {
+                "enabled": true,
+                "durations": {
+                    "default": "168h",
+                    "min": "5m",
+                    "max": "12000h"
+                }
+            },
+            "ssh": {}
+        }
+    }
+...
+	"commonName": "Step Online CA for ${REPLACE THIS WITH YOUR DOMAIN}"
+```
 
 
 ### Wireguard

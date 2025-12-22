@@ -6,25 +6,56 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_ca_ip}
     container_name: ${ENV}-ca
-    scale: ${greenhouse_scale_ca}
+    scale: ${greenhouse_scale_ca:-0}
     dns: ${greenhouse_adguard_ip}
     ports:
       - ${greenhouse_ca_port:-9000}:9000
+    secrets:
+      - step-ca_password
     restart: unless-stopped
     environment:
       DOCKER_STEPCA_INIT_NAME: ${greenhouse_ca_config_name}
       DOCKER_STEPCA_INIT_DNS_NAMES: ${greenhouse_ca_config_dns_names}
       DOCKER_STEPCA_INIT_PROVISIONER_NAME: ${greenhouse_ca_config_provisioner_name:-admin}
-      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-greenhouse}
-      DOCKER_STEPCA_INIT_PASSWORD: ${greenhouse_ca_config_password}
+      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-false}
+      DOCKER_STEPCA_INIT_ACME: ${greenhouse_ca_acme:-greenhouse-acme}
+      DOCKER_STEPCA_INIT_PASSWORD_FILE: /run/secrets/step-ca_password
+
+      PGDATABASE: ${greenhouse_ca_postgres_db}
+      PGUSER: ${greenhouse_ca_postgres_user}
+      PGHOST: ca-postgres
+      PGPORT: ${greenhouse_ca_postgres_port:-5432}
+      PGPASSWORD : ${greenhouse_ca_postgres_password}
     volumes:
       - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/home/step/certs
       - ${greenhouse_ca_volume_secrets:-${PWD}/step-ca/${ENV}/secrets}:/home/step/secrets
       - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
-      - ca-db:/home/step/db
+      - ${greenhouse_ca_volume_db:-${PWD}/step-ca/${ENV}/db}:/home/step/db
+      - ${greenhouse_ca_volume_main:-${PWD}/step-ca/${ENV}/main}:/home/step
+    depends_on:
+      - ca-postgres
     labels:
       traefik.enable: false
       traefik.docker.network: none
+
+  ca-postgres:
+    image: postgres:${greenhouse_ca_postgres_version:-${greenhouse_postgres_general_version}}
+    container_name: ${ENV}-ca-postgres
+    scale: ${greenhouse_scale_ca:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_ca_postgres_port:-5432}:${greenhouse_ca_postgres_port:-5432}
+    environment:
+      PGPORT: ${greenhouse_ca_postgres_port:-5432}
+      POSTGRES_DB: ${greenhouse_ca_postgres_db}
+      POSTGRES_USER: ${greenhouse_ca_postgres_user}
+      POSTGRES_PASSWORD: ${greenhouse_ca_postgres_password}
+    volumes:
+      - ${greenhouse_ca_postgres_vol:-${PWD}/ca-postgres}:/var/lib/postgresql
+    restart: always
+    labels:
+      traefik.enable: false
 
   adguard:
     image: adguard/adguardhome:v0.107.69
@@ -54,3 +85,6 @@ services:
       # SERVICE
       traefik.http.services.adguard-ui.loadbalancer.server.port: 80
       # MIDDLEWARE
+secrets:
+  step-ca_password:
+    file: ${greenhouse_ca_secret_password_filepath:-${PWD}/env/secrets/step-ca_password}
