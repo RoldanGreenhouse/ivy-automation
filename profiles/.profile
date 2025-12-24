@@ -329,6 +329,7 @@ function greenhouse() {
     case "$environment" in
         dev|test|prod|preprod)
             # Valid environment, continue
+            echo -e "${GRE}Selected environment: ${YEL}$environment${NC}"
             ;;
         *)
             echo -e "${RED}Error: ${YEL}Invalid environment '$environment'$NC"
@@ -336,7 +337,6 @@ function greenhouse() {
             return 1
             ;;
     esac
-    
 
     # Check if we're in the correct directory
     if [ "$(pwd)" != "$IVY_PATH/docker" ]; then
@@ -351,13 +351,14 @@ function greenhouse() {
     if [ ! -f "$compose_file" ]; then
         echo -e "${RED}Error: ${YEL}Docker compose file not found: $compose_file $NC"
         return 1
+    else
+        echo -e "${GRE}Using compose file [$compose_file]${NC}"
     fi
 
     local env_file=""
+    echo -e "${YEL}Checking environment file for [$environment]...${NC}"
     # Check if env file exists
-    if [ "$environment" == "prod" ]; then
-        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
-    elif [ "$environment" == "preprod" ]; then
+    if [[ "$environment" == "prod" || "$environment" == "preprod" ]]; then
         env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
     else
         env_file="./env/.${environment}.env"
