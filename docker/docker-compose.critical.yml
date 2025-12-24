@@ -92,8 +92,8 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_auth_ip_server}
     ports:
-      - "9443:9443"
-      - "9000:9000"
+      - ${greenhouse_auth_https_port:-9443}:${greenhouse_auth_https_port:-9443}
+      - ${greenhouse_auth_http_port:-9001}:${greenhouse_auth_http_port:-9001}
     container_name: ${ENV}-authentik-server
     scale: ${greenhouse_scale_auth:-1}
     secrets:
@@ -112,8 +112,10 @@ services:
       AUTHENTIK_REDIS__PORT: ${greenhouse_redis_port:-6379}
       AUTHENTIK_REDIS__PASSWORD: ${greenhouse_redis_password}
 
-      #AUTHENTIK_HOST: 'https://${greenhouse_auth_host:-auth.${DOMAIN}}'
+      AUTHENTIK_LISTEN__HTTP: ${greenhouse_auth_http_port:-9001}
+      AUTHENTIK_LISTEN__HTTPS: ${greenhouse_auth_https_port:-9443}
 
+      #AUTHENTIK_HOST: 'https://${greenhouse_auth_host:-auth.${DOMAIN}}'
       #AUTHENTIK_LISTEN__TRUSTED_PROXY_CIDRS: ${greenhouse_auth_trust_proxy_cidr:-127.0.0.0/8, 192.168.0.0/16}
 
       AUTHENTIK_LOG_LEVEL: ${greenhouse_auth_log_level:-info}
@@ -188,12 +190,13 @@ services:
     networks:
       greenhouse-infra:
     ports:
-      - ${greenhouse_auth_postgres_port:-5432}:5432
+      - ${greenhouse_auth_postgres_port:-5432}:${greenhouse_auth_postgres_port:-5432}
     secrets:
       - postgres_auth_db
       - postgres_auth_username
       - postgres_auth_password
     environment:
+      PGPORT: ${greenhouse_auth_postgres_port:-5432}
       POSTGRES_DB_FILE: /run/secrets/postgres_auth_db
       POSTGRES_USER_FILE: /run/secrets/postgres_auth_username
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
