@@ -1,0 +1,17 @@
+services:
+
+  redis:
+    image: redis:8.4.0
+    container_name: ${ENV}-redis
+    scale: ${greenhouse_scale_redis:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_redis_port:-6379}:${greenhouse_redis_port:-6379}
+    volumes:
+      - ${greenhouse_database_vol_redis:-${PWD}/redis}:/data
+    command: redis-server --requirepass ${greenhouse_redis_password}
+    restart: always
+    labels:
+      traefik.enable: false
+

@@ -9,18 +9,15 @@ networks:
         - subnet: ${greenhouse_network_subnet}
           gateway: ${greenhouse_network_gateway}
 
-volumes:
-  traefik-letsencrypt:
-    name: ${ENV}-traefik-letsencrypt
-  ca-db:
-    name: ${ENV}-ca-db
-    external: true
+secrets:
+  redis_password:
+    file: ${greenhouse_secret_redis_password_filepath:-${PWD}/env/secrets/redis_password}
 
 include:
+  - docker-compose.redis.yml
   - docker-compose.critical.yml
+  - docker-compose.monitoring.yml
   - docker-compose.proxy.yml
-  - docker-compose.frontend.yml
+  - docker-compose.cloud.yml
   - docker-compose.apps.yml
   - docker-compose.zero.trust.yml
-  - docker-compose.cloud.yml
-  - docker-compose.monitoring.yml
