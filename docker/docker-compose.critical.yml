@@ -87,7 +87,7 @@ services:
       # MIDDLEWARE
   
   authentik-server:
-    image: authentik/server:2025.10.3
+    image: authentik/server:${greenhouse_auth_image_version:-2025.10.3}
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_auth_ip_server}
@@ -112,10 +112,9 @@ services:
       AUTHENTIK_REDIS__PORT: ${greenhouse_redis_port:-6379}
       AUTHENTIK_REDIS__PASSWORD: ${greenhouse_redis_password}
 
-      AUTHENTIK_LISTEN__HTTP: ${greenhouse_auth_http_port:-9001}
-      AUTHENTIK_LISTEN__HTTPS: ${greenhouse_auth_https_port:-9443}
+      AUTHENTIK_LISTEN__HTTP: localhost:${greenhouse_auth_http_port:-9001}
+      AUTHENTIK_LISTEN__HTTPS: localhost:${greenhouse_auth_https_port:-9443}
 
-      #AUTHENTIK_HOST: 'https://${greenhouse_auth_host:-auth.${DOMAIN}}'
       #AUTHENTIK_LISTEN__TRUSTED_PROXY_CIDRS: ${greenhouse_auth_trust_proxy_cidr:-127.0.0.0/8, 192.168.0.0/16}
 
       AUTHENTIK_LOG_LEVEL: ${greenhouse_auth_log_level:-info}
@@ -131,6 +130,7 @@ services:
       #AUTHENTIK_EMAIL__FROM
     volumes:
       - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
+      - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
     depends_on:
       - authentik-postgres
     restart: unless-stopped
@@ -148,7 +148,7 @@ services:
       ## MIDDLEWARE
 
   authentik-worker:
-    image: authentik/server:2025.10.3
+    image: authentik/server:${greenhouse_auth_image_version:-2025.10.3}
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_auth_ip_worker}
@@ -173,9 +173,10 @@ services:
       AUTHENTIK_LOG_LEVEL: ${greenhouse_auth_log_level:-info}
       AUTHENTIK_SECRET_KEY: 'file:///run/secrets/authentik_secret_key'
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
       - ${greenhouse_auth_vol_certs:-${PWD}/authentik/${ENV}/certs}:/certs
-      - ${greenhouse_auth_vol_templates:-${PWD}/authentik/${ENV}/templates}:/templates
+      - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
     depends_on:
       - authentik-postgres
     restart: unless-stopped
@@ -202,6 +203,12 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
     volumes:
       - ${greenhouse_auth_postgres_vol:-${PWD}/authentik-postgres}:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$(cat /run/secrets/postgres_auth_db) -U $$(cat /run/secrets/postgres_auth_username)"]
+      interval: 20s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
     restart: always
     labels:
       traefik.enable: false
