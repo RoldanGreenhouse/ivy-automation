@@ -301,26 +301,20 @@ To wake up this project you will require to setup several environment files:
 
 You can follow the templates defined on [.template.env](docker\env\.template.env). The service that requires the file, should have a .template file as well.
 
-### Ports
+### Port Forwarding for VPN configuration
 
 > First of all, log in on your router, and apply the port forwarding for the machine that you will use as a host pf this project.
 >
 > Each router has their own way of configuring this, so time to use Google.
 
-|           Application           |        Default Ports         | Description                                                  |  Port Forwarding   |
-| :-----------------------------: | :--------------------------: | ------------------------------------------------------------ | :----------------: |
-|       [Wireguard][ez_wg]        |            51820             | VPN connectivity                                             | :white_check_mark: |
-|       [Wireguard][ez_wg]        |            51821             | UI                                                           |         ❌          |
-|       [Adguard][adguard]        |             3000             | Initial config                                               |         ❌          |
-|       [Adguard][adguard]        |              53              | DNS                                                          |         ❌          |
-|       [Adguard][adguard]        |              80              | UI                                                           |         ❌          |
-|       [Main Nginx][nginx]       |              80              | Dummy UI                                                     |         ❌          |
-|        [NoIP-duc][noip]         |              -               | No-IP sync                                                   |         ❌          |
-| [Teamspeak (ertagh)][ts_ertagh] |             9987             | Voice                                                        | :white_check_mark: |
-| [Teamspeak (ertagh)][ts_ertagh] |            10011             | Server Query                                                 | :white_check_mark: |
-| [Teamspeak (ertagh)][ts_ertagh] |            30033             | File transfer                                                | :white_check_mark: |
-|       [Traefik][traefik]        |             8080             | Dashboard                                                    |         ❌          |
-|       [Traefik][traefik]        | Any Port required to forward | You should move the port from the service to Traefik to handle the request instead of expose it directly |     :question:     |
+|           Application           | Default Ports | Description      |
+| :-----------------------------: | :-----------: | ---------------- |
+|       [Wireguard][ez_wg]        |     51820     | VPN connectivity |
+|       [Adguard][adguard]        |      53       | DNS              |
+| [Teamspeak (ertagh)][ts_ertagh] |     9987      | Voice            |
+| [Teamspeak (ertagh)][ts_ertagh] |     10011     | Server Query     |
+| [Teamspeak (ertagh)][ts_ertagh] |     30033     | File transfer    |
+|       [Traefik][traefik]        |      443      | For Proxy        |
 
 ### Firewall
 
@@ -588,6 +582,20 @@ At the moment I did only deploy [Rpi Monitor][rpi_mon] to watch the resources th
 #### RPi Monitor
 
 ![rpi-monitor](./README.assets/rpi-monitor.sample.png)
+
+### Tooling
+
+#### Stirling PDF
+
+Tool for editing PDF's and avoid to expose, upload or whatever any PDF to any weird app or webpage. 
+
+![stirling.pdf](./README.assets/stirling.pdf.png)
+
+#### IT Tools
+
+Group of IT Tools that are nice to have and same as Stirling PDF, with this you avoid any risk of uploading data to weird pages.
+
+![it-tools](./README.assets/it-tools.png)
 
 ### Nextcloud
 

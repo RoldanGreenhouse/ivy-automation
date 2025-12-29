@@ -43,6 +43,9 @@ docker/authentik/**/**
 docker/step-ca/**/**
 docker/ca-postgres/**/**
 docker/nextcloud/**/**
+docker/pdf/**/**
+docker/step-ca/**/**
+docker/traefik/**/**
 docker/nextcloud-postgres/**/**
 docker/wireguard/**/**
 docker/teamspeak/mariadb/**/**
