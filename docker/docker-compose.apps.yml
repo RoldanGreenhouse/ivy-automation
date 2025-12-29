@@ -25,14 +25,16 @@ services:
       greenhouse-infra:
         ipv4_address: ${greenhouse_pdf_tools_ip}
     environment:
-      SECURITY_ENABLELOGIN: false
       MODE: BOTH # Frontend and backend can be split <3
-      LANGS: ${greenhouse_pdf_lenguage:-es_ES,en_GB}
+      SECURITY_ENABLELOGIN: true
+      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username}
+      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword}
+      SYSTEM_DEFAULTLOCALE: ${greenhouse_pdf_locale:-es-ES}
     volumes:
-      - ${greenhouse_pdf_volume_tessdata:-${PWD}/stirling-data/${ENV}/tessdata}:/usr/share/tessdata
-      - ${greenhouse_pdf_volume_configs:-${PWD}/stirling-data/${ENV}/configs}:/configs
-      - ${greenhouse_pdf_volume_logs:-${PWD}/stirling-data/${ENV}/logs}:/logs
-      - ${greenhouse_pdf_volume_pipeline:-${PWD}/stirling-data/${ENV}/pipeline}:/pipeline
+      - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
+      - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
+      - ${greenhouse_pdf_volume_logs:-${PWD}/pdf/${ENV}/logs}:/logs
+      - ${greenhouse_pdf_volume_pipeline:-${PWD}/pdf/${ENV}/pipeline}:/pipeline
     labels:
       traefik.enable: true
       # ROUTER
