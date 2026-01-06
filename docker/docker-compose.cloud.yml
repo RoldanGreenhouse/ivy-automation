@@ -32,7 +32,7 @@ services:
         condition: service_healthy
       nexcloud-redis:
         condition: service_healthy
-    image: nextcloud:31.0.12
+    image: nextcloud:32.0.2.2
     container_name: ${ENV}-nextcloud
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
@@ -72,7 +72,7 @@ services:
       # MIDDLEWARE
 
   nextcloud-postgres:
-    image: postgres:${greenhouse_nextcloud_postgres_version:-${greenhouse_postgres_general_version:18.1}}
+    image: postgres:${greenhouse_nextcloud_postgres_version:-${greenhouse_postgres_general_version:-18.1}}
     container_name: ${ENV}-nextcloud-db
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:

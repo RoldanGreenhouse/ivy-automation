@@ -47,7 +47,7 @@ services:
       traefik.docker.network: none
 
   ca-postgres:
-    image: postgres:${greenhouse_ca_postgres_version:-${greenhouse_postgres_general_version:18.1}}
+    image: postgres:${greenhouse_ca_postgres_version:-${greenhouse_postgres_general_version:-18.1}}
     container_name: ${ENV}-ca-postgres
     scale: ${greenhouse_scale_ca:-0}
     networks:

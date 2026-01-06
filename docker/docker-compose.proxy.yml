@@ -4,7 +4,7 @@ services:
     depends_on:
       ca-server:
         condition: service_healthy
-    image: traefik:3.6.2
+    image: traefik:3.6.6
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_traefik_ip}
