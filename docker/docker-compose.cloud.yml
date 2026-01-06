@@ -103,13 +103,13 @@ services:
 
 secrets:
   nextcloud_admin_username:
-    file: ${greenhouse_nextcloud_secret_username_filepath:-${PWD}/env/secrets/nextcloud_admin_username}
+    file: ${greenhouse_nextcloud_secret_username_filepath:-${PWD}/secrets/nextcloud_admin_username}
   nextcloud_admin_password:
-    file: ${greenhouse_nextcloud_secret_password_filepath:-${PWD}/env/secrets/nextcloud_admin_password}
+    file: ${greenhouse_nextcloud_secret_password_filepath:-${PWD}/secrets/nextcloud_admin_password}
   
   postgres_db:
-    file: ${greenhouse_nextcloud_secret_postgres_db_filepath:-${PWD}/env/secrets/postgres_db}
+    file: ${greenhouse_nextcloud_secret_postgres_db_filepath:-${PWD}/secrets/postgres_db}
   postgres_username:
-    file: ${greenhouse_nextcloud_secret_postgres_username_filepath:-${PWD}/env/secrets/postgres_username}
+    file: ${greenhouse_nextcloud_secret_postgres_username_filepath:-${PWD}/secrets/postgres_username}
   postgres_password:
-    file: ${greenhouse_nextcloud_secret_postgres_password_filepath:-${PWD}/env/secrets/postgres_password}
+    file: ${greenhouse_nextcloud_secret_postgres_password_filepath:-${PWD}/secrets/postgres_password}

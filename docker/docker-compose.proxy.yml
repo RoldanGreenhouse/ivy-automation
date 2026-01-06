@@ -1,6 +1,9 @@
 services:
 
   traefik:
+    depends_on:
+      ca-server:
+        condition: service_healthy
     image: traefik:3.6.2
     networks:
       greenhouse-infra:
@@ -9,7 +12,7 @@ services:
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
       - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/ca-certs:ro
-      - traefik-letsencrypt:/certificate
+      - ${greenhouse_traefik_letsencrypt:-${PWD}/traefik/${ENV}/certificate}:/certificate
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8081:8080
@@ -17,9 +20,6 @@ services:
       - 443:443/tcp    # HTTPS & DoH
       - 443:443/udp    # HTTPS & DoH
     restart: unless-stopped
-    depends_on:
-      - adguard
-      - ca-server
     environment:
       LEGO_CA_CERTIFICATES: /ca-certs/root_ca.crt
     command:
@@ -42,7 +42,7 @@ services:
       - --certificatesresolvers.greenhouse-resolver.acme.email=${greenhouse_traefik_acme_email}
       - --certificatesresolvers.greenhouse-resolver.acme.certificatesDuration=${greenhouse_traefik_acme_certificates_duration:-24}
       - --certificatesresolvers.greenhouse-resolver.acme.storage=/certificate/acme.json
-      - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/greenhouse-acme/directory
+      - --certificatesresolvers.greenhouse-resolver.acme.caServer=https://${greenhouse_ca_host}:${greenhouse_ca_port:-9000}/acme/${greenhouse_ca_acme:-greenhouse-acme}/directory
       - --certificatesresolvers.greenhouse-resolver.acme.dnschallenge=false
       - --certificatesresolvers.greenhouse-resolver.acme.httpchallenge=false
       - --certificatesresolvers.greenhouse-resolver.acme.tlschallenge=true

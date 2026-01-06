@@ -39,6 +39,7 @@ docker/jellyfin/**/**
 docker/nextcloud/**/**
 docker/pdf/**/**
 docker/step-ca/**/**
+docker/step-ca-postgres/**/**
 docker/traefik/**/**
 docker/wireguard/**/**
 docker/teamspeak/mariadb/**/**
