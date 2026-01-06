@@ -90,7 +90,7 @@ services:
     volumes:
       - ${greenhouse_adguard_volume_work:-${PWD}/adguard/${ENV}/work}:/opt/adguardhome/work
       - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
-      - ${greenhouse_ca_volume_certs:-./step-ca/${ENV}/certs}:/opt/adguardhome/certs
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/opt/adguardhome/certs
     restart: unless-stopped
     labels:
       traefik.enable: true
