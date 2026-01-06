@@ -32,7 +32,7 @@ services:
         condition: service_healthy
       nexcloud-redis:
         condition: service_healthy
-    image: nextcloud:32.0.2.2
+    image: nextcloud:32.0.3
     container_name: ${ENV}-nextcloud
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
