@@ -9,13 +9,6 @@ networks:
         - subnet: ${greenhouse_network_subnet}
           gateway: ${greenhouse_network_gateway}
 
-volumes:
-  traefik-letsencrypt:
-    name: ${ENV}-traefik-letsencrypt
-  ca-db:
-    name: ${ENV}-ca-db
-    external: true
-
 include:
   - docker-compose.critical.yml
   - docker-compose.proxy.yml
