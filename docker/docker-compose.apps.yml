@@ -1,5 +1,50 @@
 services:
 
+  it-tools:
+    image: corentinth/it-tools:2024.10.22-7ca5933
+    container_name: ${ENV}-it-tools
+    scale: ${greenhouse_scale_it_tools:-0}
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_it_tools_ip}
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.it.rule: Host(`${greenhouse_it_tools_host:-it.${DOMAIN}}`)
+      traefik.http.routers.it.entrypoints: https
+      traefik.http.routers.it.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.it-service.loadbalancer.server.port: 80
+      # MIDDLEWARE
+
+  pdf-tools:
+    image: stirlingtools/stirling-pdf:2.1.5
+    container_name: ${ENV}-pdf-tools
+    scale: ${greenhouse_scale_pdf_tools:-0}
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_pdf_tools_ip}
+    environment:
+      MODE: BOTH # Frontend and backend can be split <3
+      SECURITY_ENABLELOGIN: true
+      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username}
+      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword}
+      SYSTEM_DEFAULTLOCALE: ${greenhouse_pdf_locale:-es-ES}
+    volumes:
+      - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
+      - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
+      - ${greenhouse_pdf_volume_logs:-${PWD}/pdf/${ENV}/logs}:/logs
+      - ${greenhouse_pdf_volume_pipeline:-${PWD}/pdf/${ENV}/pipeline}:/pipeline
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.pdf.rule: Host(`${greenhouse_pdf_tools_host:-pdf.${DOMAIN}}`)
+      traefik.http.routers.pdf.entrypoints: https
+      traefik.http.routers.pdf.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.pdf-service.loadbalancer.server.port: 8080
+      # MIDDLEWARE
+
   noip-sync:
     image: noipcom/noip-duc:3.3.0
     env_file: ${PWD}/env/noip/.${ENV}.env

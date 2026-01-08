@@ -1,6 +1,9 @@
 services:
 
   ca-server:
+    depends_on:
+      ca-postgres:
+        condition: service_healthy
     image: smallstep/step-ca:0.28.4
     networks:
       greenhouse-infra:
@@ -10,23 +13,70 @@ services:
     dns: ${greenhouse_adguard_ip}
     ports:
       - ${greenhouse_ca_port:-9000}:9000
-    restart: unless-stopped
+    secrets:
+      - step-ca_password
     environment:
       DOCKER_STEPCA_INIT_NAME: ${greenhouse_ca_config_name}
       DOCKER_STEPCA_INIT_DNS_NAMES: ${greenhouse_ca_config_dns_names}
       DOCKER_STEPCA_INIT_PROVISIONER_NAME: ${greenhouse_ca_config_provisioner_name:-admin}
-      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-greenhouse}
-      DOCKER_STEPCA_INIT_PASSWORD: ${greenhouse_ca_config_password}
+      DOCKER_STEPCA_INIT_SSH: ${greenhouse_ca_config_ssh:-false}
+      DOCKER_STEPCA_INIT_PASSWORD_FILE: /run/secrets/step-ca_password
+
+      PGDATABASE: ${greenhouse_ca_postgres_db}
+      PGUSER: ${greenhouse_ca_postgres_user}
+      PGHOST: ca-postgres
+      PGPORT: ${greenhouse_ca_postgres_port:-5432}
+      PGPASSWORD : ${greenhouse_ca_postgres_password}
     volumes:
       - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/home/step/certs
       - ${greenhouse_ca_volume_secrets:-${PWD}/step-ca/${ENV}/secrets}:/home/step/secrets
       - ${greenhouse_ca_volume_config:-${PWD}/step-ca/${ENV}/config}:/home/step/config
-      - ca-db:/home/step/db
+      - ${greenhouse_ca_volume_db:-${PWD}/step-ca/${ENV}/db}:/home/step/db
+      - ${greenhouse_ca_volume_main:-${PWD}/step-ca/${ENV}/main}:/home/step
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - step ca health
+      interval: 10s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+    restart: unless-stopped
     labels:
       traefik.enable: false
       traefik.docker.network: none
 
+  ca-postgres:
+    image: postgres:${greenhouse_ca_postgres_version:-${greenhouse_postgres_general_version:-18.1}}
+    container_name: ${ENV}-ca-postgres
+    scale: ${greenhouse_scale_ca:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_ca_postgres_port:-5432}:${greenhouse_ca_postgres_port:-5432}
+    environment:
+      PGPORT: ${greenhouse_ca_postgres_port:-5432}
+      POSTGRES_DB: ${greenhouse_ca_postgres_db}
+      POSTGRES_USER: ${greenhouse_ca_postgres_user}
+      POSTGRES_PASSWORD: ${greenhouse_ca_postgres_password}
+    volumes:
+      - ${greenhouse_ca_postgres_vol:-${PWD}/step-ca-postgres}:/var/lib/postgresql
+    restart: always
+    healthcheck:
+      test: 
+        - CMD-SHELL
+        - pg_isready -d $$(cat /run/secrets/postgres_ca_db) -U $$(cat /run/secrets/postgres_ca_username)
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    labels:
+      traefik.enable: false
+
   adguard:
+    depends_on:
+      ca-server:
+        condition: service_healthy
     image: adguard/adguardhome:v0.107.69
     networks:
       greenhouse-infra:
@@ -40,10 +90,8 @@ services:
     volumes:
       - ${greenhouse_adguard_volume_work:-${PWD}/adguard/${ENV}/work}:/opt/adguardhome/work
       - ${greenhouse_adguard_volume_conf:-${PWD}/adguard/${ENV}/conf}:/opt/adguardhome/conf
-      - ${greenhouse_ca_volume_certs:-./step-ca/${ENV}/certs}:/opt/adguardhome/certs
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/opt/adguardhome/certs
     restart: unless-stopped
-    depends_on:
-      - ca-server
     labels:
       traefik.enable: true
       ### Web UI Router
@@ -54,3 +102,7 @@ services:
       # SERVICE
       traefik.http.services.adguard-ui.loadbalancer.server.port: 80
       # MIDDLEWARE
+
+secrets:
+  step-ca_password:
+    file: ${greenhouse_ca_secret_password_filepath:-${PWD}/secrets/step-ca_password}

@@ -37,7 +37,12 @@ docker/env
 docker/adguard/dev/work/**/**
 docker/jellyfin/**/**
 docker/nextcloud/**/**
+docker/nextcloud-redis/**/**
+docker/nextcloud-postgres/**/**
+docker/pdf/**/**
 docker/step-ca/**/**
+docker/step-ca-postgres/**/**
+docker/traefik/**/**
 docker/wireguard/**/**
 docker/teamspeak/mariadb/**/**
 docker/teamspeak/server/logs/**/**

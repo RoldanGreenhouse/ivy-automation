@@ -27,7 +27,12 @@ services:
       traefik.http.services.jellyfin-service.loadbalancer.server.port: 8096
   
   nextcloud:
-    image: nextcloud:31.0.12
+    depends_on:
+      nextcloud-postgres:
+        condition: service_healthy
+      nexcloud-redis:
+        condition: service_healthy
+    image: nextcloud:32.0.3
     container_name: ${ENV}-nextcloud
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
@@ -37,22 +42,19 @@ services:
       - nextcloud_admin_username
       - nextcloud_admin_password
 
-      - postgres_db
-      - postgres_username
-      - postgres_password
+      - postgres_nextcloud_db
+      - postgres_nextcloud_username
+      - postgres_nextcloud_password
     environment:
       POSTGRES_HOST: nextcloud-postgres
-      POSTGRES_DB_FILE: /run/secrets/postgres_db
-      POSTGRES_USER_FILE: /run/secrets/postgres_username
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_nextcloud_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_nextcloud_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_nextcloud_password
       
       NEXTCLOUD_ADMIN_USER_FILE: /run/secrets/nextcloud_admin_username
       NEXTCLOUD_ADMIN_PASSWORD_FILE: /run/secrets/nextcloud_admin_password
 
       REDIS_HOST: nexcloud-redis
-    depends_on:
-      - nexcloud-redis
-      - nextcloud-postgres
     volumes:
       - ${greenhouse_nextcloud_vol_main:-${PWD}/nextcloud/main}:/var/www/html
       - ${greenhouse_nextcloud_vol_apps:-${PWD}/nextcloud/apps}:/var/www/html/custom_apps
@@ -70,22 +72,30 @@ services:
       # MIDDLEWARE
 
   nextcloud-postgres:
-    image: postgres:18.1
+    image: postgres:${greenhouse_nextcloud_postgres_version:-${greenhouse_postgres_general_version:-18.1}}
     container_name: ${ENV}-nextcloud-db
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
       greenhouse-infra:
     secrets:
-      - postgres_db
-      - postgres_username
-      - postgres_password
+      - postgres_nextcloud_db
+      - postgres_nextcloud_username
+      - postgres_nextcloud_password
     environment:
-      POSTGRES_DB_FILE: /run/secrets/postgres_db
-      POSTGRES_USER_FILE: /run/secrets/postgres_username
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_nextcloud_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_nextcloud_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_nextcloud_password
     volumes:
-      - ${greenhouse_nextcloud_vol_postgres:-${PWD}/nextcloud/postgres}:/var/lib/postgresql
+      - ${greenhouse_nextcloud_vol_postgres:-${PWD}/nextcloud-postgres}:/var/lib/postgresql
     restart: always
+    healthcheck:
+      test: 
+        - CMD-SHELL
+        - pg_isready -d $$(cat /run/secrets/postgres_nextcloud_db) -U $$(cat /run/secrets/postgres_nextcloud_username)
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
     labels:
       traefik.enable: false
 
@@ -96,20 +106,29 @@ services:
     networks:
       greenhouse-infra:
     volumes:
-      - ${greenhouse_nextcloud_vol_redis:-${PWD}/nextcloud/redis}:/data
+      - ${greenhouse_nextcloud_vol_redis:-${PWD}/nextcloud-redis}:/data
     restart: always
+    healthcheck:
+      test: 
+       - "CMD"
+       - "redis-cli"
+       - "ping"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: false
 
 secrets:
   nextcloud_admin_username:
-    file: ${greenhouse_nextcloud_secret_username_filepath:-${PWD}/env/secrets/nextcloud_admin_username}
+    file: ${greenhouse_nextcloud_secret_username_filepath:-${PWD}/secrets/nextcloud_admin_username}
   nextcloud_admin_password:
-    file: ${greenhouse_nextcloud_secret_password_filepath:-${PWD}/env/secrets/nextcloud_admin_password}
+    file: ${greenhouse_nextcloud_secret_password_filepath:-${PWD}/secrets/nextcloud_admin_password}
   
-  postgres_db:
-    file: ${greenhouse_nextcloud_secret_postgres_db_filepath:-${PWD}/env/secrets/postgres_db}
-  postgres_username:
-    file: ${greenhouse_nextcloud_secret_postgres_username_filepath:-${PWD}/env/secrets/postgres_username}
-  postgres_password:
-    file: ${greenhouse_nextcloud_secret_postgres_password_filepath:-${PWD}/env/secrets/postgres_password}
+  postgres_nextcloud_db:
+    file: ${greenhouse_nextcloud_secret_postgres_db_filepath:-${PWD}/secrets/postgres_nextcloud_db}
+  postgres_nextcloud_username:
+    file: ${greenhouse_nextcloud_secret_postgres_username_filepath:-${PWD}/secrets/postgres_nextcloud_username}
+  postgres_nextcloud_password:
+    file: ${greenhouse_nextcloud_secret_postgres_password_filepath:-${PWD}/secrets/postgres_nextcloud_password}
