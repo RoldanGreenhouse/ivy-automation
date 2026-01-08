@@ -1,0 +1,40 @@
+services:
+
+  authentik-postgres:
+    image: postgres:${greenhouse_auth_postgres_version:-${greenhouse_postgres_general_version}}
+    container_name: ${ENV}-authentik-postgres
+    scale: ${greenhouse_scale_auth:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_auth_postgres_port:-5432}:${greenhouse_auth_postgres_port:-5432}
+    secrets:
+      - postgres_auth_db
+      - postgres_auth_username
+      - postgres_auth_password
+    environment:
+      PGPORT: ${greenhouse_auth_postgres_port:-5432}
+      POSTGRES_DB_FILE: /run/secrets/postgres_auth_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_auth_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
+    volumes:
+      - ${greenhouse_auth_postgres_vol:-${PWD}/authentik-postgres}:/var/lib/postgresql
+    healthcheck:
+      test: 
+        - CMD-SHELL
+        - pg_isready -d $$(cat /run/secrets/postgres_auth_db) -U $$(cat /run/secrets/postgres_auth_username)
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    restart: always
+    labels:
+      traefik.enable: false
+
+secrets:
+  postgres_auth_db:
+    file: ${greenhouse_secret_postgres_auth_db_filepath:-${PWD}/secrets/postgres_auth_db}
+  postgres_auth_username:
+    file: ${greenhouse_secret_postgres_auth_username_filepath:-${PWD}/secrets/postgres_auth_username}
+  postgres_auth_password:
+    file: ${greenhouse_secret_postgres_auth_password_filepath:-${PWD}/secrets/postgres_auth_password}
