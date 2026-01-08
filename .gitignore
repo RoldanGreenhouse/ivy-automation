@@ -44,5 +44,7 @@ docker/step-ca/**/**
 docker/step-ca-postgres/**/**
 docker/traefik/**/**
 docker/wireguard/**/**
+docker/authentik/**/**
+docker/authentik-postgres/**/**
 docker/teamspeak/mariadb/**/**
 docker/teamspeak/server/logs/**/**
