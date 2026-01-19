@@ -74,6 +74,7 @@ services:
       AUTHENTIK_EMAIL__TIMEOUT: ${greenhouse_auth_email_timeout}
       AUTHENTIK_EMAIL__FROM: ${greenhouse_auth_email_from}
     volumes:
+      - ${greenhouse_auth_vol_data:-${PWD}/authentik/${ENV}/data}:/data
       - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
       - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
     restart: unless-stopped
@@ -117,6 +118,7 @@ services:
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${greenhouse_auth_vol_data:-${PWD}/authentik/${ENV}/data}:/data
       - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
       - ${greenhouse_auth_vol_certs:-${PWD}/authentik/${ENV}/certs}:/certs
       - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates

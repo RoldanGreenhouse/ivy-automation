@@ -4,9 +4,7 @@ http:
     enabled: false
   address: 42.42.42.30:80
   session_ttl: 720h
-users:
-  - name: admin
-    password: $2a$12$q/GkcYQHrfC4Lv4eRaTHse9uFLCSEMeRgwrnLuiqHNY8Pol0iQOL6
+users: []
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -182,19 +180,19 @@ filtering:
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
     - domain: dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: ca.dev.greenhouse.ogt
-      answer: 42.42.42.70
+      answer: ca
       enabled: true
     - domain: ca.dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: adguard.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: adguard.dev.greenhouse.ogt
       answer: 192.168.1.10
@@ -203,31 +201,37 @@ filtering:
       answer: 192.168.1.10
       enabled: true
     - domain: traefik.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: jellyfin.dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: jellyfin.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: cloud.dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: cloud.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: it.dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: it.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
       enabled: true
     - domain: pdf.dev.greenhouse.ogt
       answer: 192.168.1.10
       enabled: true
     - domain: pdf.dev.greenhouse.ogt
-      answer: 42.42.42.50
+      answer: traefik
+      enabled: true
+    - domain: auth.dev.greenhouse.ogt
+      answer: 192.168.1.10
+      enabled: true
+    - domain: auth.dev.greenhouse.ogt
+      answer: traefik
       enabled: true
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*

@@ -102,6 +102,7 @@ services:
       # SERVICE
       traefik.http.services.adguard-ui.loadbalancer.server.port: 80
       # MIDDLEWARE
+      traefik.http.routers.adguard-ui.middlewares: authentik@docker
 
 secrets:
   step-ca_password:
