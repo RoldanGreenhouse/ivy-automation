@@ -38,7 +38,7 @@ services:
         condition: service_healthy
       ca-server:
         condition: service_healthy
-    image: authentik/server:${greenhouse_auth_image_version:-2025.10.3}
+    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-authentik-server
@@ -97,7 +97,7 @@ services:
         condition: service_healthy
       ca-server:
         condition: service_healthy
-    image: authentik/server:${greenhouse_auth_image_version:-2025.10.3}
+    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-authentik-worker
@@ -118,9 +118,6 @@ services:
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${greenhouse_auth_vol_data:-${PWD}/authentik/${ENV}/data}:/data
-      - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
-      - ${greenhouse_auth_vol_certs:-${PWD}/authentik/${ENV}/certs}:/certs
       - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
     restart: unless-stopped
     labels:

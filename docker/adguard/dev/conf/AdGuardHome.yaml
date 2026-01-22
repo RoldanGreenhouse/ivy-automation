@@ -22,14 +22,15 @@ dns:
   refuse_any: true
   upstream_dns:
     - https://dns10.quad9.net/dns-query
-    - https://noads.joindns4.eu/dns-query
+    - '[/*.greenhouse.es/]192.168.1.30'
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
     - 149.112.112.10
     - 2620:fe::10
     - 2620:fe::fe:10
-  fallback_dns: []
+  fallback_dns:
+    - 192.168.1.30
   upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
@@ -47,6 +48,8 @@ dns:
   cache_ttl_min: 300
   cache_ttl_max: 3600
   cache_optimistic: false
+  cache_optimistic_answer_ttl: 30s
+  cache_optimistic_max_age: 12h
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: false
@@ -61,8 +64,9 @@ dns:
   bootstrap_prefer_ipv6: false
   upstream_timeout: 4s
   private_networks: []
-  use_private_ptr_resolvers: false
-  local_ptr_upstreams: []
+  use_private_ptr_resolvers: true
+  local_ptr_upstreams:
+    - 192.168.1.30
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
@@ -267,4 +271,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 31
+schema_version: 32

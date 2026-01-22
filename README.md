@@ -533,7 +533,39 @@ After importing the certificate, restart the browsers and the "Insecure webpage"
 
 Will be used to configure the Authentication layer on the project. The plan is to configure each service exposed with it to ensure security.
 
+#### First Step
 
+The first step as the [documentation page say](https://docs.goauthentik.io/install-config/install/docker-compose/) is to go to https://your.authentik.domain/if/flow/initial-setup/ and setup your admin user. I will use it to configure mine and later disable the default admin user. Just in case.
+
+![auth-setup-001](./README.assets/auth-setup-001.png)
+
+After log in, click  on `Admin Interface` > Directory > Users. And create a new user. Make sure to add it as *User Type* **Internal**. 
+
+![auth-setup-002](./README.assets/auth-setup-002.png)
+
+![auth-setup-003](./README.assets/auth-setup-003.png)
+
+Once is done, edit and add the Admin Group on the user.
+
+![auth-setup-004](./README.assets/auth-setup-004.png)
+
+#### Securing Applications
+
+##### Using OAuth2/OpenID
+
+WIP
+
+##### Using Proxy Provider
+
+For applications like AdGuardHome or just subdomains without any auth on them, you can secure them using this. The proxy (in our case Traefik) would be in charge of doing the redirections ensuring that you are logged.
+
+To do it, `Applications` > `Providers` > `New Provider` > `Proxy Provider`
+
+![auth-proxy-001](./README.assets/auth-proxy-001.png)
+
+Now the Application to secure; `Applications` > `Applications` > `Create`
+
+![auth-proxy-002](./README.assets/auth-proxy-002.png)
 
 ### Wireguard
 
