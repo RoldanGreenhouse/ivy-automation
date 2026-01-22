@@ -511,6 +511,29 @@ Additionally, I added few improvements on the **ca.json**. Not sure if neccesary
 	"commonName": "Step Online CA for ${REPLACE THIS WITH YOUR DOMAIN}"
 ```
 
+#### Install the Certificate
+
+The file we will need to import is **root_ca.crt**. It will be placed on **Step-ca Volume**, `/cert` folder.
+
+#### Windows
+
+Double click on the file `root_ca.crt` > Click on `Install Certificate` > Your User or All the machine (Up to you) > Browse to `Trusted Root Certification Authorities`. Done :heart:
+
+After importing the certificate, restart the browsers and the "Insecure webpage" messages should disappear.
+
+![CA.Cert.002](./README.assets/Step-ca_install_windows_002.png)
+
+![CA.Cert.003](./README.assets/Step-ca_install_windows_003.png)
+
+![CA.Cert.004](./README.assets/Step-ca_install_windows_004.png)
+
+![CA.Cert.001](./README.assets/Step-ca_install_windows_001.png)
+
+### Authentik
+
+Will be used to configure the Authentication layer on the project. The plan is to configure each service exposed with it to ensure security.
+
+
 
 ### Wireguard
 
