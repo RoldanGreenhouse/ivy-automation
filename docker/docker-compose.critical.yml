@@ -10,6 +10,7 @@ services:
         ipv4_address: ${greenhouse_ca_ip}
     container_name: ${ENV}-ca
     scale: ${greenhouse_scale_ca}
+    # dns: ${greenhouse_adguard_ip}
     ports:
       - ${greenhouse_ca_port:-9000}:9000
     secrets:
