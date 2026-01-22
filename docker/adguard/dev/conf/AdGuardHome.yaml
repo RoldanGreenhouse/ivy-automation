@@ -12,7 +12,7 @@ language: en
 theme: auto
 dns:
   bind_hosts:
-    - 42.42.42.30
+    - 0.0.0.0
   port: 53
   anonymize_client_ip: false
   ratelimit: 20
@@ -179,58 +179,58 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: dev.greenhouse.ogt
+    - domain: dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: dev.greenhouse.ogt
+    - domain: dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: ca.dev.greenhouse.ogt
+    - domain: ca.dev.greenhouse.roldan
       answer: ca
       enabled: true
-    - domain: ca.dev.greenhouse.ogt
+    - domain: ca.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: adguard.dev.greenhouse.ogt
+    - domain: adguard.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: adguard.dev.greenhouse.ogt
+    - domain: adguard.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: traefik.dev.greenhouse.ogt
+    - domain: traefik.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: traefik.dev.greenhouse.ogt
+    - domain: traefik.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: jellyfin.dev.greenhouse.ogt
+    - domain: jellyfin.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: jellyfin.dev.greenhouse.ogt
+    - domain: jellyfin.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: cloud.dev.greenhouse.ogt
+    - domain: cloud.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: cloud.dev.greenhouse.ogt
+    - domain: cloud.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: it.dev.greenhouse.ogt
+    - domain: it.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: it.dev.greenhouse.ogt
+    - domain: it.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: pdf.dev.greenhouse.ogt
+    - domain: pdf.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: pdf.dev.greenhouse.ogt
+    - domain: pdf.dev.greenhouse.roldan
       answer: traefik
       enabled: true
-    - domain: auth.dev.greenhouse.ogt
+    - domain: auth.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: auth.dev.greenhouse.ogt
+    - domain: auth.dev.greenhouse.roldan
       answer: traefik
       enabled: true
   safe_fs_patterns:
