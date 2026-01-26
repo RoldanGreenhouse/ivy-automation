@@ -14,8 +14,9 @@ services:
       traefik.http.routers.it.entrypoints: https
       traefik.http.routers.it.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.it-service.loadbalancer.server.port: 80
+      traefik.http.services.it.loadbalancer.server.port: 80
       # MIDDLEWARE
+      traefik.http.routers.it.middlewares: authentik@docker
 
   pdf-tools:
     image: stirlingtools/stirling-pdf:2.1.5
