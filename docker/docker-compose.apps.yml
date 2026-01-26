@@ -19,7 +19,10 @@ services:
       traefik.http.routers.it.middlewares: authentik@docker
 
   pdf-tools:
-    image: stirlingtools/stirling-pdf:2.1.5
+    depends_on:
+      ca-server:
+        condition: service_healthy
+    image: stirlingtools/stirling-pdf:2.3.1
     container_name: ${ENV}-pdf-tools
     scale: ${greenhouse_scale_pdf_tools:-0}
     networks:
@@ -27,15 +30,16 @@ services:
         ipv4_address: ${greenhouse_pdf_tools_ip}
     environment:
       MODE: BOTH # Frontend and backend can be split <3
-      SECURITY_ENABLELOGIN: true
-      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username}
-      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword}
+      SECURITY_ENABLELOGIN: ${greenhouse_pdf_enable_login:-false} 
+      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username:-gh}
+      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword:-12345}
       SYSTEM_DEFAULTLOCALE: ${greenhouse_pdf_locale:-es-ES}
     volumes:
       - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
       - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
       - ${greenhouse_pdf_volume_logs:-${PWD}/pdf/${ENV}/logs}:/logs
       - ${greenhouse_pdf_volume_pipeline:-${PWD}/pdf/${ENV}/pipeline}:/pipeline
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/usr/local/share/ca-certificates/
     labels:
       traefik.enable: true
       # ROUTER
@@ -43,8 +47,9 @@ services:
       traefik.http.routers.pdf.entrypoints: https
       traefik.http.routers.pdf.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.pdf-service.loadbalancer.server.port: 8080
+      traefik.http.services.pdf.loadbalancer.server.port: 8080
       # MIDDLEWARE
+      traefik.http.routers.pdf.middlewares: authentik@docker
 
   noip-sync:
     image: noipcom/noip-duc:3.3.0

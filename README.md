@@ -551,10 +551,6 @@ Once is done, edit and add the Admin Group on the user.
 
 #### Securing Applications
 
-##### Using OAuth2/OpenID
-
-WIP
-
 ##### Using Proxy Provider
 
 For applications like AdGuardHome or just subdomains without any auth on them, you can secure them using this. The proxy (in our case Traefik) would be in charge of doing the redirections ensuring that you are logged.
@@ -566,6 +562,34 @@ To do it, `Applications` > `Providers` > `New Provider` > `Proxy Provider`
 Now the Application to secure; `Applications` > `Applications` > `Create`
 
 ![auth-proxy-002](./README.assets/auth-proxy-002.png)
+
+##### Using OAuth2/OpenID
+
+Make sure before continue that the application that you are trying to secure with OAuth2/OpenID does support it. If not, I guess using the Proxy Provider should be enough.
+
+###### Stirling PDF
+
+![stirling-pdf.oauth](./README.assets/strling-pdf.oauth.png)
+
+They required a licence (that for personal use does not make ANY sense) to user OAuth2 on them. The issue that I have, as the project is generating their own CA certificate, was refusing connections due to the lack of trust on the certificates. 
+Just follow this [link](https://docs.stirlingpdf.com/Functionality/Security/Certificate-Signing/#signature-validation-fails) to fix it. I adding a new volume with the Step-CA certificates and add then with the command.
+
+```yaml
+...
+volumes:
+      - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
+      - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
+      - ${greenhouse_pdf_volume_logs:-${PWD}/pdf/${ENV}/logs}:/logs
+      - ${greenhouse_pdf_volume_pipeline:-${PWD}/pdf/${ENV}/pipeline}:/pipeline
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/usr/local/share/ca-certificates/ # <---- This line
+...
+```
+
+```bash
+$ docker exec stirling-pdf update-ca-certificates
+```
+
+After that, if you have licence, it should work. If not, will redirect you to url `https://your-domain/errorOAuth=oAuth2RequiresLicense`.
 
 ### Wireguard
 
