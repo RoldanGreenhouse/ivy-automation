@@ -58,3 +58,5 @@ services:
       traefik.http.middlewares.acme-allow.redirectregex.regex: "^https://(.+)/\\.well-known/acme-challenge/(.*)"
       traefik.http.middlewares.acme-allow.redirectregex.replacement: "http://$${1}/.well-known/acme-challenge/$${2}"
       traefik.http.middlewares.acme-allow.redirectregex.permanent: false
+
+      traefik.http.routers.dashboard.middlewares: authentik@docker
