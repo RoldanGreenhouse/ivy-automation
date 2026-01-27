@@ -1,5 +1,31 @@
 services:
 
+  redis:
+    image: redis:8.4.0
+    container_name: ${ENV}-redis
+    scale: ${greenhouse_scale_redis:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_redis_port:-6379}:${greenhouse_redis_port:-6379}
+    command: --port ${greenhouse_redis_port:-6379}
+    volumes:
+      - ${greenhouse_vol_redis:-${PWD}/redis}:/data
+    restart: always
+    healthcheck:
+      test: 
+      - "CMD"
+      - "redis-cli"
+      - "-p"
+      - "${greenhouse_redis_port:-6379}"
+      - "ping"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: false
+
   it-tools:
     image: corentinth/it-tools:2024.10.22-7ca5933
     container_name: ${ENV}-it-tools

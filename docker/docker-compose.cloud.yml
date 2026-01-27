@@ -16,7 +16,7 @@ services:
       - type: bind
         source: ${greenhouse_jellyfin_bind_media_path}
         target: /media
-    restart: 'unless-stopped'
+    restart: always
     labels:
       traefik.enable: true
       # ROUTER
@@ -24,37 +24,37 @@ services:
       traefik.http.routers.jellyfin.entrypoints: https
       traefik.http.routers.jellyfin.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.jellyfin-service.loadbalancer.server.port: 8096
+      traefik.http.services.jellyfin.loadbalancer.server.port: 8096
+      raefik.http.routers.jellyfin.middlewares: authentik@docker
   
   nextcloud:
     depends_on:
       nextcloud-postgres:
         condition: service_healthy
-      nexcloud-redis:
+      redis:
         condition: service_healthy
-    image: nextcloud:32.0.3
+    image: nextcloud:31.0.13
     container_name: ${ENV}-nextcloud
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_nextcloud_ip}
     secrets:
       - nextcloud_admin_username
       - nextcloud_admin_password
-
       - postgres_nextcloud_db
       - postgres_nextcloud_username
       - postgres_nextcloud_password
     environment:
-      POSTGRES_HOST: nextcloud-postgres
+      POSTGRES_HOST: nextcloud-postgres:${greenhouse_nextcloud_postgres_port:-5432}
       POSTGRES_DB_FILE: /run/secrets/postgres_nextcloud_db
       POSTGRES_USER_FILE: /run/secrets/postgres_nextcloud_username
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_nextcloud_password
-      
+
       NEXTCLOUD_ADMIN_USER_FILE: /run/secrets/nextcloud_admin_username
       NEXTCLOUD_ADMIN_PASSWORD_FILE: /run/secrets/nextcloud_admin_password
 
-      REDIS_HOST: nexcloud-redis
+      REDIS_HOST: redis
+      REDIS_HOST_PORT: ${greenhouse_redis_port:-6379}
     volumes:
       - ${greenhouse_nextcloud_vol_main:-${PWD}/nextcloud/main}:/var/www/html
       - ${greenhouse_nextcloud_vol_apps:-${PWD}/nextcloud/apps}:/var/www/html/custom_apps
@@ -68,8 +68,9 @@ services:
       traefik.http.routers.cloud.entrypoints: https
       traefik.http.routers.cloud.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.cloud-service.loadbalancer.server.port: 80
+      traefik.http.services.cloud.loadbalancer.server.port: 80
       # MIDDLEWARE
+      raefik.http.routers.cloud.middlewares: authentik@docker
 
   nextcloud-postgres:
     image: postgres:${greenhouse_nextcloud_postgres_version:-${greenhouse_postgres_general_version:-18.1}}
@@ -77,17 +78,20 @@ services:
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:
       greenhouse-infra:
+    ports:
+      - ${greenhouse_nextcloud_postgres_port:-5432}:${greenhouse_nextcloud_postgres_port:-5432}
     secrets:
       - postgres_nextcloud_db
       - postgres_nextcloud_username
       - postgres_nextcloud_password
     environment:
+      PGPORT: ${greenhouse_nextcloud_postgres_port:-5432}
       POSTGRES_DB_FILE: /run/secrets/postgres_nextcloud_db
       POSTGRES_USER_FILE: /run/secrets/postgres_nextcloud_username
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_nextcloud_password
     volumes:
       - ${greenhouse_nextcloud_vol_postgres:-${PWD}/nextcloud-postgres}:/var/lib/postgresql
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: 
         - CMD-SHELL
@@ -96,27 +100,6 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
-    labels:
-      traefik.enable: false
-
-  nexcloud-redis:
-    image: redis:8.4.0
-    container_name: ${ENV}-nextcloud-redis
-    scale: ${greenhouse_scale_nextcloud:-0}
-    networks:
-      greenhouse-infra:
-    volumes:
-      - ${greenhouse_nextcloud_vol_redis:-${PWD}/nextcloud-redis}:/data
-    restart: always
-    healthcheck:
-      test: 
-       - "CMD"
-       - "redis-cli"
-       - "ping"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     labels:
       traefik.enable: false
 
