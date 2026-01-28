@@ -567,6 +567,23 @@ Now the Application to secure; `Applications` > `Applications` > `Create`
 
 Make sure before continue that the application that you are trying to secure with OAuth2/OpenID does support it. If not, I guess using the Proxy Provider should be enough.
 
+###### Nextcloud
+
+To do it, [check this documentation page](https://integrations.goauthentik.io/chat-communication-collaboration/nextcloud/). Mainly you will have to download an extension app on Nexcloud called **OpenID Connect user backend**.
+It could change, but I found it going to **Apps > Social & conmunication**, and look for it.
+
+![nextcloud-openid-001](./README.assets/nextcloud-openid-001.png)
+
+![nextcloud-openid-002](./README.assets/nextcloud-openid-002.png)
+
+![nextcloud-openid-003](./README.assets/nextcloud-openid-003.png)
+
+On you find it, just click on **Enable** :heart:.
+
+https://help.nextcloud.com/t/add-ca-certificate-for-ldaps-on-docker-image/119386
+
+https://docs.nextcloud.com/server/latest/admin_manual/occ_command.html#security-commands-label
+
 ###### Stirling PDF
 
 ![stirling-pdf.oauth](./README.assets/strling-pdf.oauth.png)

@@ -39,11 +39,12 @@ services:
     networks:
       greenhouse-infra:
     secrets:
-      - nextcloud_admin_username
-      - nextcloud_admin_password
       - postgres_nextcloud_db
       - postgres_nextcloud_username
       - postgres_nextcloud_password
+      
+      - nextcloud_admin_username
+      - nextcloud_admin_password
     environment:
       POSTGRES_HOST: nextcloud-postgres:${greenhouse_nextcloud_postgres_port:-5432}
       POSTGRES_DB_FILE: /run/secrets/postgres_nextcloud_db
@@ -55,11 +56,23 @@ services:
 
       REDIS_HOST: redis
       REDIS_HOST_PORT: ${greenhouse_redis_port:-6379}
+
+      TRUSTED_PROXIES: "traefik localhost"
+      OVERWRITEPROTOCOL: https
+      OVERWRITEHOST: ${greenhouse_nextcloud_host:-cloud.${DOMAIN}}
     volumes:
       - ${greenhouse_nextcloud_vol_main:-${PWD}/nextcloud/main}:/var/www/html
       - ${greenhouse_nextcloud_vol_apps:-${PWD}/nextcloud/apps}:/var/www/html/custom_apps
       - ${greenhouse_nextcloud_vol_config:-${PWD}/nextcloud/config}:/var/www/html/config
       - ${greenhouse_nextcloud_vol_data:-${PWD}/nextcloud/data}:/var/www/html/data
+      - ${PWD}/nextcloud-hooks/post-installation:/docker-entrypoint-hooks.d/post-installation
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}/root_ca.crt:/greenhouse/ca-certificates/greenhouse_step_ca.crt
+    entrypoint: >
+      sh -c '
+        echo "Giving required permissions for Step-CA certificate..."
+        chmod 644 /greenhouse/ca-certificates/greenhouse_step_ca.crt 2>/dev/null || true;
+        exec /entrypoint.sh apache2-foreground
+      '
     restart: always
     labels:
       traefik.enable: true
