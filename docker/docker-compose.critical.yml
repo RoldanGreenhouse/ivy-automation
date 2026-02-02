@@ -4,13 +4,12 @@ services:
     depends_on:
       ca-postgres:
         condition: service_healthy
-    image: smallstep/step-ca:0.28.4
+    image: smallstep/step-ca:0.29.0
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_ca_ip}
     container_name: ${ENV}-ca
     scale: ${greenhouse_scale_ca}
-    dns: ${greenhouse_adguard_ip}
     ports:
       - ${greenhouse_ca_port:-9000}:9000
     secrets:
@@ -57,6 +56,7 @@ services:
     environment:
       PGPORT: ${greenhouse_ca_postgres_port:-5432}
       POSTGRES_DB: ${greenhouse_ca_postgres_db}
+      PGUSER: ${greenhouse_ca_postgres_user} # Required for the healthcheck
       POSTGRES_USER: ${greenhouse_ca_postgres_user}
       POSTGRES_PASSWORD: ${greenhouse_ca_postgres_password}
     volumes:
@@ -65,7 +65,7 @@ services:
     healthcheck:
       test: 
         - CMD-SHELL
-        - pg_isready -d $$(cat /run/secrets/postgres_ca_db) -U $$(cat /run/secrets/postgres_ca_username)
+        - pg_isready -d $${POSTGRES_DB} -U $${PGUSER}
       interval: 10s
       retries: 5
       start_period: 30s
@@ -74,10 +74,7 @@ services:
       traefik.enable: false
 
   adguard:
-    depends_on:
-      ca-server:
-        condition: service_healthy
-    image: adguard/adguardhome:v0.107.69
+    image: adguard/adguardhome:v0.107.71
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
@@ -102,6 +99,7 @@ services:
       # SERVICE
       traefik.http.services.adguard-ui.loadbalancer.server.port: 80
       # MIDDLEWARE
+      traefik.http.routers.adguard-ui.middlewares: authentik@docker
 
 secrets:
   step-ca_password:

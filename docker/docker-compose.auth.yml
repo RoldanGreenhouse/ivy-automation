@@ -1,0 +1,138 @@
+services:
+
+  authentik-postgres:
+    image: postgres:${greenhouse_auth_postgres_version:-${greenhouse_postgres_general_version}}
+    container_name: ${ENV}-authentik-postgres
+    scale: ${greenhouse_scale_auth:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_auth_postgres_port:-5432}:${greenhouse_auth_postgres_port:-5432}
+    secrets:
+      - postgres_auth_db
+      - postgres_auth_username
+      - postgres_auth_password
+    environment:
+      PGPORT: ${greenhouse_auth_postgres_port:-5432}
+      POSTGRES_DB_FILE: /run/secrets/postgres_auth_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_auth_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
+    volumes:
+      - ${greenhouse_auth_postgres_vol:-${PWD}/authentik-postgres}:/var/lib/postgresql
+    healthcheck:
+      test: 
+        - CMD-SHELL
+        - pg_isready -d $$(cat /run/secrets/postgres_auth_db) -U $$(cat /run/secrets/postgres_auth_username)
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    restart: always
+    labels:
+      traefik.enable: false
+
+  authentik-server:
+    command: server
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      ca-server:
+        condition: service_healthy
+    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
+    networks:
+      greenhouse-infra:
+    container_name: ${ENV}-authentik-server
+    scale: ${greenhouse_scale_auth:-0}
+    ports:
+      - ${greenhouse_auth_metrics_port:-9300}:9300
+    secrets:
+      - authentik_secret_key
+      - postgres_auth_db
+      - postgres_auth_username
+      - postgres_auth_password
+    environment:
+      AUTHENTIK_COOKIE_DOMAIN: ${DOMAIN}
+
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__PORT: ${greenhouse_auth_postgres_port:-5432}
+      AUTHENTIK_POSTGRESQL__NAME: file:///run/secrets/postgres_auth_db
+      AUTHENTIK_POSTGRESQL__USER: file:///run/secrets/postgres_auth_username
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_auth_password
+
+      #AUTHENTIK_LISTEN__TRUSTED_PROXY_CIDRS: ${greenhouse_auth_trust_proxy_cidr:-127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 42.42.42.0/24}
+
+      AUTHENTIK_LOG_LEVEL: ${greenhouse_auth_log_level:-info}
+      AUTHENTIK_SECRET_KEY: 'file:///run/secrets/authentik_secret_key'
+
+      # This block is optional. Just comment it if you don't want it
+      AUTHENTIK_EMAIL__HOST: ${greenhouse_auth_email_host}
+      AUTHENTIK_EMAIL__PORT: ${greenhouse_auth_email_port}
+      AUTHENTIK_EMAIL__USERNAME: ${greenhouse_auth_email_username}
+      AUTHENTIK_EMAIL__PASSWORD: ${greenhouse_auth_email_password}
+      AUTHENTIK_EMAIL__USE_TLS: ${greenhouse_auth_email_tls}
+      AUTHENTIK_EMAIL__USE_SSL: ${greenhouse_auth_email_ssl}
+      AUTHENTIK_EMAIL__TIMEOUT: ${greenhouse_auth_email_timeout}
+      AUTHENTIK_EMAIL__FROM: ${greenhouse_auth_email_from}
+    volumes:
+      - ${greenhouse_auth_vol_data:-${PWD}/authentik/${ENV}/data}:/data
+      - ${greenhouse_auth_vol_media:-${PWD}/authentik/${ENV}/media}:/media
+      - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.auth-server.rule: Host(`${greenhouse_auth_host:-auth.${DOMAIN}}`)
+      traefik.http.routers.auth-server.entrypoints: https
+      traefik.http.routers.auth-server.tls: true
+      traefik.http.routers.auth-server.tls.certresolver: greenhouse-resolver
+      traefik.http.routers.auth-server.service: auth-server-service
+      # SERVICE
+      traefik.http.services.auth-server-service.loadbalancer.server.port: ${greenhouse_auth_http_port:-9000}
+      # MIDDLEWARE
+      traefik.http.middlewares.authentik.forwardAuth.address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
+      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+
+  authentik-worker:
+    command: worker
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      ca-server:
+        condition: service_healthy
+    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
+    networks:
+      greenhouse-infra:
+    container_name: ${ENV}-authentik-worker
+    scale: ${greenhouse_scale_auth:-0}
+    secrets:
+      - authentik_secret_key
+      - postgres_auth_db
+      - postgres_auth_username
+      - postgres_auth_password
+    environment:      
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__PORT: ${greenhouse_auth_postgres_port:-5432}
+      AUTHENTIK_POSTGRESQL__NAME: file:///run/secrets/postgres_auth_db
+      AUTHENTIK_POSTGRESQL__USER: file:///run/secrets/postgres_auth_username
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_auth_password
+
+      AUTHENTIK_LOG_LEVEL: ${greenhouse_auth_log_level:-info}
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${greenhouse_auth_mail_templates:-${PWD}/authentik/${ENV}/templates}:/templates
+    restart: unless-stopped
+    labels:
+      traefik.enable: false
+
+secrets:
+  postgres_auth_db:
+    file: ${greenhouse_secret_postgres_auth_db_filepath:-${PWD}/secrets/postgres_auth_db}
+  postgres_auth_username:
+    file: ${greenhouse_secret_postgres_auth_username_filepath:-${PWD}/secrets/postgres_auth_username}
+  postgres_auth_password:
+    file: ${greenhouse_secret_postgres_auth_password_filepath:-${PWD}/secrets/postgres_auth_password}
+
+  authentik_secret_key:
+    file: ${greenhouse_authentik_secret_key_filepath:-${PWD}/secrets/authentik_secret_key}

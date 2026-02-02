@@ -1,5 +1,31 @@
 services:
 
+  redis:
+    image: redis:8.4.0
+    container_name: ${ENV}-redis
+    scale: ${greenhouse_scale_redis:-0}
+    networks:
+      greenhouse-infra:
+    ports:
+      - ${greenhouse_redis_port:-6379}:${greenhouse_redis_port:-6379}
+    command: --port ${greenhouse_redis_port:-6379}
+    volumes:
+      - ${greenhouse_vol_redis:-${PWD}/redis}:/data
+    restart: always
+    healthcheck:
+      test: 
+      - "CMD"
+      - "redis-cli"
+      - "-p"
+      - "${greenhouse_redis_port:-6379}"
+      - "ping"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: false
+
   it-tools:
     image: corentinth/it-tools:2024.10.22-7ca5933
     container_name: ${ENV}-it-tools
@@ -14,11 +40,15 @@ services:
       traefik.http.routers.it.entrypoints: https
       traefik.http.routers.it.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.it-service.loadbalancer.server.port: 80
+      traefik.http.services.it.loadbalancer.server.port: 80
       # MIDDLEWARE
+      traefik.http.routers.it.middlewares: authentik@docker
 
   pdf-tools:
-    image: stirlingtools/stirling-pdf:2.1.5
+    depends_on:
+      ca-server:
+        condition: service_healthy
+    image: stirlingtools/stirling-pdf:2.3.1
     container_name: ${ENV}-pdf-tools
     scale: ${greenhouse_scale_pdf_tools:-0}
     networks:
@@ -26,15 +56,16 @@ services:
         ipv4_address: ${greenhouse_pdf_tools_ip}
     environment:
       MODE: BOTH # Frontend and backend can be split <3
-      SECURITY_ENABLELOGIN: true
-      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username}
-      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword}
+      SECURITY_ENABLELOGIN: ${greenhouse_pdf_enable_login:-false} 
+      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username:-gh}
+      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword:-12345}
       SYSTEM_DEFAULTLOCALE: ${greenhouse_pdf_locale:-es-ES}
     volumes:
       - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
       - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
       - ${greenhouse_pdf_volume_logs:-${PWD}/pdf/${ENV}/logs}:/logs
       - ${greenhouse_pdf_volume_pipeline:-${PWD}/pdf/${ENV}/pipeline}:/pipeline
+      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/usr/local/share/ca-certificates/
     labels:
       traefik.enable: true
       # ROUTER
@@ -42,8 +73,9 @@ services:
       traefik.http.routers.pdf.entrypoints: https
       traefik.http.routers.pdf.tls.certresolver: greenhouse-resolver
       # SERVICE
-      traefik.http.services.pdf-service.loadbalancer.server.port: 8080
+      traefik.http.services.pdf.loadbalancer.server.port: 8080
       # MIDDLEWARE
+      traefik.http.routers.pdf.middlewares: authentik@docker
 
   noip-sync:
     image: noipcom/noip-duc:3.3.0

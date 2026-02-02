@@ -4,9 +4,7 @@ http:
     enabled: false
   address: 42.42.42.30:80
   session_ttl: 720h
-users:
-  - name: admin
-    password: $2a$12$q/GkcYQHrfC4Lv4eRaTHse9uFLCSEMeRgwrnLuiqHNY8Pol0iQOL6
+users: []
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -14,7 +12,7 @@ language: en
 theme: auto
 dns:
   bind_hosts:
-    - 42.42.42.30
+    - 0.0.0.0
   port: 53
   anonymize_client_ip: false
   ratelimit: 20
@@ -24,14 +22,15 @@ dns:
   refuse_any: true
   upstream_dns:
     - https://dns10.quad9.net/dns-query
-    - https://noads.joindns4.eu/dns-query
+    - '[/*.greenhouse.es/]192.168.1.30'
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
     - 149.112.112.10
     - 2620:fe::10
     - 2620:fe::fe:10
-  fallback_dns: []
+  fallback_dns:
+    - 192.168.1.30
   upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
@@ -49,6 +48,8 @@ dns:
   cache_ttl_min: 300
   cache_ttl_max: 3600
   cache_optimistic: false
+  cache_optimistic_answer_ttl: 30s
+  cache_optimistic_max_age: 12h
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: false
@@ -63,8 +64,9 @@ dns:
   bootstrap_prefer_ipv6: false
   upstream_timeout: 4s
   private_networks: []
-  use_private_ptr_resolvers: false
-  local_ptr_upstreams: []
+  use_private_ptr_resolvers: true
+  local_ptr_upstreams:
+    - 192.168.1.30
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
@@ -181,53 +183,59 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: dev.greenhouse.ogt
+    - domain: dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: ca.dev.greenhouse.ogt
-      answer: 42.42.42.70
+    - domain: ca.dev.greenhouse.roldan
+      answer: ca
       enabled: true
-    - domain: ca.dev.greenhouse.ogt
+    - domain: ca.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: adguard.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: adguard.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: adguard.dev.greenhouse.ogt
+    - domain: adguard.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: traefik.dev.greenhouse.ogt
+    - domain: traefik.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: traefik.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: traefik.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: jellyfin.dev.greenhouse.ogt
+    - domain: jellyfin.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: jellyfin.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: jellyfin.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: cloud.dev.greenhouse.ogt
+    - domain: cloud.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: cloud.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: cloud.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: it.dev.greenhouse.ogt
+    - domain: it.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: it.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: it.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
-    - domain: pdf.dev.greenhouse.ogt
+    - domain: pdf.dev.greenhouse.roldan
       answer: 192.168.1.10
       enabled: true
-    - domain: pdf.dev.greenhouse.ogt
-      answer: 42.42.42.50
+    - domain: pdf.dev.greenhouse.roldan
+      answer: traefik
+      enabled: true
+    - domain: auth.dev.greenhouse.roldan
+      answer: 192.168.1.10
+      enabled: true
+    - domain: auth.dev.greenhouse.roldan
+      answer: traefik
       enabled: true
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
@@ -263,4 +271,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 31
+schema_version: 32

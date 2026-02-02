@@ -12,6 +12,7 @@ networks:
 include:
   - docker-compose.critical.yml
   - docker-compose.proxy.yml
+  - docker-compose.auth.yml
   - docker-compose.frontend.yml
   - docker-compose.apps.yml
   - docker-compose.zero.trust.yml
