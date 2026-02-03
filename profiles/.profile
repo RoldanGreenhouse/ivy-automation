@@ -14,7 +14,7 @@ function getProfileOsName() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo ".zshrc"
 	else # Linux or in this case Raspberry Pi OS
-		echo "greenhouse.sh"
+		echo ".bashrc"
 	fi
 }
 
@@ -26,7 +26,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "/Users/$USERNAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/etc/profile.d"
+		echo "/home/$USER"
 	fi
 }
 
@@ -56,7 +56,7 @@ function getProfileConfigPath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/home/$USER/$PROFILE_CONFIG_SCRIPT_NAME"
+		echo "$BASE_PATH_SCRIPTS/greenhouse/$PROFILE_CONFIG_SCRIPT_NAME"
 	fi
 }
 
@@ -68,7 +68,7 @@ function getProfileColorsPath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/etc/profile.d/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
+		echo "$BASE_PATH_SCRIPTS/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
 	fi
 }
 
