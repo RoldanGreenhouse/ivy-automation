@@ -11,9 +11,9 @@ services:
     container_name: ${ENV}-traefik
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/ca-certs:ro
       - ${greenhouse_traefik_letsencrypt:-${PWD}/traefik/${ENV}/certificate}:/certificate
-      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8081:8080
       - 80:80          # HTTP

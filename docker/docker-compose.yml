@@ -10,11 +10,61 @@ networks:
           gateway: ${greenhouse_network_gateway}
 
 include:
-  - docker-compose.critical.yml
-  - docker-compose.proxy.yml
-  - docker-compose.auth.yml
-  - docker-compose.frontend.yml
-  - docker-compose.apps.yml
-  - docker-compose.zero.trust.yml
-  - docker-compose.cloud.yml
-  - docker-compose.monitoring.yml
+  - path: docker-compose.critical.yml
+    env_file:
+      - ${PWD}/env/template/ca.env
+      - ${ENV_FILES_PATH}/ca.env
+
+      - ${PWD}/env/template/adguard.env
+      - ${ENV_FILES_PATH}/adguard.env
+
+  - path: docker-compose.proxy.yml
+    env_file:
+      - ${PWD}/env/template/traefik.env
+      - ${ENV_FILES_PATH}/traefik.env
+
+  - path: docker-compose.auth.yml
+    env_file:
+      - ${PWD}/env/template/authentik.env
+      - ${ENV_FILES_PATH}/authentik.env
+  
+  - path: docker-compose.apps.yml
+    env_file:
+      - ${PWD}/env/template/redis.env
+      - ${ENV_FILES_PATH}/redis.env
+
+      - ${PWD}/env/template/it.env
+      - ${ENV_FILES_PATH}/it.env
+
+      - ${PWD}/env/template/pdf.env
+      - ${ENV_FILES_PATH}/pdf.env
+
+      - ${PWD}/env/template/noip.env
+      - ${ENV_FILES_PATH}/noip.env
+
+      - ${PWD}/env/template/nginx.gh.env
+      - ${ENV_FILES_PATH}/nginx.gh.env
+
+      - ${PWD}/env/template/traefik.whoami.env
+      - ${ENV_FILES_PATH}/traefik.whoami.env
+
+      - ${PWD}/env/template/teamspeak.env
+      - ${ENV_FILES_PATH}/teamspeak.env
+
+  - path: docker-compose.zero.trust.yml
+    env_file:
+      - ${PWD}/env/template/twingate.env
+      - ${ENV_FILES_PATH}/twingate.env
+
+  - path: docker-compose.cloud.yml
+    env_file:
+      - ${PWD}/env/template/nextcloud.env
+      - ${ENV_FILES_PATH}/nextcloud.env
+
+      - ${PWD}/env/template/jellyfin.env
+      - ${ENV_FILES_PATH}/jellyfin.env
+
+  - path: docker-compose.monitoring.yml
+    env_file:
+      - ${PWD}/env/template/rpi.monitoring.env
+      - ${ENV_FILES_PATH}/rpi.monitoring.env
