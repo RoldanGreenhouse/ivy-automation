@@ -7,7 +7,6 @@ services:
     image: traefik:3.6.6
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_traefik_ip}
     container_name: ${ENV}-traefik
     scale: ${greenhouse_scale_traefik:-1}
     volumes:

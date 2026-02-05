@@ -7,7 +7,6 @@ services:
     image: smallstep/step-ca:0.29.0
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_ca_ip}
     container_name: ${ENV}-ca
     scale: ${greenhouse_scale_ca}
     ports:
@@ -91,7 +90,6 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: true
-      ### Web UI Router
       # ROUTER
       traefik.http.routers.adguard-ui.rule: Host(`${greenhouse_adguard_host:-adguard.${DOMAIN}}`)
       traefik.http.routers.adguard-ui.entrypoints: https
