@@ -294,12 +294,9 @@ The  [main file](docker/docker-compose.yml)  has been split to avoid to have one
 
 ### Environment File
 
-To wake up this project you will require to setup several environment files:
+On [**Docker**](./docker) folder, there is anothe [**env**](./docker/env) folder the is placed [**template**](./docker/env/template). All configurations will be placed in here and each time you want to create a new environment, just clone them and adapt.
 
-- Main environment file
-- Each service that require his environment file (example [NoIP-duc][noip] for credentials)
-
-You can follow the templates defined on [.template.env](docker\env\.template.env). The service that requires the file, should have a .template file as well.
+Each service has his own config file to avoid a huge config file that make the maintenance a little hard.
 
 ### Port Forwarding for VPN configuration
 
