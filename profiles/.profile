@@ -356,11 +356,13 @@ function greenhouse() {
     local env_file=""
     # Check if env file exists
     if [ "$environment" == "prod" ]; then
-        env_file="$GREENHOUSE_PATH/config/${environment}/.env"
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
     elif [ "$environment" == "preprod" ]; then
-        env_file="$GREENHOUSE_PATH/config/${environment}/.env"
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
+    elif [ "$environment" == "dev" ]; then
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-${PWD}/env/${environment}/.env}"
     else
-        env_file="./env/${environment}/.env"
+        env_file="$GREENHOUSE_CUSTOM_ENV_FILE_PATH"
     fi
 
     echo "Using env file [$env_file]"
