@@ -18,18 +18,22 @@ include:
       - ${PWD}/env/template/adguard.env
       - ${ENV_FILES_PATH}/adguard.env
 
-  - path: docker-compose.proxy.yml
-    env_file:
-      - ${PWD}/env/template/ca.env
-      - ${ENV_FILES_PATH}/ca.env
-
-      - ${PWD}/env/template/traefik.env
-      - ${ENV_FILES_PATH}/traefik.env
-
   - path: docker-compose.auth.yml
     env_file:
       - ${PWD}/env/template/authentik.env
       - ${ENV_FILES_PATH}/authentik.env
+
+  - path: docker-compose.proxy.yml
+    env_file:
+      # Required for Let'scrypt as it will require the certificate
+      - ${PWD}/env/template/ca.env
+      - ${ENV_FILES_PATH}/ca.env
+      # Required for the middleware. On RPI seems more slower and throws error.
+      - ${PWD}/env/template/authentik.env
+      - ${ENV_FILES_PATH}/authentik.env
+
+      - ${PWD}/env/template/traefik.env
+      - ${ENV_FILES_PATH}/traefik.env
   
   - path: docker-compose.apps.yml
     env_file:

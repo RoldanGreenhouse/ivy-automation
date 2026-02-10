@@ -58,4 +58,8 @@ services:
       traefik.http.middlewares.acme-allow.redirectregex.replacement: "http://$${1}/.well-known/acme-challenge/$${2}"
       traefik.http.middlewares.acme-allow.redirectregex.permanent: false
 
+      traefik.http.middlewares.authentik.forwardAuth.address: http://authentik-server:${greenhouse_auth_http_port:-9000}/outpost.goauthentik.io/auth/traefik
+      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+
       traefik.http.routers.dashboard.middlewares: authentik@docker
