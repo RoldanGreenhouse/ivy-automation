@@ -20,6 +20,9 @@ include:
 
   - path: docker-compose.proxy.yml
     env_file:
+      - ${PWD}/env/template/ca.env
+      - ${ENV_FILES_PATH}/ca.env
+
       - ${PWD}/env/template/traefik.env
       - ${ENV_FILES_PATH}/traefik.env
 
