@@ -65,6 +65,10 @@ include:
 
   - path: docker-compose.cloud.yml
     env_file:
+      # Required by nextcloud to allow OAuth2/OpenID to work
+      - ${PWD}/env/template/ca.env
+      - ${ENV_FILES_PATH}/ca.env
+
       - ${PWD}/env/template/nextcloud.env
       - ${ENV_FILES_PATH}/nextcloud.env
 
