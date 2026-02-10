@@ -11,7 +11,7 @@ services:
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}:/ca-certs:ro
+      - ${greenhouse_traefik_ca_cert:-$greenhouse_ca_volume_certs/root_ca.crt}:/ca-certs/greenhouse.${ENV}.crt:ro
       - ${greenhouse_traefik_letsencrypt:-${PWD}/traefik/${ENV}/certificate}:/certificate
     ports:
       - 8081:8080
@@ -20,7 +20,7 @@ services:
       - 443:443/udp    # HTTPS & DoH
     restart: unless-stopped
     environment:
-      LEGO_CA_CERTIFICATES: /ca-certs/root_ca.crt
+      LEGO_CA_CERTIFICATES: /ca-certs/greenhouse.${ENV}.crt
     command:
       - --log.level=${greenhouse_traefik_log_level:-INFO}
       
