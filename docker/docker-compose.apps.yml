@@ -32,7 +32,6 @@ services:
     scale: ${greenhouse_scale_it_tools:-0}
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_it_tools_ip}
     labels:
       traefik.enable: true
       # ROUTER
@@ -53,7 +52,6 @@ services:
     scale: ${greenhouse_scale_pdf_tools:-0}
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_pdf_tools_ip}
     environment:
       MODE: BOTH # Frontend and backend can be split <3
       SECURITY_ENABLELOGIN: ${greenhouse_pdf_enable_login:-false} 
@@ -79,11 +77,32 @@ services:
 
   noip-sync:
     image: noipcom/noip-duc:3.3.0
-    env_file: ${PWD}/env/noip/.${ENV}.env
+    env_file: ${greenhouse_noip_env_file_path:-${PWD}/env/template/noip.env}
     container_name: ${ENV}-noip-sync
     scale: ${greenhouse_scale_noip_sync:-0}
     labels:
       traefik.enable: false
+
+  nginx:
+    image: nginx:1.25.3
+    networks:
+      greenhouse-infra:
+        ipv4_address: ${greenhouse_nginx_static_pages_ip}
+    container_name: ${ENV}-nginx-static-pages
+    scale: ${greenhouse_scale_nginx:-1}
+    volumes:
+      - ${greenhouse_nginx_static_pages_volume_conf:-${PWD}/nginx/${ENV}/conf}:/etc/nginx/conf.d:ro
+      - ${greenhouse_nginx_static_pages_volume_html:-${PWD}/nginx/${ENV}/html}:/usr/share/nginx/html
+    restart: always
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.nginx-static-pages.rule: Host(`${greenhouse_nginx_static_pages_host:-${DOMAIN}}`)
+      traefik.http.routers.nginx-static-pages.entrypoints: https
+      traefik.http.routers.nginx-static-pages.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.nginx-static-pages.loadbalancer.server.port: 80
+      # MIDDLEWARE
 
   whoami:
     image: traefik/whoami
@@ -103,7 +122,7 @@ services:
       # MIDDLEWARE
 
   # The official image does not support RPI, so I have to move to ertagh image.
-  # I'm not happy but it has half million o fdownloads...
+  # I'm not happy but it has half million of downloads...
   teamspeak:
     image: ${greenhouse_teamspeak_image:-ertagh/teamspeak3-server}
     networks:
@@ -116,10 +135,10 @@ services:
       - ${greenhouse_teamspeak_port_query:-10011}:10011     # ServerQuery
       - ${greenhouse_teamspeak_port_file:-30033}:30033      # File transfer
     environment:
-      INIFILE: 1
-      DIST_UPDATE: 0
-      TS_UPDATE: 0
-      TS_UPDATE_BACKUP: 0
+      INIFILE: ${greenhouse_ts_initfile:-1}
+      DIST_UPDATE: ${greenhouse_ts_dist_update:-0}
+      TS_UPDATE: ${greenhouse_ts_update:-0}
+      TS_UPDATE_BACKUP: ${greenhouse_ts_update_backup:-0}
     restart: always
     labels:
       traefik.enable: true

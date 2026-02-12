@@ -14,7 +14,7 @@ function getProfileOsName() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo ".zshrc"
 	else # Linux or in this case Raspberry Pi OS
-		echo "greenhouse.sh"
+		echo ".bashrc"
 	fi
 }
 
@@ -26,7 +26,7 @@ function getBasePath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "/Users/$USERNAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/etc/profile.d"
+		echo "/home/$USER"
 	fi
 }
 
@@ -56,7 +56,7 @@ function getProfileConfigPath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "$BASE_PATH_SCRIPTS/$PROFILE_CONFIG_SCRIPT_NAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/home/$USER/$PROFILE_CONFIG_SCRIPT_NAME"
+		echo "$BASE_PATH_SCRIPTS/greenhouse/$PROFILE_CONFIG_SCRIPT_NAME"
 	fi
 }
 
@@ -68,7 +68,7 @@ function getProfileColorsPath() {
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		echo "$BASE_PATH_SCRIPTS/$PROFILE_COLORS_SCRIPT_NAME"
 	else # Linux or in this case Raspberry Pi OS
-		echo "/etc/profile.d/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
+		echo "$BASE_PATH_SCRIPTS/greenhouse/$PROFILE_COLORS_SCRIPT_NAME"
 	fi
 }
 
@@ -356,11 +356,13 @@ function greenhouse() {
     local env_file=""
     # Check if env file exists
     if [ "$environment" == "prod" ]; then
-        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
     elif [ "$environment" == "preprod" ]; then
-        env_file="$GREENHOUSE_PATH/config/env/.${environment}.env"
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
+    elif [ "$environment" == "dev" ]; then
+        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-${PWD}/env/${environment}/.env}"
     else
-        env_file="./env/.${environment}.env"
+        env_file="$GREENHOUSE_CUSTOM_ENV_FILE_PATH"
     fi
 
     echo "Using env file [$env_file]"

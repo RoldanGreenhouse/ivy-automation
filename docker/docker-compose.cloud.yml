@@ -6,7 +6,6 @@ services:
     scale: ${greenhouse_scale_jellyfin:-0}
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_jellyfin_ip}
     ports:
       - 7359:7359/udp # Client Discovery
       - 1900:1900/udp # DLNA
