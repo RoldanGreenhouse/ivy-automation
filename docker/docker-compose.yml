@@ -69,6 +69,9 @@ include:
       - ${PWD}/env/template/ca.env
       - ${ENV_FILES_PATH}/ca.env
 
+      - ${PWD}/env/template/redis.env
+      - ${ENV_FILES_PATH}/redis.env
+
       - ${PWD}/env/template/nextcloud.env
       - ${ENV_FILES_PATH}/nextcloud.env
 
