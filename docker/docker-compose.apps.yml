@@ -54,10 +54,8 @@ services:
       greenhouse-infra:
     environment:
       MODE: BOTH # Frontend and backend can be split <3
-      SECURITY_ENABLELOGIN: ${greenhouse_pdf_enable_login:-false} 
-      SECURITY_INITIALLOGIN_USERNAME: ${greenhouse_pdf_username:-gh}
-      SECURITY_INITIALLOGIN_PASSWORD: ${greenhouse_pdf_pasword:-12345}
-      SYSTEM_DEFAULTLOCALE: ${greenhouse_pdf_locale:-es-ES}
+      SECURITY_ENABLELOGIN: false    # This will depend if you use authentik or not.
+      LANGS: en_GB                   # Interface language
     volumes:
       - ${greenhouse_pdf_volume_tessdata:-${PWD}/pdf/${ENV}/tessdata}:/usr/share/tessdata
       - ${greenhouse_pdf_volume_configs:-${PWD}/pdf/${ENV}/configs}:/configs
