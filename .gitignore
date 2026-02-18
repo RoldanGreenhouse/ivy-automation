@@ -32,7 +32,10 @@ ansible/logs/**
 __pycache__/
 
 # Secrets from docker in local development
-docker/env
+docker/secrets
+docker/env/dev
+docker/env/prod
+
 # volume - bind 
 docker/adguard/dev/work/**/**
 docker/jellyfin/**/**

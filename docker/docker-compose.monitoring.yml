@@ -5,7 +5,6 @@ services:
       container_name: ${ENV}-rpi-monitor
       networks:
         greenhouse-infra:
-          ipv4_address: ${greenhouse_rpi_monitor_ip}
       volumes:
         - /opt/vc:/opt/vc 
         - /boot:/boot 

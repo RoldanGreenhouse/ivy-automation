@@ -294,12 +294,9 @@ The  [main file](docker/docker-compose.yml)  has been split to avoid to have one
 
 ### Environment File
 
-To wake up this project you will require to setup several environment files:
+On [**Docker**](./docker) folder, there is anothe [**env**](./docker/env) folder the is placed [**template**](./docker/env/template). All configurations will be placed in here and each time you want to create a new environment, just clone them and adapt.
 
-- Main environment file
-- Each service that require his environment file (example [NoIP-duc][noip] for credentials)
-
-You can follow the templates defined on [.template.env](docker\env\.template.env). The service that requires the file, should have a .template file as well.
+Each service has his own config file to avoid a huge config file that make the maintenance a little hard.
 
 ### Port Forwarding for VPN configuration
 
@@ -790,6 +787,51 @@ After this, I just modified the theme and everything was working smoothly.
 > IMPORTANT for **GMAIL**! To make the email work, go to the Profile of the admin user and assign an email, the same given on the IMAP configuration. Is what I did to make it work.
 >
 > https://www.reddit.com/r/NextCloud/comments/1jydvvb/using_gmail_as_email_server/
+
+An issue founded when you have your own CA is that Nextcloud will not allow communications due to the lack of the CA certificate. It not trust it. 
+I make a hook to add manually the certificate and allow the OAuth2 communication that without it, will fail.
+
+As a tip here, I notice meanwhile I was developing, in my Windows machine, the hook works perfectly, on the Raspberry Pi, once I start the service and start to settle, after the installation, this message appear:
+
+> ...
+>
+> => Searching for hook scripts (*.sh) to run, located in the folder "/docker-entrypoint-hooks.d/post-installation"
+> ==> The script "/docker-entrypoint-hooks.d/post-installation/import_greenhouse_ca.sh" was skipped, because it lacks the executable flag
+> ==> Skipped: the "post-installation" folder does not contain any valid scripts
+> ...
+
+This issue came due to the file does not have the required permissions. If you do a `ls -la` over the script, these are the current permissions by default:
+
+```bash
+$ ls -l/greenhouse/ivy-automation/docker/nextcloud-hooks/post-installation
+total 12
+drwxr-xr-x 2 greenhouse greenhouse 4096 feb 16 17:06 .
+drwxr-xr-x 4 greenhouse docker     4096 feb 16 17:04 ..
+-rw-r--r-- 1 greenhouse docker      712 feb 16 16:59 import_greenhouse_ca.sh
+```
+
+Giving the correct permissions to the scripts, will fix it.
+
+```bash
+$ sudo chmod +x /greenhouse/ivy-automation/docker/nextcloud-hooks/post-installation/import_greenhouse_ca.sh
+
+...
+=> Searching for hook scripts (*.sh) to run, located in the folder "/docker-entrypoint-hooks.d/post-installation"
+==> Running the script (cwd: /var/www/html): "/docker-entrypoint-hooks.d/post-installation/import_greenhouse_ca.sh"
+Setting variables...
+Creating path </var/www/html/ca-certificates>
+Duplicating Greenhouse CA certificate <greenhouse_step_ca.crt>...
+Importing certificate </var/www/html/ca-certificates/greenhouse_step_ca.crt> ...
+Import completed. Checking current certificates...
++------------------------+--------------------------------------------------+------------------------------------------+-------------------+--------------------------------------------------+
+| File Name              | Common Name                                      | Organization                             | Valid Until       | Issued By                                        |
++------------------------+--------------------------------------------------+------------------------------------------+-------------------+--------------------------------------------------+
+| greenhouse_step_ca.crt | Greenhouse CA Server - greenhouse.roldan Root CA | Greenhouse CA Server - greenhouse.roldan | February 14, 2036 | Greenhouse CA Server - greenhouse.roldan Root CA |
++------------------------+--------------------------------------------------+------------------------------------------+-------------------+--------------------------------------------------+
+Done!
+==> Finished executing the script: "/docker-entrypoint-hooks.d/post-installation/import_greenhouse_ca.sh"
+...
+```
 
 ### Traefik
 

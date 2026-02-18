@@ -4,7 +4,6 @@ services:
     image: twingate/connector:1.80.0
     networks:
       greenhouse-infra:
-        ipv4_address: ${greenhouse_twingate_ip}
     container_name: ${ENV}-twingate-connector
     scale: ${greenhouse_scale_twingate_connector:-1}
     environment:
