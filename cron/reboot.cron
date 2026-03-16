@@ -1,0 +1,17 @@
+# https://docs.gitlab.com/topics/cron/
+# In cron syntax, the asterisk (*) means ’every,’
+# ┌───────────── minute (0 - 59)
+# │ ┌───────────── hour (0 - 23)
+# │ │ ┌───────────── day of the month (1 - 31)
+# │ │ │ ┌───────────── month (1 - 12)
+# │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
+# │ │ │ │ │
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * * <command to execute>
+
+# To apply this changes, run: 
+# sudo crontab -e
+
+# Restart everyday at 3 o'clock
+0 3 * * * /usr/sbin/shutdown -r now
