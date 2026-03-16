@@ -1,5 +1,5 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" version="29.3.7" pages="6">
-  <diagram name="Page-1" id="Np1vOxiR1sLP8Gy2p4mM">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.3" pages="6">
+  <diagram name="Page-1" id="yNJjRNsP6j9R2DWJOmsD">
     <mxGraphModel dx="2066" dy="1109" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -22,7 +22,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="VPN" id="98UylFErhyVR8gyYw2o9">
+  <diagram name="VPN" id="mwwkLTiPWSGfZ7iFWGxR">
     <mxGraphModel dx="2066" dy="1109" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -307,8 +307,8 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="ZeroTrust Diagram" id="bMzLJgyDrnu_ajbTIIjB">
-    <mxGraphModel dx="2066" dy="1109" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <diagram name="ZeroTrust Diagram" id="p1DGpHuJ2FeqKevkhEhM">
+    <mxGraphModel dx="2175" dy="1167" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="Iv2FHJ47jbh2Bhij0J8N-0" />
         <mxCell id="Iv2FHJ47jbh2Bhij0J8N-1" parent="Iv2FHJ47jbh2Bhij0J8N-0" />
@@ -518,12 +518,6 @@
         <mxCell id="QFE2E3TikC_XdKECNSQf-8" edge="1" parent="QFE2E3TikC_XdKECNSQf-0" source="QFE2E3TikC_XdKECNSQf-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="QFE2E3TikC_XdKECNSQf-2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="QFE2E3TikC_XdKECNSQf-9" edge="1" parent="Ji6k2UyFcBzq0jYsSD2Q-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="90" y="174" as="sourcePoint" />
-            <mxPoint x="170" y="174" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="QFE2E3TikC_XdKECNSQf-10" edge="1" parent="Ji6k2UyFcBzq0jYsSD2Q-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
@@ -692,7 +686,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="Page-2" id="BpbRRsYw3Uh6ShcmfQJ6">
+  <diagram name="Page-2" id="50GU6kjMw3O9KXaM-Sad">
     <mxGraphModel dx="1678" dy="874" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -854,7 +848,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="Stage 1" id="r3mtriB4JtgQh4fJ0MKk">
+  <diagram name="Stage 1" id="x1j6LeZmdPwKc3wnCgPr">
     <mxGraphModel dx="1426" dy="743" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -1252,7 +1246,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="Current Status" id="oFesvroj_Mi9kdpzty1r">
+  <diagram name="Current Status" id="VTvkRjqhM0qr1biU1JCu">
     <mxGraphModel dx="1372" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
