@@ -290,8 +290,8 @@ function ssh-with() {
 }
 
 function greenhouse-service-setup() {
-    echo -e "${GRE}Setting up the Greenhouse Services from ${IVY_PATH}\systemd\greenhouse.service.sh ${NC}"
-    ${IVY_PATH}\systemd\greenhouse.service.sh
+    echo -e "${GRE}Setting up the Greenhouse Services from ${IVY_PATH}/systemd/greenhouse.service.sh ${NC}"
+    ${IVY_PATH}/systemd/greenhouse.service.sh
 }
 
 function greenhouse-help() {
