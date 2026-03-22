@@ -291,6 +291,8 @@ function ssh-with() {
 
 function greenhouse-service-setup() {
     echo -e "${GRE}Setting up the Greenhouse Services from ${IVY_PATH}/systemd/greenhouse.service.sh ${NC}"
+    echo -e "${BYEL}Warning: ${YEL}If you have a Permission Error, make sure to run this commands on folder.${NC}"
+    echo -e "${GRE}chmod -R +x "${IVY_REPOSITY_PATH}/systemd"${NC}"
     ${IVY_PATH}/systemd/greenhouse.service.sh
 }
 
