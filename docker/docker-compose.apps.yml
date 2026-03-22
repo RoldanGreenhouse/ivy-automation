@@ -47,7 +47,7 @@ services:
     depends_on:
       ca-server:
         condition: service_healthy
-    image: stirlingtools/stirling-pdf:2.3.1
+    image: stirlingtools/stirling-pdf:2.5.0
     container_name: ${ENV}-pdf-tools
     scale: ${greenhouse_scale_pdf_tools:-0}
     networks:
