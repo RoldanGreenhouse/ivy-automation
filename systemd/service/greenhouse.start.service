@@ -1,0 +1,11 @@
+[Unit]
+Description=Greenhouse start script (user session)
+After=default.target
+
+[Service]
+Type=oneshot
+ExecStart=__IVY_REPOSITY_PATH__/systemd/scripts/user.start.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

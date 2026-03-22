@@ -1,0 +1,14 @@
+[Unit]
+Description=Greenhouse stop script (before shutdown/reboot)
+Before=shutdown.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=__IVY_REPOSITY_PATH__/systemd/scripts/user.stop.sh
+TimeoutStopSec=120
+
+[Install]
+WantedBy=default.target
