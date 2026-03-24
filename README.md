@@ -36,7 +36,7 @@ Specified on file [**reboot.cron**](.\cron\reboot.cron), a task with the reboot 
 
 #### Backup
 
-WIP
+We will use [Borg](https://borgbackup.readthedocs.io/) for this.
 
 ### Firewall
 
