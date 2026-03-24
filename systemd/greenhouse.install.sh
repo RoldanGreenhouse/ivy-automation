@@ -22,6 +22,9 @@ fi
 
 mkdir -p "$USER_SYSTEMD_DIR"
 
+read -p "Enter the Environment File Path for Systemd: " ENV_FILE
+ENV_FILE="${ENV_FILE%/}"   # remove trailing slash
+
 read -p "Enter the absolute path where logs should be stored (e.g., /home/$USER/logs/greenhouse): " LOG_DIR
 LOG_DIR="${LOG_DIR%/}"   # remove trailing slash
 # Create the log directory if it doesn't exist
@@ -40,11 +43,13 @@ for service in greenhouse.start.service greenhouse.stop.service; do
         echo "ERROR: No se encuentra $src"
         exit 1
     fi
-    echo "Working on $service... Replacing [__IVY_REPOSITY_PATH__] for path [$src]"
-    echo "Replacing [__IVY_REPOSITY_PATH__] for path [$src]"
+    echo "Working on $service..."
+    echo "Replacing [__IVY_REPOSITY_PATH__] for path [$BASE_DIR]"
     echo "Replacing [__LOG_DIR_] for path [$LOG_DIR]"
-    sed -e "s|__IVY_REPOSITY_PATH__|$src|g" \
+    echo "Replacing [__ENV_FILE__] for path [$ENV_FILE]"
+    sed -e "s|__IVY_REPOSITY_PATH__|$BASE_DIR|g" \
         -e "s|__LOG_DIR__|$LOG_DIR|g" \
+        -e "s|__ENV_FILE__|$ENV_FILE|g" \
         "$src" > "$dst"
     chmod 644 "$dst"
 done

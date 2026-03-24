@@ -4,7 +4,8 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=__IVY_REPOSITY_PATH__/systemd/scripts/user.start.sh
+EnvironmentFile=__ENV_FILE__
+ExecStart=__IVY_REPOSITY_PATH__/scripts/user.start.sh
 RemainAfterExit=yes
 StandardOutput=append:__LOG_DIR__/greenhouse.start.log
 StandardError=append:__LOG_DIR__/greenhouse.start.log
