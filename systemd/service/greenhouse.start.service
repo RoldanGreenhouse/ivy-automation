@@ -6,6 +6,8 @@ After=default.target
 Type=oneshot
 ExecStart=__IVY_REPOSITY_PATH__/systemd/scripts/user.start.sh
 RemainAfterExit=yes
+StandardOutput=append:__LOG_DIR__/greenhouse.start.log
+StandardError=append:__LOG_DIR__/greenhouse.start.log
 
 [Install]
 WantedBy=default.target

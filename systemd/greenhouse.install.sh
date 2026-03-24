@@ -22,6 +22,16 @@ fi
 
 mkdir -p "$USER_SYSTEMD_DIR"
 
+read -p "Enter the absolute path where logs should be stored (e.g., /home/$USER/logs/greenhouse): " LOG_DIR
+LOG_DIR="${LOG_DIR%/}"   # remove trailing slash
+# Create the log directory if it doesn't exist
+mkdir -p "$LOG_DIR"
+if [ ! -w "$LOG_DIR" ]; then
+    echo "ERROR: Cannot write to '$LOG_DIR'. Please check permissions."
+    exit 1
+fi
+echo "Logs will be written to [$LOG_DIR]"
+
 echo "Copy Service files [greenhouse.start.service|greenhouse.stop.service] and processing them..."
 for service in greenhouse.start.service greenhouse.stop.service; do
     src="$BASE_DIR/service/$service"
@@ -31,8 +41,11 @@ for service in greenhouse.start.service greenhouse.stop.service; do
         exit 1
     fi
     echo "Working on $service... Replacing [__IVY_REPOSITY_PATH__] for path [$src]"
-    # Reemplazar __IVY_REPOSITY_PATH__ por la ruta proporcionada
-    sed "s|__IVY_REPOSITY_PATH__|$IVY_PATH|g" "$src" > "$dst"
+    echo "Replacing [__IVY_REPOSITY_PATH__] for path [$src]"
+    echo "Replacing [__LOG_DIR_] for path [$LOG_DIR]"
+    sed -e "s|__IVY_REPOSITY_PATH__|$src|g" \
+        -e "s|__LOG_DIR__|$LOG_DIR|g" \
+        "$src" > "$dst"
     chmod 644 "$dst"
 done
 
