@@ -30,13 +30,20 @@ Each service has his own config file to avoid a huge config file that make the m
 
 ### Tasks
 
-##### CRON jobs
+| Task                  | Description                                                  | Type     |
+| --------------------- | ------------------------------------------------------------ | -------- |
+| On Stop Raspberry Pi  | Delete the docker compose of Greenhouse.<br />It will execute [user.stop.sh](.\systemd\scripts\user.stop.sh) script. | Systemd  |
+| On Start Raspberry Pi | Will delete and start the docker compose of Greenhouse.<br />It will execute [user.start.sh](.\systemd\scripts\user.start.sh) script. | Systemd  |
+| Backup                | Will trigger a daily backup using Borg.<br />It will execute [backup.sh](.\cron\scripts\backup.sh) script. | Cron Job |
+
+#### Systemd
 
 Specified on file [**reboot.cron**](.\cron\reboot.cron), a task with the reboot of the RPI in daily bases.
 
-#### Backup
+#### CRON
 
-We will use [Borg](https://borgbackup.readthedocs.io/) for this.
+We will use [Borg](https://borgbackup.readthedocs.io/) to handle the RPI backups. On daily bases and with a [configuration](.\cron\scripts\backup\borg.env) file specified, will handle the backups.
+The initial configuration of Borg has to be done manually, the setup of the repository. Once done that, just create the config file and the passphrase somewhere.
 
 ### Firewall
 
