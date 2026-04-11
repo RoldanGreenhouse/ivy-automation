@@ -15,3 +15,5 @@
 
 # Restart everyday at 3 o'clock
 0 3 * * * /usr/sbin/shutdown -r now
+# Do a daily backup
+0 2 * * * /workspace/greenhouse/ivy-automation/cron/scripts/backup.sh -c /greenhouse/env/borg.env -p /greenhouse/secrets/borg.passphrase --log-path /greenhouse/logs/backup
