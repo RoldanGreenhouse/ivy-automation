@@ -289,6 +289,13 @@ function ssh-with() {
     fi
 }
 
+function greenhouse-service-setup() {
+    echo -e "${GRE}Setting up the Greenhouse Services from ${IVY_PATH}/systemd/greenhouse.service.sh ${NC}"
+    echo -e "${BYEL}Warning: ${YEL}If you have a Permission Error, make sure to run this commands on folder.${NC}"
+    echo -e "${GRE}chmod -R +x "${IVY_REPOSITY_PATH}/systemd"${NC}"
+    ${IVY_PATH}/systemd/greenhouse.service.sh
+}
+
 function greenhouse-help() {
     echo -e "${GRE}Usage: greenhouse ${BLU}<environment> ${PUR}<command>${NC}"
     echo -e ""
@@ -448,7 +455,10 @@ function info() {
     echo ""
     echo -e "${RED} -$BRED greenhouse ${GRE}:${YEL} Deploy docker-compose of greenhouse. ${NC}"
     echo -e "${RED} -$BRED greenhouse-help ${GRE}:${YEL} greenhouse documentation function. ${NC}"
+    echo ""
     greenhouse-help
+    echo ""
+    echo -e "${RED} -$BRED greenhouse-service-setup ${GRE}:${YEL} It set up the User services recommended by Greenhouse team. ${NC}"
     echo ""
     echo -e "${RED} -$BRED goto ${GRE}:${YEL} giving the \"where\" will do a cd to that address. ${NC}"
     gotoHelp

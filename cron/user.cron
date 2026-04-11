@@ -10,8 +10,5 @@
 # │ │ │ │ │
 # * * * * * <command to execute>
 
-# To apply this changes, run: 
-# sudo crontab -e
-
-# Restart everyday at 3 o'clock
-0 3 * * * /usr/sbin/shutdown -r now
+# To apply this changes, as is only at user level, run: 
+# crontab -e

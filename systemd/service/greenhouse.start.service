@@ -1,0 +1,14 @@
+[Unit]
+Description=Greenhouse start script (user session)
+After=default.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=__ENV_FILE__
+ExecStart=__IVY_REPOSITY_PATH__/scripts/user.start.sh
+RemainAfterExit=yes
+StandardOutput=append:__LOG_DIR__/greenhouse.start.log
+StandardError=append:__LOG_DIR__/greenhouse.start.log
+
+[Install]
+WantedBy=default.target
