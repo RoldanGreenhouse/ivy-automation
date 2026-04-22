@@ -1,7 +1,7 @@
 services:
 
   twingate-connector:
-    image: twingate/connector:1.80.0
+    image: twingate/connector:${greenhouse_version_twingate-connector}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-twingate-connector

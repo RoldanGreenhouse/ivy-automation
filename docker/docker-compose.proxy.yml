@@ -4,7 +4,7 @@ services:
     depends_on:
       ca-server:
         condition: service_healthy
-    image: traefik:3.6.6
+    image: traefik:${greenhouse_version_traefik}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-traefik

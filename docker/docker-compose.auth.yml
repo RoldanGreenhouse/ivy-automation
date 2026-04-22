@@ -38,7 +38,7 @@ services:
         condition: service_healthy
       ca-server:
         condition: service_healthy
-    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
+    image: authentik/server:${greenhouse_version_authentik-server}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-authentik-server
@@ -95,7 +95,7 @@ services:
         condition: service_healthy
       ca-server:
         condition: service_healthy
-    image: authentik/server:${greenhouse_auth_image_version:-2025.12.1}
+    image: authentik/server:${greenhouse_version_authentik-worker}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-authentik-worker

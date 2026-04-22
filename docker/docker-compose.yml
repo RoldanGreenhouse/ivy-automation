@@ -12,6 +12,9 @@ networks:
 include:
   - path: docker-compose.critical.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       - ${PWD}/env/template/ca.env
       - ${ENV_FILES_PATH}/ca.env
 
@@ -20,11 +23,17 @@ include:
 
   - path: docker-compose.auth.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       - ${PWD}/env/template/authentik.env
       - ${ENV_FILES_PATH}/authentik.env
 
   - path: docker-compose.proxy.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       # Required for Let'scrypt as it will require the certificate
       - ${PWD}/env/template/ca.env
       - ${ENV_FILES_PATH}/ca.env
@@ -37,6 +46,9 @@ include:
   
   - path: docker-compose.apps.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       - ${PWD}/env/template/redis.env
       - ${ENV_FILES_PATH}/redis.env
 
@@ -60,11 +72,17 @@ include:
 
   - path: docker-compose.zero.trust.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       - ${PWD}/env/template/twingate.env
       - ${ENV_FILES_PATH}/twingate.env
 
   - path: docker-compose.cloud.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+
       # Required by nextcloud to allow OAuth2/OpenID to work
       - ${PWD}/env/template/ca.env
       - ${ENV_FILES_PATH}/ca.env
@@ -80,5 +98,8 @@ include:
 
   - path: docker-compose.monitoring.yml
     env_file:
+      - ${PWD}/env/template/versions.env
+      - ${ENV_FILES_PATH}/versions.env
+      
       - ${PWD}/env/template/rpi.monitoring.env
       - ${ENV_FILES_PATH}/rpi.monitoring.env

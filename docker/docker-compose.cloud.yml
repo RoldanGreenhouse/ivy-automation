@@ -1,7 +1,7 @@
 services:
 
   jellyfin:
-    image: jellyfin/jellyfin:2025120105
+    image: jellyfin/jellyfin:${greenhouse_version_jellyfin}
     container_name: ${ENV}-jellyfin
     scale: ${greenhouse_scale_jellyfin:-0}
     networks:
@@ -32,7 +32,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    image: nextcloud:31.0.13
+    image: nextcloud:${greenhouse_version_nextcloud}
     container_name: ${ENV}-nextcloud
     scale: ${greenhouse_scale_nextcloud:-0}
     networks:

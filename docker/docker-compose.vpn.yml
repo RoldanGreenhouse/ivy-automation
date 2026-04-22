@@ -1,7 +1,7 @@
 services:
 
   wireguard:
-    image: ghcr.io/wg-easy/wg-easy:15.1.0
+    image: ghcr.io/wg-easy/wg-easy:${greenhouse_version_wireguard}
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_wireguard_ip}
