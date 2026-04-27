@@ -1,6 +1,6 @@
 services:
     rpi-monitor:
-      image: michaelmiklis/rpi-monitor:latest
+      image: michaelmiklis/rpi-monitor:${greenhouse_version_rpi_monitor}
       scale: ${greenhouse_scale_rpi_monitor:-0}
       container_name: ${ENV}-rpi-monitor
       networks:

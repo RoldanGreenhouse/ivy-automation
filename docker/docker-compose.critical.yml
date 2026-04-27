@@ -4,7 +4,7 @@ services:
     depends_on:
       ca-postgres:
         condition: service_healthy
-    image: smallstep/step-ca:0.29.0
+    image: smallstep/step-ca:${greenhouse_version_ca_server}
     networks:
       greenhouse-infra:
     container_name: ${ENV}-ca
@@ -73,7 +73,7 @@ services:
       traefik.enable: false
 
   adguard:
-    image: adguard/adguardhome:v0.107.71
+    image: adguard/adguardhome:${greenhouse_version_adguard}
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_adguard_ip}
