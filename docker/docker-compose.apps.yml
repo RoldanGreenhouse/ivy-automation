@@ -27,7 +27,7 @@ services:
       traefik.enable: false
 
   it-tools:
-    image: corentinth/it-tools:${greenhouse_version_it-tools}
+    image: corentinth/it-tools:${greenhouse_version_it_tools}
     container_name: ${ENV}-it-tools
     scale: ${greenhouse_scale_it_tools:-0}
     networks:
@@ -47,7 +47,7 @@ services:
     depends_on:
       ca-server:
         condition: service_healthy
-    image: stirlingtools/stirling-pdf:${greenhouse_version_pdf-tools}
+    image: stirlingtools/stirling-pdf:${greenhouse_version_pdf_tools}
     container_name: ${ENV}-pdf-tools
     scale: ${greenhouse_scale_pdf_tools:-0}
     networks:
@@ -74,7 +74,7 @@ services:
       traefik.http.routers.pdf.middlewares: authentik@docker
 
   noip-sync:
-    image: noipcom/noip-duc:${greenhouse_version_noip-sync}
+    image: noipcom/noip-duc:${greenhouse_version_noip_sync}
     env_file: ${greenhouse_noip_env_file_path:-${PWD}/env/template/noip.env}
     container_name: ${ENV}-noip-sync
     scale: ${greenhouse_scale_noip_sync:-0}
