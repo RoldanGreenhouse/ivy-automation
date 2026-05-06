@@ -11,8 +11,8 @@ services:
     scale: ${greenhouse_scale_traefik:-1}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${greenhouse_traefik_ca_cert:-$greenhouse_ca_volume_certs/root_ca.crt}:/ca-certs/greenhouse.${ENV}.crt:ro
-      - ${greenhouse_traefik_letsencrypt:-${PWD}/traefik/${ENV}/certificate}:/certificate
+      - ${greenhouse_traefik_letsencrypt:-${VOLUMES_PATH}/traefik/certificate}:/certificate
+      - ${greenhouse_traefik_ca_cert:-${greenhouse_ca_volume_certs}/root_ca.crt}:/ca-certs/greenhouse.${ENV}.crt:ro
     ports:
       - 8081:8080
       - 80:80          # HTTP

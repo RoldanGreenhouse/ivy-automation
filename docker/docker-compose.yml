@@ -12,94 +12,94 @@ networks:
 include:
   - path: docker-compose.critical.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
-      - ${PWD}/env/template/ca.env
+      - ${PWD}/env/template/config/ca.env
       - ${ENV_FILES_PATH}/ca.env
 
-      - ${PWD}/env/template/adguard.env
+      - ${PWD}/env/template/config/adguard.env
       - ${ENV_FILES_PATH}/adguard.env
 
   - path: docker-compose.auth.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
-      - ${PWD}/env/template/authentik.env
+      - ${PWD}/env/template/config/authentik.env
       - ${ENV_FILES_PATH}/authentik.env
 
   - path: docker-compose.proxy.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
       # Required for Let'scrypt as it will require the certificate
-      - ${PWD}/env/template/ca.env
+      - ${PWD}/env/template/config/ca.env
       - ${ENV_FILES_PATH}/ca.env
       # Required for the middleware. On RPI seems more slower and throws error.
-      - ${PWD}/env/template/authentik.env
+      - ${PWD}/env/template/config/authentik.env
       - ${ENV_FILES_PATH}/authentik.env
 
-      - ${PWD}/env/template/traefik.env
+      - ${PWD}/env/template/config/traefik.env
       - ${ENV_FILES_PATH}/traefik.env
   
   - path: docker-compose.apps.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
-      - ${PWD}/env/template/redis.env
+      - ${PWD}/env/template/config/redis.env
       - ${ENV_FILES_PATH}/redis.env
 
-      - ${PWD}/env/template/it.env
+      - ${PWD}/env/template/config/it.env
       - ${ENV_FILES_PATH}/it.env
 
-      - ${PWD}/env/template/pdf.env
+      - ${PWD}/env/template/config/pdf.env
       - ${ENV_FILES_PATH}/pdf.env
 
-      - ${PWD}/env/template/noip.env
+      - ${PWD}/env/template/config/noip.env
       - ${ENV_FILES_PATH}/noip.env
 
-      - ${PWD}/env/template/nginx.gh.env
+      - ${PWD}/env/template/config/nginx.gh.env
       - ${ENV_FILES_PATH}/nginx.gh.env
 
-      - ${PWD}/env/template/traefik.whoami.env
+      - ${PWD}/env/template/config/traefik.whoami.env
       - ${ENV_FILES_PATH}/traefik.whoami.env
 
-      - ${PWD}/env/template/teamspeak.env
+      - ${PWD}/env/template/config/teamspeak.env
       - ${ENV_FILES_PATH}/teamspeak.env
 
   - path: docker-compose.zero.trust.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
-      - ${PWD}/env/template/twingate.env
+      - ${PWD}/env/template/config/twingate.env
       - ${ENV_FILES_PATH}/twingate.env
 
   - path: docker-compose.cloud.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
 
       # Required by nextcloud to allow OAuth2/OpenID to work
-      - ${PWD}/env/template/ca.env
+      - ${PWD}/env/template/config/ca.env
       - ${ENV_FILES_PATH}/ca.env
 
-      - ${PWD}/env/template/redis.env
+      - ${PWD}/env/template/config/redis.env
       - ${ENV_FILES_PATH}/redis.env
 
-      - ${PWD}/env/template/nextcloud.env
+      - ${PWD}/env/template/config/nextcloud.env
       - ${ENV_FILES_PATH}/nextcloud.env
 
-      - ${PWD}/env/template/jellyfin.env
+      - ${PWD}/env/template/config/jellyfin.env
       - ${ENV_FILES_PATH}/jellyfin.env
 
   - path: docker-compose.monitoring.yml
     env_file:
-      - ${PWD}/env/template/versions.env
+      - ${PWD}/env/template/config/versions.env
       - ${ENV_FILES_PATH}/versions.env
       
-      - ${PWD}/env/template/rpi.monitoring.env
+      - ${PWD}/env/template/config/rpi.monitoring.env
       - ${ENV_FILES_PATH}/rpi.monitoring.env

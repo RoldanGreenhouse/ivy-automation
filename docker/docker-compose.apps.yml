@@ -75,7 +75,7 @@ services:
 
   noip-sync:
     image: noipcom/noip-duc:${greenhouse_version_noip_sync}
-    env_file: ${greenhouse_noip_env_file_path:-${PWD}/env/template/noip.env}
+    env_file: ${greenhouse_noip_env_file_path:-${PWD}/env/template/config/noip.env}
     container_name: ${ENV}-noip-sync
     scale: ${greenhouse_scale_noip_sync:-0}
     labels:
@@ -122,7 +122,7 @@ services:
   # The official image does not support RPI, so I have to move to ertagh image.
   # I'm not happy but it has half million of downloads...
   teamspeak:
-    image: ${greenhouse_teamspeak_image:-ertagh/teamspeak3-server}:${greenhouse_version_teamspeak}
+    image: ${greenhouse_teamspeak_image:-ertagh/teamspeak3-server}
     networks:
       greenhouse-infra:
         ipv4_address: ${greenhouse_teamspeak_ip}

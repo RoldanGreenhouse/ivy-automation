@@ -65,7 +65,7 @@ services:
       - ${greenhouse_nextcloud_vol_config:-${PWD}/nextcloud/config}:/var/www/html/config
       - ${greenhouse_nextcloud_vol_data:-${PWD}/nextcloud/data}:/var/www/html/data
       - ${greenhouse_nextcloud_post_installation_script:-${PWD}/nextcloud-hooks/post-installation}:/docker-entrypoint-hooks.d/post-installation
-      - ${greenhouse_ca_volume_certs:-${PWD}/step-ca/${ENV}/certs}/root_ca.crt:/greenhouse/ca-certificates/greenhouse_step_ca.crt
+      - ${greenhouse_nextcloud_ca_cert:-${greenhouse_ca_volume_certs}/root_ca.crt}:/greenhouse/ca-certificates/greenhouse_step_ca.crt:ro
     entrypoint: >
       sh -c '
         echo "Giving required permissions for Step-CA certificate..."

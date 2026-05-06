@@ -297,13 +297,14 @@ function greenhouse-service-setup() {
 }
 
 function greenhouse-help() {
-    echo -e "${GRE}Usage: greenhouse ${BLU}<environment> ${PUR}<command>${NC}"
+    echo -e "${GRE}Usage: greenhouse ${BLU}<environment> ${PUR}<command> ${WHI}<path?>${NC}"
     echo -e ""
     echo -e "${GRE}Manage docker-compose environments.${NC}"
     echo -e ""
     echo -e "${YEL}Parameters:${NC}"
-    echo -e "  ${BLU}environment: ${GRE}Target environment ${BGRE}[dev | test | preprod | prod].${NC}"
+    echo -e "  ${BLU}environment: ${GRE}Target environment ${BGRE}. If value is [path], provide the path after command.${NC}"
     echo -e "  ${PUR}command:     ${GRE}Action to perform.${NC}"
+    echo -e "  ${WHI}path:        ${GRE}Path to .env file.${NC}"
     echo -e ""
     echo -e "${YEL}Available commands:${NC}"
     echo -e "${PUR}  up, u        ${BPUR}- ${GRE}Start containers in detached mode.${NC}"
@@ -318,32 +319,31 @@ function greenhouse-help() {
     echo -e "  ${GRE}greenhouse ${BLU}prod ${PUR}stop${NC}"
     echo -e "  ${GRE}greenhouse ${BLU}test ${PUR}restart${NC}"
     echo -e "  ${GRE}greenhouse ${BLU}preprod ${PUR}su${NC}"
+    echo -e "  ${GRE}greenhouse ${BLU}path ${PUR}su ${WHI}/greenhouse/custom/path/config${NC}"
 }
 
 function greenhouse() {
+    local environment="$1"
+    local command="$2"
+    local path_config="$3"
+
+    local expected_paramateres=0
+
+    if [ "${environment}" == "path" ]; then
+        expected_paramateres=3
+    else
+        expected_paramateres=2
+    fi
+
     # Check parameter count
-    if [ $# -ne 2 ]; then
-        echo -e "${RED}Error: ${YEL}Invalid number of parameters $NC"
+    if [ $# -ne $expected_paramateres ]; then
+        echo -e "${RED}Error: ${YEL}Invalid number of parameters [$expected_paramateres] $NC"
         greenhouse-help
         return 1
     fi
 
-    local environment="$1"
-    local command="$2"
-    local compose_file="docker-compose.yml"
 
-    # Validate environment
-    case "$environment" in
-        dev|test|prod|preprod)
-            # Valid environment, continue
-            ;;
-        *)
-            echo -e "${RED}Error: ${YEL}Invalid environment '$environment'$NC"
-            greenhouse-help
-            return 1
-            ;;
-    esac
-    
+    local compose_file="docker-compose.yml"
 
     # Check if we're in the correct directory
     if [ "$(pwd)" != "$IVY_PATH/docker" ]; then
@@ -361,16 +361,16 @@ function greenhouse() {
     fi
 
     local env_file=""
-    # Check if env file exists
-    if [ "$environment" == "prod" ]; then
-        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
-    elif [ "$environment" == "preprod" ]; then
-        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-$GREENHOUSE_PATH/config/${environment}/.env}"
-    elif [ "$environment" == "dev" ]; then
-        env_file="${GREENHOUSE_PROD_ENV_FILE_PATH:-${PWD}/env/${environment}/.env}"
-    else
-        env_file="$GREENHOUSE_CUSTOM_ENV_FILE_PATH"
-    fi
+
+        # Validate environment
+    case "$environment" in
+        path)
+            env_file="${path_config}/.env"
+            ;;
+        *)
+            env_file="$(PWD)/env/${environment}/config/.env"
+            ;;
+    esac
 
     echo "Using env file [$env_file]"
     if [ ! -f "$env_file" ]; then
@@ -492,6 +492,20 @@ alias push="git push"
 alias add="git add"
 alias restore="git restore"
 alias dbranch="git branch -d"
+
+# Greenhouse Aliases
+
+# dev
+alias gddu="greenhouse dev du"
+alias gdd="greenhouse dev d"
+alias gdu="greenhouse dev u"
+alias gds="greenhouse dev s"
+
+#prod
+alias gpdu="greenhouse prod du $GREENHOUSE_PROD_ENV_FILE_PATH"
+alias gpd="greenhouse prod d $GREENHOUSE_PROD_ENV_FILE_PATH"
+alias gpu="greenhouse prod u $GREENHOUSE_PROD_ENV_FILE_PATH"
+alias gps="greenhouse prod s $GREENHOUSE_PROD_ENV_FILE_PATH"
 
 # Other Aliases
 
