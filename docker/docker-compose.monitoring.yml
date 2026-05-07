@@ -1,23 +1,50 @@
 services:
-    rpi-monitor:
-      image: michaelmiklis/rpi-monitor:${greenhouse_version_rpi_monitor}
-      scale: ${greenhouse_scale_rpi_monitor:-0}
-      container_name: ${ENV}-rpi-monitor
-      networks:
-        greenhouse-infra:
-      volumes:
-        - /opt/vc:/opt/vc 
-        - /boot:/boot 
-        - /sys:/dockerhost/sys:ro 
-        - /etc:/dockerhost/etc:ro 
-        - /proc:/dockerhost/proc:ro 
-        - /usr/lib:/dockerhost/usr/lib:ro
-      labels:
-        traefik.enable: true
-        # ROUTER
-        traefik.http.routers.rpi-monitor.rule: Host(`${greenhouse_rpi_monitor_host:-rpi.${DOMAIN}}`)
-        traefik.http.routers.rpi-monitor.entrypoints: https
-        traefik.http.routers.rpi-monitor.tls.certresolver: greenhouse-resolver
-        # SERVICE
-        traefik.http.services.rpi-monitor-service.loadbalancer.server.port: 8888
-        # MIDDLEWARE
+  rpi-monitor:
+    image: michaelmiklis/rpi-monitor:${greenhouse_version_rpi_monitor}
+    scale: ${greenhouse_scale_rpi_monitor:-0}
+    container_name: ${ENV}-rpi-monitor
+    networks:
+      greenhouse-infra:
+    volumes:
+      - /opt/vc:/opt/vc 
+      - /boot:/boot 
+      - /sys:/dockerhost/sys:ro 
+      - /etc:/dockerhost/etc:ro 
+      - /proc:/dockerhost/proc:ro 
+      - /usr/lib:/dockerhost/usr/lib:ro
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.rpi-monitor.rule: Host(`${greenhouse_rpi_monitor_host:-rpi.${DOMAIN}}`)
+      traefik.http.routers.rpi-monitor.entrypoints: https
+      traefik.http.routers.rpi-monitor.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.rpi-monitor-service.loadbalancer.server.port: 8888
+      # MIDDLEWARE
+
+  grafana:
+    image: grafana/grafana:${greenhouse_version_grafana}
+    container_name: ${ENV}-grafana
+    scale: ${greenhouse_scale_grafana:-1}
+    networks:
+      greenhouse-infra:
+    environment:
+      GF_SECURITY_ADMIN_USER: ${greenhouse_grafana_admin_user:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${greenhouse_grafana_admin_password:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${greenhouse_grafana_root_url:-https://${greenhouse_grafana_host:-grafana.${DOMAIN}}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - ${greenhouse_grafana_data:-${VOLUMES_PATH}/grafana/data}:/var/lib/grafana
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.grafana.rule: Host(`${greenhouse_grafana_host:-grafana.${DOMAIN}}`)
+      traefik.http.routers.grafana.entrypoints: https
+      traefik.http.routers.grafana.tls: true
+      traefik.http.routers.grafana.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.grafana-service.loadbalancer.server.port: 3000
+      # MIDDLEWARE
+      # traefik.http.routers.grafana.middlewares: authentik@docker
