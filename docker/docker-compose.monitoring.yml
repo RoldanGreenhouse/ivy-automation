@@ -48,3 +48,33 @@ services:
       traefik.http.services.grafana-service.loadbalancer.server.port: 3000
       # MIDDLEWARE
       # traefik.http.routers.grafana.middlewares: authentik@docker
+
+  # System metric collector # For Linux
+  node-exporter:
+    image: prom/node-exporter:${greenhouse_version_node_exporter}
+    container_name: ${ENV}-node_exporter
+    scale: ${greenhouse_scale_node_exporter:-1}
+    networks:
+      greenhouse-infra:
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      # Exclude pseudo-filesystems to reduce noise
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      # Enable additional collectors for Raspberry Pi
+      - '--collector.textfile.directory=/var/lib/node_exporter/textfile_collector'
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      # ROUTER
+      traefik.http.routers.node-exporter.rule: Host(`${greenhouse_node_exporter_host:-node-exporter.${DOMAIN}}`)
+      traefik.http.routers.node-exporter.entrypoints: https
+      traefik.http.routers.node-exporter.tls: true
+      traefik.http.routers.node-exporter.tls.certresolver: greenhouse-resolver
+      # SERVICE
+      traefik.http.services.node-exporter-service.loadbalancer.server.port: 9100

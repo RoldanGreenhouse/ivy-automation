@@ -103,3 +103,9 @@ include:
       
       - ${PWD}/env/template/config/rpi.monitoring.env
       - ${ENV_FILES_PATH}/rpi.monitoring.env
+
+      - ${PWD}/env/template/config/grafana.env
+      - ${ENV_FILES_PATH}/grafana.env
+
+      - ${PWD}/env/template/config/node_exporter.env
+      - ${ENV_FILES_PATH}/node_exporter.env
